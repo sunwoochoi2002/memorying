@@ -25,20 +25,42 @@ export interface WritingItem {
   coverImageAlt?: string;
 }
 
+export function getWritingSourceId(entry: string): string {
+  return entry.replace(/\.(md|mdx)$/, '');
+}
+
 export function normalizeWritingSlug(id: string): string {
   return id.replace(/\/index$/, '');
 }
 
+export function compareCodePointStrings(left: string, right: string): number {
+  const leftCodePoints = Array.from(left, (character) => character.codePointAt(0)!);
+  const rightCodePoints = Array.from(right, (character) => character.codePointAt(0)!);
+  const length = Math.min(leftCodePoints.length, rightCodePoints.length);
+
+  for (let index = 0; index < length; index += 1) {
+    const difference = leftCodePoints[index] - rightCodePoints[index];
+    if (difference !== 0) return difference;
+  }
+
+  return leftCodePoints.length - rightCodePoints.length;
+}
+
+export function compareWritingItems(
+  left: Pick<WritingItem, 'publishedAt' | 'slug'>,
+  right: Pick<WritingItem, 'publishedAt' | 'slug'>,
+): number {
+  const byDate = right.publishedAt.getTime() - left.publishedAt.getTime();
+  return byDate || compareCodePointStrings(left.slug, right.slug);
+}
+
 export function sortWriting<T extends Pick<WritingItem, 'publishedAt' | 'slug'>>(entries: T[]): T[] {
-  return [...entries].sort((left, right) => {
-    const byDate = right.publishedAt.getTime() - left.publishedAt.getTime();
-    return byDate || left.slug.localeCompare(right.slug);
-  });
+  return [...entries].sort(compareWritingItems);
 }
 
 export function selectFeatured(entries: WritingItem[]): WritingItem | undefined {
-  return entries.find((entry) => entry.type === 'essay' && entry.featured)
-    ?? entries.find((entry) => entry.type === 'essay');
+  const essays = sortWriting(entries.filter((entry) => entry.type === 'essay'));
+  return essays.find((entry) => entry.featured) ?? essays[0];
 }
 
 export function filterWriting(entries: WritingItem[], filters: WritingFilters): WritingItem[] {

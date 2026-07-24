@@ -3,6 +3,7 @@ import {
   assertWritingInvariants,
   buildWritingSearch,
   filterWriting,
+  getWritingSourceId,
   normalizeWritingSlug,
   parseWritingFilters,
   selectFeatured,
@@ -23,28 +24,67 @@ const item = (overrides: Partial<WritingItem>): WritingItem => ({
 });
 
 describe('writing domain', () => {
+  it('keeps flat and folder-index source IDs distinct until route normalization', () => {
+    const sourceIds = [
+      getWritingSourceId('same.mdx'),
+      getWritingSourceId('same/index.md'),
+    ];
+
+    expect(sourceIds).toEqual(['same', 'same/index']);
+    expect(sourceIds[0]).not.toBe(sourceIds[1]);
+
+    const slugs = sourceIds.map(normalizeWritingSlug);
+    expect(slugs).toEqual(['same', 'same']);
+    expect(() => assertWritingInvariants(slugs.map((slug) => item({ slug })))).toThrow(
+      'Duplicate writing slug: same',
+    );
+  });
+
   it('normalizes folder index IDs into stable slugs', () => {
     expect(normalizeWritingSlug('memory-as-a-place/index')).toBe('memory-as-a-place');
     expect(normalizeWritingSlug('small-beginning')).toBe('small-beginning');
   });
 
-  it('sorts newest first and uses slug as a deterministic tie-breaker', () => {
+  it('sorts newest first and uses code-point slug order as a deterministic tie-breaker', () => {
     const entries = [
       item({ slug: 'z', publishedAt: new Date('2026-07-01') }),
       item({ slug: 'a', publishedAt: new Date('2026-07-01') }),
+      item({ slug: 'B', publishedAt: new Date('2026-07-01') }),
       item({ slug: 'new', publishedAt: new Date('2026-07-02') }),
     ];
-    expect(sortWriting(entries).map(({ slug }) => slug)).toEqual(['new', 'a', 'z']);
+    expect(sortWriting(entries).map(({ slug }) => slug)).toEqual(['new', 'B', 'a', 'z']);
   });
 
-  it('selects an explicit featured essay, then falls back to the latest essay', () => {
-    const entries = sortWriting([
-      item({ slug: 'old-featured', featured: true, publishedAt: new Date('2026-06-01') }),
+  it('sorts without mutating the input array', () => {
+    const entries = [
+      item({ slug: 'old', publishedAt: new Date('2026-07-01') }),
+      item({ slug: 'new', publishedAt: new Date('2026-07-02') }),
+    ];
+
+    sortWriting(entries);
+
+    expect(entries.map(({ slug }) => slug)).toEqual(['old', 'new']);
+  });
+
+  it('selects an explicit featured essay from unsorted input', () => {
+    const entries = [
       item({ slug: 'new', publishedAt: new Date('2026-07-01') }),
       item({ slug: 'note', type: 'note', publishedAt: new Date('2026-07-02') }),
-    ]);
+      item({ slug: 'old-featured', featured: true, publishedAt: new Date('2026-06-01') }),
+    ];
+
     expect(selectFeatured(entries)?.slug).toBe('old-featured');
-    expect(selectFeatured(entries.map((entry) => ({ ...entry, featured: false })))?.slug).toBe('new');
+  });
+
+  it('falls back to the newest essay with code-point slug tie-breaking from unsorted input', () => {
+    const entries = [
+      item({ slug: 'z', publishedAt: new Date('2026-07-01') }),
+      item({ slug: 'note', type: 'note', publishedAt: new Date('2026-07-02') }),
+      item({ slug: 'a', publishedAt: new Date('2026-07-01') }),
+      item({ slug: 'old', publishedAt: new Date('2026-06-01') }),
+    ];
+
+    expect(selectFeatured(entries)?.slug).toBe('a');
   });
 
   it('returns no featured item when only notes exist', () => {
@@ -79,5 +119,12 @@ describe('writing domain', () => {
       item({ slug: 'one', featured: true }),
       item({ slug: 'two', featured: true }),
     ])).toThrow('Only one published essay may be featured.');
+  });
+
+  it('does not count draft featured essays toward the published featured invariant', () => {
+    expect(() => assertWritingInvariants([
+      item({ slug: 'published', featured: true }),
+      item({ slug: 'draft', draft: true, featured: true }),
+    ])).not.toThrow();
   });
 });

@@ -1,16 +1,21 @@
 import { z } from 'astro/zod';
 
+const nonemptyTextSchema = z.string().trim().min(1);
+const contentDateSchema = z
+  .union([z.date(), nonemptyTextSchema])
+  .pipe(z.coerce.date());
+
 const writingCoreSchema = z.object({
-  title: z.string().min(1),
-  description: z.string().min(1),
-  publishedAt: z.coerce.date(),
-  updatedAt: z.coerce.date().optional(),
+  title: nonemptyTextSchema,
+  description: nonemptyTextSchema,
+  publishedAt: contentDateSchema,
+  updatedAt: contentDateSchema.optional(),
   type: z.enum(['essay', 'note']),
   language: z.enum(['ko', 'en']),
   draft: z.boolean(),
   featured: z.boolean().default(false),
-  canonicalUrl: z.string().url().optional(),
-  coverImageAlt: z.string().min(1).optional(),
+  canonicalUrl: z.url().optional(),
+  coverImageAlt: nonemptyTextSchema.optional(),
 });
 
 export function createWritingSchema<T extends z.ZodType>(imageSchema: T) {
@@ -19,7 +24,7 @@ export function createWritingSchema<T extends z.ZodType>(imageSchema: T) {
     .superRefine((value, context) => {
       if (value.type === 'note' && value.featured) {
         context.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           path: ['featured'],
           message: 'Only essays may be featured.',
         });
@@ -27,7 +32,7 @@ export function createWritingSchema<T extends z.ZodType>(imageSchema: T) {
 
       if (!value.draft && value.publishedAt.getTime() > Date.now()) {
         context.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           path: ['publishedAt'],
           message: 'Published writing cannot use a future date.',
         });
@@ -35,7 +40,7 @@ export function createWritingSchema<T extends z.ZodType>(imageSchema: T) {
 
       if (value.coverImage && !value.coverImageAlt) {
         context.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           path: ['coverImageAlt'],
           message: 'Cover images require meaningful alternative text.',
         });
@@ -44,12 +49,12 @@ export function createWritingSchema<T extends z.ZodType>(imageSchema: T) {
 }
 
 const workCoreSchema = z.object({
-  title: z.string().min(1),
-  period: z.string().min(1),
-  role: z.string().min(1),
-  description: z.string().min(1),
-  status: z.string().min(1).optional(),
-  url: z.string().url().optional(),
+  title: nonemptyTextSchema,
+  period: nonemptyTextSchema,
+  role: nonemptyTextSchema,
+  description: nonemptyTextSchema,
+  status: nonemptyTextSchema.optional(),
+  url: z.url().optional(),
   order: z.number().int().nonnegative(),
 });
 

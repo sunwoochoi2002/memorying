@@ -1,0 +1,28 @@
+---
+import WritingCard from '../../components/WritingCard.astro';
+import WritingFilters from '../../components/WritingFilters.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { loadWriting } from '../../lib/content';
+
+const writing = await loadWriting();
+---
+
+<BaseLayout title="Writing" description="Essays and notes by Sunwoo Choi.">
+  <section class="container section">
+    <p class="eyebrow">Essays and notes</p>
+    <h1 class="section-title">Writing</h1>
+    <p>한국어와 영어로 기록한 Essay와 Note를 최신순으로 모았습니다.</p>
+    <WritingFilters />
+    {writing.length ? (
+      <ul class="writing-grid" data-writing-list>
+        {writing.map((item) => (
+          <li data-writing-card data-type={item.type} data-language={item.language}>
+            <WritingCard item={item} />
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="empty-state">아직 공개된 글이 없습니다. 곧 이곳에 Essay와 Note를 기록할 예정입니다.</p>
+    )}
+  </section>
+</BaseLayout>

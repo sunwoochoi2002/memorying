@@ -1,0 +1,75 @@
+<div class="filters" data-writing-filters>
+  <fieldset class="filter-group" data-filter-group="type">
+    <legend>Type</legend>
+    <button class="filter-button" type="button" data-value="all" aria-pressed="true">All</button>
+    <button class="filter-button" type="button" data-value="essay" aria-pressed="false">Essay</button>
+    <button class="filter-button" type="button" data-value="note" aria-pressed="false">Note</button>
+  </fieldset>
+  <fieldset class="filter-group" data-filter-group="language">
+    <legend>Language</legend>
+    <button class="filter-button" type="button" data-value="all" aria-pressed="true">All</button>
+    <button class="filter-button" type="button" data-value="ko" aria-pressed="false">한국어</button>
+    <button class="filter-button" type="button" data-value="en" aria-pressed="false">English</button>
+  </fieldset>
+  <p aria-live="polite" data-filter-status></p>
+  <p class="empty-state" data-filter-empty hidden>
+    이 조건에 해당하는 글이 아직 없습니다.
+    <button class="filter-button" type="button" data-reset-filters>모든 글 보기</button>
+  </p>
+</div>
+
+<script>
+  import { buildWritingSearch, parseWritingFilters, type WritingFilters } from '../lib/writing';
+
+  const root = document.querySelector<HTMLElement>('[data-writing-filters]');
+  const cards = [...document.querySelectorAll<HTMLElement>('[data-writing-card]')];
+
+  if (root) {
+    const status = root.querySelector<HTMLElement>('[data-filter-status]');
+    const empty = root.querySelector<HTMLElement>('[data-filter-empty]');
+
+    const apply = (filters: WritingFilters) => {
+      let visible = 0;
+      for (const card of cards) {
+        const matchesType = filters.type === 'all' || card.dataset.type === filters.type;
+        const matchesLanguage = filters.language === 'all' || card.dataset.language === filters.language;
+        card.hidden = !(matchesType && matchesLanguage);
+        if (!card.hidden) visible += 1;
+      }
+
+      for (const group of root.querySelectorAll<HTMLElement>('[data-filter-group]')) {
+        const key = group.dataset.filterGroup as keyof WritingFilters;
+        for (const button of group.querySelectorAll<HTMLButtonElement>('[data-value]')) {
+          button.setAttribute('aria-pressed', String(button.dataset.value === filters[key]));
+        }
+      }
+
+      if (status) status.textContent = `${visible} writing item${visible === 1 ? '' : 's'}`;
+      if (empty) empty.hidden = visible !== 0;
+    };
+
+    const read = () => parseWritingFilters(window.location.search);
+    apply(read());
+
+    root.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      const reset = target.closest<HTMLButtonElement>('[data-reset-filters]');
+      if (reset) {
+        history.pushState({}, '', window.location.pathname);
+        apply({ type: 'all', language: 'all' });
+        return;
+      }
+
+      const button = target.closest<HTMLButtonElement>('[data-value]');
+      const group = button?.closest<HTMLElement>('[data-filter-group]');
+      if (!button || !group) return;
+      const current = read();
+      const key = group.dataset.filterGroup as keyof WritingFilters;
+      const next = { ...current, [key]: button.dataset.value } as WritingFilters;
+      history.pushState({}, '', `${window.location.pathname}${buildWritingSearch(next)}`);
+      apply(next);
+    });
+
+    window.addEventListener('popstate', () => apply(read()));
+  }
+</script>

@@ -2,7 +2,7 @@
   color-scheme: light;
   --ink: #28251f;
   --muted: #665f55;
-  --faint: #81796d;
+  --faint: #756d62;
   --paper: #fbfaf7;
   --paper-deep: #f1ede4;
   --line: #d8d1c5;
@@ -24,10 +24,10 @@ a { color: inherit; text-underline-offset: 0.2em; }
 button, input { font: inherit; }
 button { cursor: pointer; }
 [hidden] { display: none !important; }
-:focus-visible { outline: 0.1875rem solid var(--accent); outline-offset: 0.1875rem; }
+:focus-visible { outline: 0.1875rem solid var(--paper); outline-offset: 0.1875rem; box-shadow: 0 0 0 0.5625rem var(--ink); }
 
 .skip-link { position: fixed; inset: 0 auto auto 0; z-index: 100; padding: 0.75rem 1rem; background: var(--ink); color: var(--paper); transform: translateY(-120%); }
-.skip-link:focus { transform: translateY(0); }
+.skip-link:focus { inset: 0.75rem auto auto 0.75rem; transform: translateY(0); }
 .container { width: min(calc(100% - 2rem), var(--content)); margin-inline: auto; }
 .section { padding-block: clamp(3.5rem, 8vw, 7rem); }
 .eyebrow { margin: 0 0 1.25rem; color: var(--accent); font: 700 0.72rem/1 var(--sans); letter-spacing: 0.13em; text-transform: uppercase; }

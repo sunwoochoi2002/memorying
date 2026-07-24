@@ -16,6 +16,6 @@ const locale = item.language === 'ko' ? 'ko-KR' : 'en-US';
   <Heading><a href={`/writing/${item.slug}/`}>{item.title}</a></Heading>
   <p>{item.description}</p>
   <time class="meta" datetime={item.publishedAt.toISOString()}>
-    {new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(item.publishedAt)}
+    {new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' }).format(item.publishedAt)}
   </time>
 </article>

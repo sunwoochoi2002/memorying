@@ -10,8 +10,8 @@ const { item } = Astro.props;
 
 <a class="featured-card" href={`/writing/${item.slug}/`}>
   <span class="meta">Essay · {item.language === 'ko' ? '한국어' : 'English'}</span>
-  <span>
+  <div>
     <h3>{item.title}</h3>
     <p>{item.description}</p>
-  </span>
+  </div>
 </a>

@@ -1,12 +1,13 @@
 import { expect, test } from '@playwright/test';
 
-test('home is person-first and keeps the introduction in one column', async ({ page }) => {
+test('home is person-first and presents its introduction content', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1, name: "Hello, I’m Sunwoo." })).toBeVisible();
   await expect(page.getByText('시간이 지나도 잊고 싶지 않은 것들을 기록합니다.')).toBeVisible();
   await expect(page.getByText('이 공간에 도착한 당신을 환영합니다.')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Latest writing' })).toBeVisible();
   await expect(page.getByRole('link', { name: /Memorying을 시작하며/ })).toBeVisible();
+  await expect(page.locator('time')).toContainText('Jul 23, 2026');
 });
 
 test('about and work explain the person without becoming a full résumé', async ({ page }) => {

@@ -1,0 +1,27 @@
+---
+import { Image } from 'astro:assets';
+import type { WorkEntry } from '../lib/content';
+
+interface Props {
+  entries: WorkEntry[];
+}
+
+const { entries } = Astro.props;
+---
+
+<ul class="work-list">
+  {entries.map((entry) => (
+    <li class="work-item">
+      <div>
+        <h2>{entry.data.title}</h2>
+        <p class="meta">{entry.data.period} · {entry.data.role}</p>
+      </div>
+      <div>
+        {entry.data.image && <Image src={entry.data.image} alt={entry.data.title} widths={[480, 800]} sizes="(max-width: 720px) 100vw, 50vw" />}
+        <p>{entry.data.description}</p>
+        {entry.data.status && <p class="meta">{entry.data.status}</p>}
+        {entry.data.url && <p><a href={entry.data.url} target="_blank" rel="noreferrer">Visit project ↗</a></p>}
+      </div>
+    </li>
+  ))}
+</ul>

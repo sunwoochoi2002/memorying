@@ -1,0 +1,17 @@
+---
+import WorkList from '../components/WorkList.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadWork } from '../lib/content';
+
+const work = await loadWork();
+---
+
+<BaseLayout title="Work" description="Selected work by Sunwoo Choi.">
+  <section class="container section">
+    <p class="eyebrow">Projects and practice</p>
+    <h1 class="section-title">Selected work</h1>
+    <div style="margin-top: 2rem">
+      {work.length ? <WorkList entries={work} /> : <p class="empty-state">Selected work will appear here.</p>}
+    </div>
+  </section>
+</BaseLayout>

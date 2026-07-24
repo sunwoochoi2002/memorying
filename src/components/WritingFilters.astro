@@ -1,4 +1,4 @@
-<div class="filters" data-writing-filters>
+<div class="filters" data-writing-filters hidden>
   <fieldset class="filter-group" data-filter-group="type">
     <legend>Type</legend>
     <button class="filter-button" type="button" data-value="all" aria-pressed="true">All</button>
@@ -21,12 +21,23 @@
 <script>
   import { buildWritingSearch, parseWritingFilters, type WritingFilters } from '../lib/writing';
 
-  const root = document.querySelector<HTMLElement>('[data-writing-filters]');
-  const cards = [...document.querySelectorAll<HTMLElement>('[data-writing-card]')];
+  for (const archive of document.querySelectorAll<HTMLElement>('[data-writing-archive]')) {
+    const root = archive.querySelector<HTMLElement>('[data-writing-filters]');
+    const cards = [...archive.querySelectorAll<HTMLElement>('[data-writing-card]')];
+    if (!root) continue;
 
-  if (root) {
     const status = root.querySelector<HTMLElement>('[data-filter-status]');
     const empty = root.querySelector<HTMLElement>('[data-filter-empty]');
+    const typeLabels: Record<WritingFilters['type'], string> = {
+      all: 'All',
+      essay: 'Essay',
+      note: 'Note',
+    };
+    const languageLabels: Record<WritingFilters['language'], string> = {
+      all: 'All',
+      ko: '한국어',
+      en: 'English',
+    };
 
     const apply = (filters: WritingFilters) => {
       let visible = 0;
@@ -44,19 +55,26 @@
         }
       }
 
-      if (status) status.textContent = `${visible} writing item${visible === 1 ? '' : 's'}`;
+      if (status) {
+        status.textContent = `Showing ${visible} writing item${visible === 1 ? '' : 's'}: Type ${typeLabels[filters.type]}, Language ${languageLabels[filters.language]}.`;
+      }
       if (empty) empty.hidden = visible !== 0;
     };
 
     const read = () => parseWritingFilters(window.location.search);
+    root.hidden = false;
     apply(read());
 
     root.addEventListener('click', (event) => {
-      const target = event.target as HTMLElement;
+      if (!(event.target instanceof Element)) return;
+      const target = event.target;
       const reset = target.closest<HTMLButtonElement>('[data-reset-filters]');
       if (reset) {
+        const current = read();
+        if (current.type === 'all' && current.language === 'all') return;
         history.pushState({}, '', window.location.pathname);
         apply({ type: 'all', language: 'all' });
+        root.querySelector<HTMLButtonElement>('[data-filter-group="type"] [data-value="all"]')?.focus();
         return;
       }
 
@@ -66,6 +84,7 @@
       const current = read();
       const key = group.dataset.filterGroup as keyof WritingFilters;
       const next = { ...current, [key]: button.dataset.value } as WritingFilters;
+      if (next.type === current.type && next.language === current.language) return;
       history.pushState({}, '', `${window.location.pathname}${buildWritingSearch(next)}`);
       apply(next);
     });

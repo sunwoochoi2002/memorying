@@ -14,6 +14,7 @@
     "preview": "astro preview",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "new:writing": "node scripts/new-writing.mjs",
     "check:links": "node scripts/check-built-links.mjs",
     "check:assets": "node scripts/check-source-assets.mjs",
     "verify": "npm run check && npm run test && npm run check:assets && npm run build && npm run check:links && npm run test:e2e"

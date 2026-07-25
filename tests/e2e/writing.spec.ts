@@ -146,6 +146,8 @@ test('renders original-first bilingual articles at one stable URL', async ({ pag
   const noJavaScriptPage = await noJavaScriptContext.newPage();
   await noJavaScriptPage.goto('/writing/memorying-start/');
   await expect(noJavaScriptPage.getByRole('heading', { level: 1, name: 'Memorying을 시작하며' })).toBeVisible();
+  await expect(noJavaScriptPage.locator('[data-language-panel="ko"]')).toBeVisible();
+  await expect(noJavaScriptPage.locator('[data-language-panel="ko"]')).toContainText('시간이 지나도 잊고 싶지 않은 것들을 기록합니다.');
   await expect(noJavaScriptPage.locator('[data-language-panel="en"]')).toBeHidden();
   await noJavaScriptContext.close();
 });

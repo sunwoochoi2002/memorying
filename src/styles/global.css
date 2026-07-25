@@ -79,7 +79,7 @@ button { cursor: pointer; }
 .language-toggle { display: flex; align-items: center; gap: 0.5rem; margin-top: 1.25rem; color: var(--faint); font: 600 0.76rem/1 var(--sans); }
 .language-toggle button { min-height: 2.5rem; border: 0; border-bottom: 1px solid transparent; background: transparent; color: inherit; padding: 0.4rem 0; }
 .language-toggle button[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); }
-.language-toggle small { margin-left: 0.2rem; font: inherit; text-transform: uppercase; }
+.language-toggle small { margin-left: 0.2rem; font-size: 0.68rem; text-transform: uppercase; }
 .writing-cover { width: min(calc(100% - 2rem), var(--prose)); margin: 0 auto 2rem; }
 .prose { width: min(calc(100% - 2rem), var(--prose)); margin-inline: auto; padding-bottom: clamp(4rem, 9vw, 8rem); font-size: 1.05rem; }
 .prose :is(h2, h3) { margin-top: 2.5em; line-height: 1.25; }

@@ -1,24 +1,24 @@
 ---
-import { render, type CollectionEntry } from 'astro:content';
+import { render } from 'astro:content';
 import WritingLayout from '../../layouts/WritingLayout.astro';
-import { loadWritingEntries } from '../../lib/content';
-import type { WritingItem } from '../../lib/writing';
+import { loadWritingArticleEntries, type LoadedWritingArticle } from '../../lib/content';
 
 export async function getStaticPaths() {
-  const pairs = await loadWritingEntries();
-  return pairs.map(({ entry, item }) => ({
+  const pairs = await loadWritingArticleEntries();
+  return pairs.map(({ entries, item }) => ({
     params: { slug: item.slug },
-    props: { entry, item },
+    props: { entries, item },
   }));
 }
 
-interface Props {
-  entry: CollectionEntry<'writing'>;
-  item: WritingItem;
-}
+type Props = LoadedWritingArticle;
 
-const { entry, item } = Astro.props;
-const { Content } = await render(entry);
+const { entries, item } = Astro.props;
+const { Content: KoreanContent } = await render(entries.ko);
+const { Content: EnglishContent } = await render(entries.en);
 ---
 
-<WritingLayout item={item}><Content /></WritingLayout>
+<WritingLayout item={item}>
+  <div slot="ko"><KoreanContent /></div>
+  <div slot="en"><EnglishContent /></div>
+</WritingLayout>

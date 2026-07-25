@@ -3,38 +3,61 @@ import { Image } from 'astro:assets';
 import ContentMetadata from '../components/ContentMetadata.astro';
 import NewsletterSignup from '../components/NewsletterSignup.astro';
 import BaseLayout from './BaseLayout.astro';
-import type { WritingItem } from '../lib/writing';
+import { originalTranslation, type WritingArticle } from '../lib/writing';
 
 interface Props {
-  item: WritingItem;
+  item: WritingArticle;
 }
 
 const { item } = Astro.props;
+const original = originalTranslation(item);
+const { ko, en } = item.translations;
+const { originalLanguage } = item;
 ---
 
 <BaseLayout
-  title={item.title}
-  description={item.description}
-  lang={item.language}
+  title={original.title}
+  description={original.description}
+  lang={originalLanguage}
   canonicalUrl={item.canonicalUrl}
   type="article"
 >
   <article>
     <header class="article-header">
       <ContentMetadata item={item} />
-      <h1>{item.title}</h1>
-      <p class="article-header__description">{item.description}</p>
-      {item.coverImage && (
+      <div class="language-toggle" role="group" aria-label="Language" data-language-toggle>
+        <button type="button" data-language-button="ko" aria-pressed={originalLanguage === 'ko'}>
+          한국어 {originalLanguage === 'ko' && <small>Original</small>}
+        </button>
+        <span aria-hidden="true">/</span>
+        <button type="button" data-language-button="en" aria-pressed={originalLanguage === 'en'}>
+          English {originalLanguage === 'en' && <small>Original</small>}
+        </button>
+      </div>
+      <h1 lang="ko" data-language-fragment="ko" hidden={originalLanguage !== 'ko'}>{ko.title}</h1>
+      <h1 lang="en" data-language-fragment="en" hidden={originalLanguage !== 'en'}>{en.title}</h1>
+      <p class="article-header__description" lang="ko" data-language-fragment="ko" hidden={originalLanguage !== 'ko'}>{ko.description}</p>
+      <p class="article-header__description" lang="en" data-language-fragment="en" hidden={originalLanguage !== 'en'}>{en.description}</p>
+    </header>
+    {item.coverImage && item.coverImageAlt && (
+      <div
+        class="writing-cover"
+        data-writing-cover
+        data-alt-ko={item.coverImageAlt.ko}
+        data-alt-en={item.coverImageAlt.en}
+      >
         <Image
           src={item.coverImage}
-          alt={item.coverImageAlt ?? ''}
+          alt={item.coverImageAlt[originalLanguage]}
           widths={[640, 960, 1280]}
           sizes="(max-width: 720px) 100vw, 704px"
-          style="margin-top: 2rem"
         />
-      )}
-    </header>
-    <div class="prose"><slot /></div>
+      </div>
+    )}
+    <div class="prose">
+      <div lang="ko" data-language-panel="ko" hidden={originalLanguage !== 'ko'}><slot name="ko" /></div>
+      <div lang="en" data-language-panel="en" hidden={originalLanguage !== 'en'}><slot name="en" /></div>
+    </div>
     {item.type === 'essay' && (
       <div class="container" style="padding-bottom: 3rem">
         <NewsletterSignup id="essay-end" compact={true} />
@@ -45,3 +68,29 @@ const { item } = Astro.props;
     </div>
   </article>
 </BaseLayout>
+
+<script>
+  for (const toggle of document.querySelectorAll<HTMLElement>('[data-language-toggle]')) {
+    toggle.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>('[data-language-button]');
+      const language = button?.dataset.languageButton;
+      if (language !== 'ko' && language !== 'en') return;
+
+      for (const fragment of document.querySelectorAll<HTMLElement>('[data-language-fragment]')) {
+        fragment.hidden = fragment.dataset.languageFragment !== language;
+      }
+      for (const panel of document.querySelectorAll<HTMLElement>('[data-language-panel]')) {
+        panel.hidden = panel.dataset.languagePanel !== language;
+      }
+      for (const languageButton of toggle.querySelectorAll<HTMLButtonElement>('[data-language-button]')) {
+        languageButton.setAttribute('aria-pressed', String(languageButton === button));
+      }
+
+      document.documentElement.lang = language;
+      for (const cover of document.querySelectorAll<HTMLElement>('[data-writing-cover]')) {
+        const image = cover.querySelector('img');
+        if (image) image.alt = language === 'ko' ? cover.dataset.altKo ?? '' : cover.dataset.altEn ?? '';
+      }
+    });
+  }
+</script>

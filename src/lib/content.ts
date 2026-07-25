@@ -42,16 +42,6 @@ export async function loadWriting(options: { includeDrafts?: boolean } = {}): Pr
   return (await loadPreparedWriting(includeDrafts)).items.map(toWritingItem);
 }
 
-export async function loadWritingEntries(
-  options: { includeDrafts?: boolean } = {},
-): Promise<Array<{ entry: WritingEntry; item: WritingItem }>> {
-  const includeDrafts = resolveIncludeDrafts(options.includeDrafts, import.meta.env.DEV);
-  return (await loadPreparedWriting(includeDrafts)).pairs.map(({ entries, item }) => ({
-    entry: entries[item.originalLanguage],
-    item: toWritingItem(item),
-  }));
-}
-
 export async function loadWork(): Promise<WorkEntry[]> {
   return sortWorkData(await getCollection('work'));
 }

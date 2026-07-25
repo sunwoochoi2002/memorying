@@ -108,16 +108,46 @@ test('server-renders visible archive cards but hides inert enhancement controls 
   await context.close();
 });
 
-test('renders a bilingual article route with stable metadata', async ({ page }) => {
+test('renders original-first bilingual articles at one stable URL', async ({ page, browser }) => {
   await page.goto('/writing/memorying-start/');
   await expect(page.getByRole('heading', { level: 1, name: 'Memorying을 시작하며' })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
+  await expect(page.getByRole('button', { name: /한국어.*Original/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: 'English' })).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('[data-language-panel="ko"]')).toBeVisible();
+  await expect(page.locator('[data-language-panel="en"]')).toBeHidden();
+  await expect(page.locator('[data-writing-cover] img')).toHaveCount(1);
+  await expect(page.locator('[data-writing-cover] img')).toHaveAttribute('alt', '저녁빛 아래 겹쳐진 기억의 풍경');
   await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'article');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
     'http://localhost:4321/writing/memorying-start/',
   );
   await expect(page.getByRole('link', { name: 'Back to Writing' })).toBeVisible();
+
+  const initialUrl = page.url();
+  await page.getByRole('button', { name: 'English' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Beginning Memorying' })).toBeVisible();
+  await expect(page.locator('[data-language-panel="en"]')).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('[data-writing-cover] img')).toHaveAttribute('alt', 'Layered memory landscapes in evening light');
+  expect(page.url()).toBe(initialUrl);
+
+  await page.reload();
+  await expect(page.getByRole('heading', { level: 1, name: 'Memorying을 시작하며' })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
+
+  await page.goto('/writing/small-beginning/');
+  await expect(page.getByRole('heading', { level: 1, name: 'A small beginning' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /English.*Original/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('[data-writing-cover]')).toHaveCount(0);
+
+  const noJavaScriptContext = await browser.newContext({ javaScriptEnabled: false });
+  const noJavaScriptPage = await noJavaScriptContext.newPage();
+  await noJavaScriptPage.goto('/writing/memorying-start/');
+  await expect(noJavaScriptPage.getByRole('heading', { level: 1, name: 'Memorying을 시작하며' })).toBeVisible();
+  await expect(noJavaScriptPage.locator('[data-language-panel="en"]')).toBeHidden();
+  await noJavaScriptContext.close();
 });
 
 test('keeps navigation available on the noindex 404 page', async ({ page }) => {

@@ -18,3 +18,10 @@ test('skip link and primary navigation work by keyboard', async ({ page }) => {
   await page.keyboard.press('Enter');
   await expect(page.locator('#main-content')).toBeFocused();
 });
+
+test('article language controls expose their selected language', async ({ page }) => {
+  await page.goto('/writing/memorying-start/');
+  await expect(page.getByRole('group', { name: 'Language' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /한국어.*Original/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: 'English' })).toHaveAttribute('aria-pressed', 'false');
+});

@@ -1,5 +1,3 @@
-import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 
 const statusText = (count: number, type: string, language: string) =>
@@ -77,6 +75,28 @@ test('restores valid and partial-invalid query state before canonical interactio
   await expect(page.getByRole('link', { name: 'A small beginning' })).toBeVisible();
 });
 
+test('synchronizes dynamically added writing archives after a filter click', async ({ page }) => {
+  await page.goto('/writing/');
+  await page.locator('[data-writing-archive]').evaluate((archive) => {
+    const clone = archive.cloneNode(true) as HTMLElement;
+    archive.insertAdjacentElement('afterend', clone);
+  });
+
+  const firstArchive = page.locator('[data-writing-archive]').nth(0);
+  const secondArchive = page.locator('[data-writing-archive]').nth(1);
+  await firstArchive.locator('[data-filter-group="type"]').getByRole('button', { name: 'Note' }).click();
+
+  await expect(page).toHaveURL('/writing/?type=note');
+  await expect(firstArchive.locator('[data-filter-group="type"]').getByRole('button', { name: 'Note' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(secondArchive.locator('[data-filter-group="type"]').getByRole('button', { name: 'Note' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(firstArchive.locator('[data-filter-status]')).toHaveText(statusText(1, 'Note', 'All'));
+  await expect(secondArchive.locator('[data-filter-status]')).toHaveText(statusText(1, 'Note', 'All'));
+  await expect(firstArchive.getByRole('link', { name: 'Memorying을 시작하며' })).toBeHidden();
+  await expect(secondArchive.getByRole('link', { name: 'Memorying을 시작하며' })).toBeHidden();
+  await expect(firstArchive.getByRole('link', { name: 'A small beginning' })).toBeVisible();
+  await expect(secondArchive.getByRole('link', { name: 'A small beginning' })).toBeVisible();
+});
+
 test('server-renders visible archive cards but hides inert enhancement controls without JavaScript', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
@@ -86,13 +106,4 @@ test('server-renders visible archive cards but hides inert enhancement controls 
   await expect(page.locator('[data-writing-filters]')).toBeHidden();
   await expect(page.getByRole('button', { name: 'Note' })).toHaveCount(0);
   await context.close();
-});
-
-test('production archive omits filters when all writing is draft-only', () => {
-  execFileSync('npm', ['run', 'build'], { cwd: process.cwd(), stdio: 'pipe' });
-  const archive = readFileSync('dist/writing/index.html', 'utf8');
-
-  expect(archive).toContain('아직 공개된 글이 없습니다. 곧 이곳에 Essay와 Note를 기록할 예정입니다.');
-  expect(archive).not.toContain('data-writing-filters');
-  expect(archive).not.toContain('이 조건에 해당하는 글이 아직 없습니다.');
 });

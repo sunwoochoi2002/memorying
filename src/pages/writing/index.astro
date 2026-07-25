@@ -1,6 +1,7 @@
 ---
 import WritingCard from '../../components/WritingCard.astro';
 import WritingFilters from '../../components/WritingFilters.astro';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { loadWriting } from '../../lib/content';
 
@@ -26,5 +27,6 @@ const writing = await loadWriting();
     ) : (
       <p class="empty-state">아직 공개된 글이 없습니다. 곧 이곳에 Essay와 Note를 기록할 예정입니다.</p>
     )}
+    <div style="margin-top: 4rem"><NewsletterSignup id="writing-archive" /></div>
   </section>
 </BaseLayout>

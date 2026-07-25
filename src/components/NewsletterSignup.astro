@@ -1,0 +1,49 @@
+---
+interface Props {
+  id: string;
+  compact?: boolean;
+}
+
+const { id, compact = false } = Astro.props;
+const username = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME?.trim();
+const action = username
+  ? `https://buttondown.com/api/emails/embed-subscribe/${encodeURIComponent(username)}`
+  : undefined;
+---
+
+<aside class="newsletter" aria-labelledby={`${id}-newsletter-heading`}>
+  <h2 id={`${id}-newsletter-heading`}>{compact ? '새 Essay를 이메일로 받아보세요.' : 'Subscribe to new Essays'}</h2>
+  <p>선택한 Essay의 전문을 이메일로 보냅니다. Note는 기본 발송 대상이 아닙니다.</p>
+  <form
+    class="newsletter-form"
+    aria-label="Newsletter subscription"
+    action={action}
+    method="post"
+    data-newsletter-form
+  >
+    <div class="field">
+      <label for={`${id}-email`}>Email</label>
+      <input id={`${id}-email`} name="email" type="email" autocomplete="email" required />
+      <input type="hidden" name="embed" value="1" />
+    </div>
+    <button class="button" type="submit" disabled={!action}>Subscribe</button>
+    <p><small>구독은 언제든 취소할 수 있습니다. <a href="/privacy/">Privacy</a></small></p>
+  </form>
+  {!action && import.meta.env.DEV && <p role="status">Set PUBLIC_BUTTONDOWN_USERNAME to test subscriptions.</p>}
+</aside>
+
+<script>
+  for (const form of document.querySelectorAll<HTMLFormElement>('[data-newsletter-form]')) {
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    form.addEventListener('submit', () => {
+      if (!form.checkValidity() || !button) return;
+      button.disabled = true;
+      button.textContent = 'Subscribing…';
+    });
+    window.addEventListener('pageshow', () => {
+      if (!button || !form.hasAttribute('action')) return;
+      button.disabled = false;
+      button.textContent = 'Subscribe';
+    });
+  }
+</script>

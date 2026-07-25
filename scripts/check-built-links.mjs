@@ -1,5 +1,5 @@
 import { access, readdir, readFile } from 'node:fs/promises';
-import { extname, join, relative, resolve } from 'node:path';
+import { extname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { parseHTML } from 'linkedom';
 
 const root = resolve('dist');
@@ -18,13 +18,25 @@ async function exists(path) {
 }
 
 async function resolvesFromBuild(pathname) {
-  const clean = decodeURIComponent(pathname).replace(/^\/+/, '');
-  const direct = join(root, clean);
-  const candidates = extname(clean)
+  const clean = decodeURIComponent(pathname).replace(/^[/\\]+/, '');
+  const direct = resolve(root, clean);
+  const pathFromRoot = relative(root, direct);
+  if (pathFromRoot === '..' || pathFromRoot.startsWith(`..${sep}`) || isAbsolute(pathFromRoot)) return false;
+  const candidates = extname(clean.replace(/\/+$/, ''))
     ? [direct]
     : [join(direct, 'index.html'), `${direct}.html`];
   for (const candidate of candidates) if (await exists(candidate)) return true;
   return false;
+}
+
+function buildUrlFor(file) {
+  const builtPath = relative(root, file).split(sep).join('/');
+  const pathname = builtPath === 'index.html'
+    ? '/'
+    : builtPath.endsWith('/index.html')
+      ? `/${builtPath.slice(0, -'index.html'.length)}`
+      : `/${builtPath}`;
+  return new URL(pathname, 'https://memorying.local');
 }
 
 const htmlFiles = (await walk(root)).filter((file) => file.endsWith('.html'));
@@ -36,7 +48,7 @@ for (const file of htmlFiles) {
   for (const element of document.querySelectorAll('[href], [src]')) {
     const value = element.getAttribute('href') ?? element.getAttribute('src');
     if (!value || value.startsWith('#') || value.startsWith('mailto:') || value.startsWith('data:')) continue;
-    const url = new URL(value, 'https://memorying.local');
+    const url = new URL(value, buildUrlFor(file));
     if (url.origin !== 'https://memorying.local') continue;
     if (!(await resolvesFromBuild(url.pathname))) {
       failures.push(`${relative(root, file)} -> ${value}`);

@@ -3,7 +3,8 @@ import { expect, test } from '@playwright/test';
 
 for (const path of ['/', '/about/', '/writing/', '/writing/memorying-start/', '/work/', '/privacy/', '/404/']) {
   test(`${path} has no serious or critical axe violations`, async ({ page }) => {
-    await page.goto(path);
+    const response = await page.goto(path);
+    expect(response?.status()).toBe(path === '/404/' ? 404 : 200);
     const results = await new AxeBuilder({ page }).analyze();
     const blocking = results.violations.filter(({ impact }) => impact === 'serious' || impact === 'critical');
     expect(blocking).toEqual([]);

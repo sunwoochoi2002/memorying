@@ -7,7 +7,8 @@ for (const width of widths) {
   for (const path of paths) {
     test(`${path} fits a ${width}px viewport`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
-      await page.goto(path);
+      const response = await page.goto(path);
+      expect(response?.status()).toBe(path === '/404/' ? 404 : 200);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       expect(overflow).toBeLessThanOrEqual(1);
       await expect(page.getByRole('navigation', { name: 'Primary' })).toBeVisible();

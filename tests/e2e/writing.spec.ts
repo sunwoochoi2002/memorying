@@ -107,3 +107,23 @@ test('server-renders visible archive cards but hides inert enhancement controls 
   await expect(page.getByRole('button', { name: 'Note' })).toHaveCount(0);
   await context.close();
 });
+
+test('renders a bilingual article route with stable metadata', async ({ page }) => {
+  await page.goto('/writing/memorying-start/');
+  await expect(page.getByRole('heading', { level: 1, name: 'Memorying을 시작하며' })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
+  await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'article');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'http://localhost:4321/writing/memorying-start/',
+  );
+  await expect(page.getByRole('link', { name: 'Back to Writing' })).toBeVisible();
+});
+
+test('keeps navigation available on the noindex 404 page', async ({ page }) => {
+  const response = await page.goto('/missing-memory/');
+  expect(response?.status()).toBe(404);
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('기억 속에 남아 있지 않습니다');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+  await expect(page.getByRole('link', { name: 'Writing 둘러보기' })).toBeVisible();
+});

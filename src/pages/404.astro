@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+Astro.response.status = 404;
+---
+
+<BaseLayout
+  title="Page not found"
+  description="The requested page could not be found."
+  noindex={true}
+>
+  <section class="container section">
+    <p class="eyebrow">404</p>
+    <h1 class="section-title">이 페이지는 기억 속에 남아 있지 않습니다.</h1>
+    <p><a href="/">Home으로 돌아가기</a> · <a href="/writing/">Writing 둘러보기</a></p>
+  </section>
+</BaseLayout>

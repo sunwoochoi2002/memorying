@@ -27,11 +27,11 @@ const { originalLanguage } = item;
       <ContentMetadata item={item} />
       <div class="language-toggle" role="group" aria-label="Language" data-language-toggle>
         <button type="button" data-language-button="ko" aria-pressed={originalLanguage === 'ko'}>
-          한국어 {originalLanguage === 'ko' && <small>Original</small>}
+          <span lang="ko">한국어</span> {originalLanguage === 'ko' && <small lang="en">Original</small>}
         </button>
         <span aria-hidden="true">/</span>
         <button type="button" data-language-button="en" aria-pressed={originalLanguage === 'en'}>
-          English {originalLanguage === 'en' && <small>Original</small>}
+          <span lang="en">English</span> {originalLanguage === 'en' && <small lang="en">Original</small>}
         </button>
       </div>
       <h1 lang="ko" data-language-fragment="ko" hidden={originalLanguage !== 'ko'}>{ko.title}</h1>

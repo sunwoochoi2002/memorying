@@ -10,6 +10,11 @@ import {
   type WritingTranslation,
 } from './writing';
 
+const generatedDraftBodies: Record<WritingLanguage, string> = {
+  ko: '한국어 본문을 작성하세요.',
+  en: 'Write the English body here.',
+};
+
 export type WritingMetadataEntryData = Omit<WritingArticle, 'slug' | 'translations'>;
 export type WritingTranslationEntryData = Omit<WritingTranslation, 'language'>;
 
@@ -122,6 +127,9 @@ export function prepareWritingData<
       if (!metaEntry.data.draft && (entry.data.title.startsWith('[Draft]')
         || entry.data.description.startsWith('[Draft]'))) {
         throw new Error(`Published writing "${slug}" cannot use [Draft] title or description markers.`);
+      }
+      if (!metaEntry.data.draft && entry.body.trim() === generatedDraftBodies[language]) {
+        throw new Error(`Published writing "${slug}" cannot use the generated ${language} body placeholder.`);
       }
     }
 

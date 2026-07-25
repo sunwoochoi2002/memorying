@@ -25,3 +25,17 @@ test('article language controls expose their selected language', async ({ page }
   await expect(page.getByRole('button', { name: /한국어.*Original/ })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: 'English' })).toHaveAttribute('aria-pressed', 'false');
 });
+
+test('article controls and static metadata retain their own language annotations after switching', async ({ page }) => {
+  await page.goto('/writing/memorying-start/');
+  const metadata = page.locator('.article-header .meta');
+
+  await expect(metadata).toHaveAttribute('lang', 'ko');
+  await expect(page.locator('[data-language-button="ko"] > span')).toHaveAttribute('lang', 'ko');
+  await expect(page.locator('[data-language-button="en"] > span')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('[data-language-button="ko"] small')).toHaveAttribute('lang', 'en');
+
+  await page.getByRole('button', { name: 'English' }).click();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(metadata).toHaveAttribute('lang', 'ko');
+});

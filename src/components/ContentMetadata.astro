@@ -10,7 +10,7 @@ const locale = item.originalLanguage === 'ko' ? 'ko-KR' : 'en-US';
 const formatter = new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' });
 ---
 
-<p class="meta">
+<p class="meta" lang={item.originalLanguage}>
   <span>{item.type === 'essay' ? 'Essay' : 'Note'}</span>
   <span> · <time datetime={item.publishedAt.toISOString()}>{formatter.format(item.publishedAt)}</time></span>
   {item.updatedAt && (

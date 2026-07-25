@@ -198,6 +198,26 @@ describe('content data preparation', () => {
     )).not.toThrow();
   });
 
+  it.each([
+    { language: 'ko', placeholder: '한국어 본문을 작성하세요.' },
+    { language: 'en', placeholder: 'Write the English body here.' },
+  ] as const)('rejects a published generated $language body placeholder', ({ language, placeholder }) => {
+    const bodies = {
+      ko: 'Completed Korean body',
+      en: 'Completed English body',
+      [language]: placeholder,
+    };
+
+    expect(() => prepareWritingData(
+      [metadataEntry('published')],
+      [
+        translationEntry('published/ko', 'Korean title', 'Korean description', bodies.ko),
+        translationEntry('published/en', 'English title', 'English description', bodies.en),
+      ],
+      true,
+    )).toThrow(`Published writing "published" cannot use the generated ${language} body placeholder.`);
+  });
+
   it('excludes drafts and returns articles newest-first with stable tie ordering without mutating inputs', () => {
     const old = pair('old', { publishedAt: new Date('2026-07-01T00:00:00Z') });
     const tieZ = pair('z', { publishedAt: new Date('2026-07-03T00:00:00Z') });

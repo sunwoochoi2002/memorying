@@ -5,12 +5,6 @@
     <button class="filter-button" type="button" data-value="essay" aria-pressed="false">Essay</button>
     <button class="filter-button" type="button" data-value="note" aria-pressed="false">Note</button>
   </fieldset>
-  <fieldset class="filter-group" data-filter-group="language">
-    <legend>Language</legend>
-    <button class="filter-button" type="button" data-value="all" aria-pressed="true">All</button>
-    <button class="filter-button" type="button" data-value="ko" aria-pressed="false">한국어</button>
-    <button class="filter-button" type="button" data-value="en" aria-pressed="false">English</button>
-  </fieldset>
   <p aria-live="polite" data-filter-status></p>
   <p class="empty-state" data-filter-empty hidden>
     이 조건에 해당하는 글이 아직 없습니다.
@@ -26,38 +20,27 @@
     essay: 'Essay',
     note: 'Note',
   };
-  const languageLabels: Record<WritingFilters['language'], string> = {
-    all: 'All',
-    ko: '한국어',
-    en: 'English',
-  };
-
   const applyAll = (filters: WritingFilters) => {
     for (const archive of document.querySelectorAll<HTMLElement>('[data-writing-archive]')) {
       const root = archive.querySelector<HTMLElement>('[data-writing-filters]');
-      const cards = [...archive.querySelectorAll<HTMLElement>('[data-writing-card]')];
+      const items = [...archive.querySelectorAll<HTMLElement>('[data-writing-item]')];
       if (!root) continue;
 
       const status = root.querySelector<HTMLElement>('[data-filter-status]');
       const empty = root.querySelector<HTMLElement>('[data-filter-empty]');
       root.hidden = false;
       let visible = 0;
-      for (const card of cards) {
-        const matchesType = filters.type === 'all' || card.dataset.type === filters.type;
-        const matchesLanguage = filters.language === 'all' || card.dataset.language === filters.language;
-        card.hidden = !(matchesType && matchesLanguage);
-        if (!card.hidden) visible += 1;
+      for (const item of items) {
+        item.hidden = filters.type !== 'all' && item.dataset.type !== filters.type;
+        if (!item.hidden) visible += 1;
       }
 
-      for (const group of root.querySelectorAll<HTMLElement>('[data-filter-group]')) {
-        const key = group.dataset.filterGroup as keyof WritingFilters;
-        for (const button of group.querySelectorAll<HTMLButtonElement>('[data-value]')) {
-          button.setAttribute('aria-pressed', String(button.dataset.value === filters[key]));
-        }
+      for (const button of root.querySelectorAll<HTMLButtonElement>('[data-filter-group="type"] [data-value]')) {
+        button.setAttribute('aria-pressed', String(button.dataset.value === filters.type));
       }
 
       if (status) {
-        status.textContent = `Showing ${visible} writing item${visible === 1 ? '' : 's'}: Type ${typeLabels[filters.type]}, Language ${languageLabels[filters.language]}.`;
+        status.textContent = `Showing ${visible} writing item${visible === 1 ? '' : 's'}: Type ${typeLabels[filters.type]}.`;
       }
       if (empty) empty.hidden = visible !== 0;
     }
@@ -76,22 +59,19 @@
 
     const reset = target.closest<HTMLButtonElement>('[data-reset-filters]');
     if (reset && root.contains(reset)) {
-      const current = read();
-      if (current.type === 'all' && current.language === 'all') return;
+      if (read().type === 'all' && window.location.search === '') return;
       history.pushState({}, '', window.location.pathname);
-      applyAll({ type: 'all', language: 'all' });
+      applyAll({ type: 'all' });
       root.querySelector<HTMLButtonElement>('[data-filter-group="type"] [data-value="all"]')?.focus();
       return;
     }
 
     const button = target.closest<HTMLButtonElement>('[data-value]');
-    const group = button?.closest<HTMLElement>('[data-filter-group]');
-    if (!button || !group || !root.contains(button) || !root.contains(group)) return;
-    const current = read();
-    const key = group.dataset.filterGroup as keyof WritingFilters;
-    const next = { ...current, [key]: button.dataset.value } as WritingFilters;
-    if (next.type === current.type && next.language === current.language) return;
-    history.pushState({}, '', `${window.location.pathname}${buildWritingSearch(next)}`);
+    if (!button || !root.contains(button)) return;
+    const next = { type: button.dataset.value as WritingFilters['type'] };
+    const nextUrl = `${window.location.pathname}${buildWritingSearch(next)}`;
+    if (nextUrl === `${window.location.pathname}${window.location.search}`) return;
+    history.pushState({}, '', nextUrl);
     applyAll(next);
   });
 

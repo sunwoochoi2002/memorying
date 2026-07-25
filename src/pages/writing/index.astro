@@ -1,25 +1,25 @@
 ---
-import WritingCard from '../../components/WritingCard.astro';
+import WritingListItem from '../../components/WritingListItem.astro';
 import WritingFilters from '../../components/WritingFilters.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { loadWriting } from '../../lib/content';
+import { loadWritingArticles } from '../../lib/content';
 
-const writing = await loadWriting();
+const writing = await loadWritingArticles();
 ---
 
 <BaseLayout title="Writing" description="Essays and notes by Sunwoo Choi.">
   <section class="container section">
     <p class="eyebrow">Essays and notes</p>
     <h1 class="section-title">Writing</h1>
-    <p>한국어와 영어로 기록한 Essay와 Note를 최신순으로 모았습니다.</p>
+    <p>시간이 지나도 잊고 싶지 않은 Essay와 Note를 최신순으로 모았습니다.</p>
     {writing.length ? (
       <div data-writing-archive>
         <WritingFilters />
-        <ul class="writing-grid" data-writing-list>
+        <ul class="writing-list" data-writing-list>
           {writing.map((item) => (
-            <li data-writing-card data-type={item.type} data-language={item.language}>
-              <WritingCard item={item} />
+            <li data-writing-item data-type={item.type}>
+              <WritingListItem item={item} />
             </li>
           ))}
         </ul>

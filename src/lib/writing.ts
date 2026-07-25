@@ -3,11 +3,9 @@ import type { ImageMetadata } from 'astro';
 export type WritingType = 'essay' | 'note';
 export type WritingLanguage = 'ko' | 'en';
 export type WritingTypeFilter = WritingType | 'all';
-export type WritingLanguageFilter = WritingLanguage | 'all';
 
 export interface WritingFilters {
   type: WritingTypeFilter;
-  language: WritingLanguageFilter;
 }
 
 export interface WritingItem {
@@ -110,16 +108,12 @@ export function selectFeaturedArticle(entries: WritingArticle[]): WritingArticle
   return essays.find((entry) => entry.featured) ?? essays[0];
 }
 
-export function filterWriting(entries: WritingItem[], filters: WritingFilters): WritingItem[] {
-  return entries.filter((entry) => {
-    const typeMatches = filters.type === 'all' || entry.type === filters.type;
-    const languageMatches = filters.language === 'all' || entry.language === filters.language;
-    return typeMatches && languageMatches;
-  });
+export function filterWriting(entries: WritingArticle[], filters: WritingFilters): WritingArticle[] {
+  return filterWritingArticles(entries, filters.type);
 }
 
-export function filterWritingArticles(entries: WritingArticle[], type: WritingType): WritingArticle[] {
-  return entries.filter((entry) => entry.type === type);
+export function filterWritingArticles(entries: WritingArticle[], type: WritingTypeFilter): WritingArticle[] {
+  return entries.filter((entry) => type === 'all' || entry.type === type);
 }
 
 export function parseWritingFilters(search: string | URLSearchParams): WritingFilters {
@@ -127,18 +121,14 @@ export function parseWritingFilters(search: string | URLSearchParams): WritingFi
     ? new URLSearchParams(search.startsWith('?') ? search.slice(1) : search)
     : search;
   const type = parameters.get('type');
-  const language = parameters.get('lang');
-
   return {
     type: type === 'essay' || type === 'note' ? type : 'all',
-    language: language === 'ko' || language === 'en' ? language : 'all',
   };
 }
 
 export function buildWritingSearch(filters: WritingFilters): string {
   const parameters = new URLSearchParams();
   if (filters.type !== 'all') parameters.set('type', filters.type);
-  if (filters.language !== 'all') parameters.set('lang', filters.language);
   const value = parameters.toString();
   return value ? `?${value}` : '';
 }

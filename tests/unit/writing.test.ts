@@ -113,22 +113,21 @@ describe('writing domain', () => {
     expect(selectFeatured([item({ type: 'note' })])).toBeUndefined();
   });
 
-  it('filters by type and language independently or together', () => {
+  it('filters logical articles by type only', () => {
     const entries = [
-      item({ slug: 'ko-essay' }),
-      item({ slug: 'en-essay', language: 'en' }),
-      item({ slug: 'ko-note', type: 'note' }),
+      article({ slug: 'essay' }),
+      article({ slug: 'note', type: 'note' }),
     ];
-    expect(filterWriting(entries, { type: 'essay', language: 'all' })).toHaveLength(2);
-    expect(filterWriting(entries, { type: 'all', language: 'ko' })).toHaveLength(2);
-    expect(filterWriting(entries, { type: 'note', language: 'ko' }).map(({ slug }) => slug)).toEqual(['ko-note']);
+    expect(filterWriting(entries, { type: 'essay' }).map(({ slug }) => slug)).toEqual(['essay']);
+    expect(filterWriting(entries, { type: 'all' })).toHaveLength(2);
+    expect(filterWriting(entries, { type: 'note' }).map(({ slug }) => slug)).toEqual(['note']);
   });
 
-  it('parses supported queries, ignores unsupported values, and serializes non-all values', () => {
-    expect(parseWritingFilters('?type=essay&lang=en')).toEqual({ type: 'essay', language: 'en' });
-    expect(parseWritingFilters('?type=article&lang=jp')).toEqual({ type: 'all', language: 'all' });
-    expect(buildWritingSearch({ type: 'note', language: 'all' })).toBe('?type=note');
-    expect(buildWritingSearch({ type: 'all', language: 'all' })).toBe('');
+  it('ignores legacy language queries and serializes type-only filters', () => {
+    expect(parseWritingFilters('?type=essay&lang=en')).toEqual({ type: 'essay' });
+    expect(parseWritingFilters('?type=article&lang=ko')).toEqual({ type: 'all' });
+    expect(buildWritingSearch({ type: 'note' })).toBe('?type=note');
+    expect(buildWritingSearch({ type: 'all' })).toBe('');
   });
 
   it('rejects duplicate normalized slugs and multiple published featured essays', () => {

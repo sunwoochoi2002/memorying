@@ -121,6 +121,30 @@ describe('writing domain', () => {
     ])).toThrow('Only one published essay may be featured.');
   });
 
+  it('rejects slugs outside the stable lowercase ASCII hyphen policy', () => {
+    const invalidSlugs = [
+      'two words',
+      'Uppercase',
+      '글',
+      'nested/path',
+      '-leading',
+      'trailing-',
+      'two--hyphens',
+    ];
+
+    for (const slug of invalidSlugs) {
+      expect(() => assertWritingInvariants([item({ slug })])).toThrow(
+        `Invalid writing slug: "${slug}". Slugs must use lowercase ASCII letters and numbers separated by single hyphens.`,
+      );
+    }
+  });
+
+  it('accepts stable lowercase ASCII alphanumeric slugs separated by single hyphens', () => {
+    const validSlugs = ['a', 'memorying-start', 'essay-2', '2026'];
+
+    expect(() => assertWritingInvariants(validSlugs.map((slug) => item({ slug })))).not.toThrow();
+  });
+
   it('does not count draft featured essays toward the published featured invariant', () => {
     expect(() => assertWritingInvariants([
       item({ slug: 'published', featured: true }),

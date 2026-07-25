@@ -95,6 +95,11 @@ export function buildWritingSearch(filters: WritingFilters): string {
 export function assertWritingInvariants(entries: WritingItem[]): void {
   const slugs = new Set<string>();
   for (const entry of entries) {
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(entry.slug)) {
+      throw new Error(
+        `Invalid writing slug: "${entry.slug}". Slugs must use lowercase ASCII letters and numbers separated by single hyphens.`,
+      );
+    }
     if (slugs.has(entry.slug)) throw new Error(`Duplicate writing slug: ${entry.slug}`);
     slugs.add(entry.slug);
   }

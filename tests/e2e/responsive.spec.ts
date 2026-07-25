@@ -16,3 +16,48 @@ for (const width of widths) {
     });
   }
 }
+
+test('Writing navigation and filters provide 44px touch targets at 320px', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto('/writing/');
+
+  const controls = [
+    ...await page.getByRole('navigation', { name: 'Primary' }).getByRole('link').all(),
+    ...await page.locator('[data-writing-filters]').getByRole('button').all(),
+  ];
+
+  expect(controls.length).toBeGreaterThan(0);
+  for (const control of controls) {
+    const box = await control.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.width).toBeGreaterThanOrEqual(44);
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+  }
+
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Tab');
+  const navLink = page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'About' });
+  await expect(navLink).toBeFocused();
+  const navFocus = await navLink.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { outlineWidth: style.outlineWidth, boxShadow: style.boxShadow };
+  });
+  expect(Number.parseFloat(navFocus.outlineWidth)).toBeGreaterThanOrEqual(3);
+  expect(navFocus.boxShadow).not.toBe('none');
+
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Tab');
+  const filterButton = page.locator('[data-filter-group="type"]').getByRole('button', { name: 'All' });
+  await expect(filterButton).toBeFocused();
+  const filterFocus = await filterButton.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { outlineWidth: style.outlineWidth, boxShadow: style.boxShadow };
+  });
+  expect(Number.parseFloat(filterFocus.outlineWidth)).toBeGreaterThanOrEqual(3);
+  expect(filterFocus.boxShadow).not.toBe('none');
+});

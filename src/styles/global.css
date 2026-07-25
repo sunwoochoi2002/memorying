@@ -35,7 +35,7 @@ button { cursor: pointer; }
 .site-header__inner { min-height: 4.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
 .site-brand { font: 700 0.85rem/1 var(--sans); text-decoration: none; }
 .site-nav { display: flex; flex-wrap: wrap; gap: clamp(1rem, 3vw, 2rem); }
-.site-nav a { color: var(--muted); font: 500 0.78rem/1 var(--sans); text-decoration: none; }
+.site-nav a { min-width: 2.75rem; min-height: 2.75rem; display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 0.35rem; color: var(--muted); font: 500 0.78rem/1 var(--sans); text-decoration: none; }
 .site-nav a[aria-current="page"] { color: var(--ink); text-decoration: underline; }
 .hero { padding-block: clamp(5rem, 12vw, 10rem); }
 .hero__title { max-width: 13ch; margin: 0; font-size: clamp(3rem, 8vw, 6.5rem); font-weight: 400; letter-spacing: -0.055em; line-height: 0.95; }
@@ -58,7 +58,7 @@ button { cursor: pointer; }
 .filters { display: grid; gap: 1rem; margin-block: 2rem; }
 .filter-group { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; border: 0; }
 .filter-group legend { width: 100%; margin-bottom: 0.4rem; font: 700 0.72rem/1 var(--sans); }
-.filter-button { padding: 0.55rem 0.8rem; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); font: 600 0.76rem/1 var(--sans); }
+.filter-button { min-width: 2.75rem; min-height: 2.75rem; padding: 0.55rem 0.8rem; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); font: 600 0.76rem/1 var(--sans); }
 .filter-button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--paper); }
 .empty-state { padding: 2rem; border: 1px dashed var(--line); color: var(--muted); }
 .newsletter { padding: clamp(1.5rem, 4vw, 2.5rem); border: 1px solid var(--line); background: var(--paper-deep); }

@@ -3,11 +3,19 @@ import {
   assertWritingInvariants,
   buildWritingSearch,
   filterWriting,
+  filterWritingArticles,
+  getWritingMetaSourceId,
   getWritingSourceId,
   normalizeWritingSlug,
+  originalTranslation,
+  parseWritingTranslationId,
   parseWritingFilters,
+  selectFeaturedArticle,
   selectFeatured,
+  sortWritingArticles,
   sortWriting,
+  assertWritingArticleInvariants,
+  type WritingArticle,
   type WritingItem,
 } from '../../src/lib/writing';
 
@@ -20,6 +28,20 @@ const item = (overrides: Partial<WritingItem>): WritingItem => ({
   language: 'ko',
   draft: false,
   featured: false,
+  ...overrides,
+});
+
+const article = (overrides: Partial<WritingArticle> = {}): WritingArticle => ({
+  slug: 'base',
+  publishedAt: new Date('2026-07-01T00:00:00Z'),
+  type: 'essay',
+  originalLanguage: 'ko',
+  draft: false,
+  featured: false,
+  translations: {
+    ko: { language: 'ko', title: '기본 제목', description: '기본 설명' },
+    en: { language: 'en', title: 'Base title', description: 'Base description' },
+  },
   ...overrides,
 });
 
@@ -150,5 +172,75 @@ describe('writing domain', () => {
       item({ slug: 'published', featured: true }),
       item({ slug: 'draft', draft: true, featured: true }),
     ])).not.toThrow();
+  });
+});
+
+describe('bilingual writing article domain', () => {
+  it('parses translation and metadata source IDs and retrieves the original translation', () => {
+    expect(parseWritingTranslationId('memorying-start/ko')).toEqual({
+      slug: 'memorying-start', language: 'ko',
+    });
+    expect(() => parseWritingTranslationId('memorying-start/jp')).toThrow(
+      'Invalid writing translation ID: memorying-start/jp',
+    );
+    expect(getWritingMetaSourceId('memorying-start/meta.yaml')).toBe('memorying-start');
+    expect(originalTranslation(article()).title).toBe('기본 제목');
+  });
+
+  it('filters articles by type', () => {
+    expect(filterWritingArticles([article(), article({ slug: 'note', type: 'note' })], 'note'))
+      .toHaveLength(1);
+  });
+
+  it('sorts newest first and uses code-point slug order as a deterministic tie-breaker', () => {
+    const entries = [
+      article({ slug: 'z', publishedAt: new Date('2026-07-01') }),
+      article({ slug: 'a', publishedAt: new Date('2026-07-01') }),
+      article({ slug: 'B', publishedAt: new Date('2026-07-01') }),
+      article({ slug: 'new', publishedAt: new Date('2026-07-02') }),
+    ];
+
+    expect(sortWritingArticles(entries).map(({ slug }) => slug)).toEqual(['new', 'B', 'a', 'z']);
+  });
+
+  it('sorts without mutating the article input array', () => {
+    const entries = [
+      article({ slug: 'old', publishedAt: new Date('2026-07-01') }),
+      article({ slug: 'new', publishedAt: new Date('2026-07-02') }),
+    ];
+
+    sortWritingArticles(entries);
+
+    expect(entries.map(({ slug }) => slug)).toEqual(['old', 'new']);
+  });
+
+  it('selects an explicit featured essay and ignores featured notes', () => {
+    const entries = [
+      article({ slug: 'new', publishedAt: new Date('2026-07-01') }),
+      article({ slug: 'note', type: 'note', featured: true, publishedAt: new Date('2026-07-02') }),
+      article({ slug: 'old-featured', featured: true, publishedAt: new Date('2026-06-01') }),
+    ];
+
+    expect(selectFeaturedArticle(entries)?.slug).toBe('old-featured');
+  });
+
+  it('rejects article slugs outside the stable lowercase ASCII hyphen policy', () => {
+    expect(() => assertWritingArticleInvariants([article({ slug: 'Uppercase' })])).toThrow(
+      'Invalid writing slug: "Uppercase". Slugs must use lowercase ASCII letters and numbers separated by single hyphens.',
+    );
+  });
+
+  it('does not count draft featured articles toward the published featured invariant', () => {
+    expect(() => assertWritingArticleInvariants([
+      article({ slug: 'published', featured: true }),
+      article({ slug: 'draft', draft: true, featured: true }),
+    ])).not.toThrow();
+  });
+
+  it('rejects multiple published featured essays', () => {
+    expect(() => assertWritingArticleInvariants([
+      article({ slug: 'one', featured: true }),
+      article({ slug: 'two', featured: true }),
+    ])).toThrow('Only one published essay may be featured.');
   });
 });

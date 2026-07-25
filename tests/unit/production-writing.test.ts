@@ -13,6 +13,17 @@ describe('production draft exclusion', () => {
   let sitemap: string;
 
   beforeAll(() => {
+    expect(readdirSync('src/content/writing/small-beginning').sort()).toEqual([
+      'en.mdx',
+      'ko.mdx',
+      'meta.yaml',
+    ]);
+    expect(readdirSync('src/content/writing/memorying-start').sort()).toEqual([
+      'cover.svg',
+      'en.mdx',
+      'ko.mdx',
+      'meta.yaml',
+    ]);
     execFileSync('npm', ['run', 'build'], {
       cwd: process.cwd(),
       env: {

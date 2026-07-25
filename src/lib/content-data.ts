@@ -1,16 +1,27 @@
 import {
-  assertWritingInvariants,
+  assertWritingArticleInvariants,
   compareCodePointStrings,
-  compareWritingItems,
-  normalizeWritingSlug,
+  originalTranslation,
+  parseWritingTranslationId,
+  sortWritingArticles,
+  type WritingArticle,
   type WritingItem,
+  type WritingLanguage,
+  type WritingTranslation,
 } from './writing';
 
-export type WritingEntryData = Omit<WritingItem, 'slug'>;
+export type WritingMetadataEntryData = Omit<WritingArticle, 'slug' | 'translations'>;
+export type WritingTranslationEntryData = Omit<WritingTranslation, 'language'>;
 
-export interface WritingDataEntry {
+export interface WritingMetadataDataEntry {
   id: string;
-  data: WritingEntryData;
+  data: WritingMetadataEntryData;
+}
+
+export interface WritingTranslationDataEntry {
+  id: string;
+  body?: string;
+  data: WritingTranslationEntryData;
 }
 
 export interface WorkEntryData {
@@ -22,30 +33,38 @@ export interface WorkDataEntry {
   data: WorkEntryData;
 }
 
-export interface PreparedWritingPair<TEntry extends WritingDataEntry> {
-  entry: TEntry;
-  item: WritingItem;
+export interface PreparedWritingPair<
+  TMeta extends WritingMetadataDataEntry,
+  TTranslation extends WritingTranslationDataEntry,
+> {
+  metaEntry: TMeta;
+  entries: Record<WritingLanguage, TTranslation>;
+  item: WritingArticle;
 }
 
-export interface PreparedWritingData<TEntry extends WritingDataEntry> {
-  items: WritingItem[];
-  pairs: Array<PreparedWritingPair<TEntry>>;
+export interface PreparedWritingData<
+  TMeta extends WritingMetadataDataEntry,
+  TTranslation extends WritingTranslationDataEntry,
+> {
+  items: WritingArticle[];
+  pairs: Array<PreparedWritingPair<TMeta, TTranslation>>;
 }
 
-export function toWritingItem(entry: WritingDataEntry): WritingItem {
+export function toWritingItem(article: WritingArticle): WritingItem {
+  const translation = originalTranslation(article);
   return {
-    slug: normalizeWritingSlug(entry.id),
-    title: entry.data.title,
-    description: entry.data.description,
-    publishedAt: entry.data.publishedAt,
-    updatedAt: entry.data.updatedAt,
-    type: entry.data.type,
-    language: entry.data.language,
-    draft: entry.data.draft,
-    featured: entry.data.featured,
-    canonicalUrl: entry.data.canonicalUrl,
-    coverImage: entry.data.coverImage,
-    coverImageAlt: entry.data.coverImageAlt,
+    slug: article.slug,
+    title: translation.title,
+    description: translation.description,
+    publishedAt: article.publishedAt,
+    updatedAt: article.updatedAt,
+    type: article.type,
+    language: translation.language,
+    draft: article.draft,
+    featured: article.featured,
+    canonicalUrl: article.canonicalUrl,
+    coverImage: article.coverImage,
+    coverImageAlt: article.coverImageAlt?.[translation.language],
   };
 }
 
@@ -56,21 +75,79 @@ export function resolveIncludeDrafts(
   return explicit ?? isDevelopment;
 }
 
-export function prepareWritingData<TEntry extends WritingDataEntry>(
-  entries: readonly TEntry[],
+export function prepareWritingData<
+  TMeta extends WritingMetadataDataEntry,
+  TTranslation extends WritingTranslationDataEntry,
+>(
+  metaEntries: readonly TMeta[],
+  translationEntries: readonly TTranslation[],
   includeDrafts: boolean,
-): PreparedWritingData<TEntry> {
-  const pairs = entries.map((entry) => ({ entry, item: toWritingItem(entry) }));
-  assertWritingInvariants(pairs.map(({ item }) => item));
+): PreparedWritingData<TMeta, TTranslation> {
+  const metaBySlug = new Map<string, TMeta>();
+  for (const metaEntry of metaEntries) {
+    if (metaBySlug.has(metaEntry.id)) throw new Error(`Duplicate writing slug: ${metaEntry.id}`);
+    metaBySlug.set(metaEntry.id, metaEntry);
+  }
 
-  const visiblePairs = pairs.filter(({ item }) => includeDrafts || !item.draft);
-  const sortedPairs = [...visiblePairs].sort((left, right) => (
-    compareWritingItems(left.item, right.item)
-  ));
+  const translationsBySlug = new Map<string, Partial<Record<WritingLanguage, TTranslation>>>();
+  for (const translationEntry of translationEntries) {
+    const { slug, language } = parseWritingTranslationId(translationEntry.id);
+    const translations = translationsBySlug.get(slug) ?? {};
+    if (translations[language]) {
+      throw new Error(`Writing "${slug}" has duplicate translation: ${language}.`);
+    }
+    translations[language] = translationEntry;
+    translationsBySlug.set(slug, translations);
+  }
+
+  const slugs = [...new Set([...metaBySlug.keys(), ...translationsBySlug.keys()])]
+    .sort(compareCodePointStrings);
+  const pairs: Array<PreparedWritingPair<TMeta, TTranslation>> = [];
+
+  for (const slug of slugs) {
+    const metaEntry = metaBySlug.get(slug);
+    if (!metaEntry) throw new Error(`Writing "${slug}" is missing meta.yaml.`);
+
+    const translations = translationsBySlug.get(slug) ?? {};
+    const ko = translations.ko;
+    const en = translations.en;
+    if (!ko) throw new Error(`Writing "${slug}" is missing translation: ko.`);
+    if (!en) throw new Error(`Writing "${slug}" is missing translation: en.`);
+
+    const entries = { ko, en };
+    for (const [language, entry] of Object.entries(entries) as Array<[WritingLanguage, TTranslation]>) {
+      if (!entry.body?.trim()) {
+        throw new Error(`Writing "${slug}" translation "${language}" has an empty body.`);
+      }
+      if (!metaEntry.data.draft && (entry.data.title.startsWith('[Draft]')
+        || entry.data.description.startsWith('[Draft]'))) {
+        throw new Error(`Published writing "${slug}" cannot use [Draft] title or description markers.`);
+      }
+    }
+
+    pairs.push({
+      metaEntry,
+      entries,
+      item: {
+        slug,
+        ...metaEntry.data,
+        translations: {
+          ko: { language: 'ko', ...ko.data },
+          en: { language: 'en', ...en.data },
+        },
+      },
+    });
+  }
+
+  assertWritingArticleInvariants(pairs.map(({ item }) => item));
+  const visibleItems = sortWritingArticles(
+    pairs.map(({ item }) => item).filter((item) => includeDrafts || !item.draft),
+  );
+  const pairsByItem = new Map(pairs.map((pair) => [pair.item, pair]));
 
   return {
-    pairs: sortedPairs,
-    items: sortedPairs.map(({ item }) => item),
+    items: visibleItems,
+    pairs: visibleItems.map((item) => pairsByItem.get(item)!),
   };
 }
 

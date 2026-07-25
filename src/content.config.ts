@@ -1,7 +1,11 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
-import { createWorkSchema, createWritingSchema } from './lib/content-schema';
-import { getWritingSourceId } from './lib/writing';
+import {
+  createWorkSchema,
+  createWritingMetadataSchema,
+  createWritingTranslationSchema,
+} from './lib/content-schema';
+import { getWritingMetaSourceId, getWritingSourceId } from './lib/writing';
 
 const writing = defineCollection({
   loader: glob({
@@ -9,7 +13,16 @@ const writing = defineCollection({
     base: './src/content/writing',
     generateId: ({ entry }) => getWritingSourceId(entry),
   }),
-  schema: ({ image }) => createWritingSchema(image()),
+  schema: createWritingTranslationSchema(),
+});
+
+const writingMeta = defineCollection({
+  loader: glob({
+    pattern: '**/meta.(yaml|yml)',
+    base: './src/content/writing',
+    generateId: ({ entry }) => getWritingMetaSourceId(entry),
+  }),
+  schema: ({ image }) => createWritingMetadataSchema(image()),
 });
 
 const work = defineCollection({
@@ -17,4 +30,4 @@ const work = defineCollection({
   schema: ({ image }) => createWorkSchema(image()),
 });
 
-export const collections = { writing, work };
+export const collections = { writing, writingMeta, work };

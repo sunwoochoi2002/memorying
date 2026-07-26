@@ -33,6 +33,8 @@ Update this checkpoint before every handoff and before pushing, so a fresh human
 - Design: [`docs/superpowers/specs/2026-07-25-compact-home-bilingual-writing-design.md`](superpowers/specs/2026-07-25-compact-home-bilingual-writing-design.md)
 - Foundation implementation plan: [`docs/superpowers/plans/2026-07-25-bilingual-writing-foundation.md`](superpowers/plans/2026-07-25-bilingual-writing-foundation.md)
 - Compact-home UI implementation plan: [`docs/superpowers/plans/2026-07-25-compact-home-writing-ui.md`](superpowers/plans/2026-07-25-compact-home-writing-ui.md)
+- Writing-presentation design: [`docs/superpowers/specs/2026-07-26-consistent-writing-dates-title-wrapping-design.md`](superpowers/specs/2026-07-26-consistent-writing-dates-title-wrapping-design.md)
+- Writing-presentation implementation plan: [`docs/superpowers/plans/2026-07-26-consistent-writing-dates-title-wrapping.md`](superpowers/plans/2026-07-26-consistent-writing-dates-title-wrapping.md)
 
 ## Resume prompt
 

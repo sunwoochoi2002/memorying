@@ -41,6 +41,12 @@ describe('Codespaces continuity handoff', () => {
     expect(currentWork).toMatch(/writing dates.*YYYY-MM-DD/i);
     expect(currentWork).toMatch(/title.*word boundar|word.*title/i);
     expect(currentWork).not.toMatch(/date.*pending|title.*pending/i);
+    expect(currentWork).toContain(
+      'docs/superpowers/specs/2026-07-26-consistent-writing-dates-title-wrapping-design.md',
+    );
+    expect(currentWork).toContain(
+      'docs/superpowers/plans/2026-07-26-consistent-writing-dates-title-wrapping.md',
+    );
 
     expect(guide).toMatch(/private|incognito/i);
     expect(guide).toContain('feature/memorying-mvp');

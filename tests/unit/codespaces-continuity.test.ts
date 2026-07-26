@@ -33,11 +33,14 @@ describe('Codespaces continuity handoff', () => {
     expect(agents).toMatch(/Cloudflare.*domain|domain.*Cloudflare/i);
 
     expect(currentWork).toContain('feature/memorying-mvp');
-    expect(currentWork).toContain('d7131b9975a10bcb3cdd52ad57df5b2476239484');
+    expect(currentWork).toContain('8865a80d36eeffca09252f1f4f4fc1f9a062ab6e');
     expect(currentWork).toMatch(/UI Task 1.*complete/i);
     expect(currentWork).toMatch(/UI Task 2.*complete/i);
     expect(currentWork).toContain('[data-writing-item]');
     expect(currentWork).toContain('Resume prompt');
+    expect(currentWork).toMatch(/writing dates.*YYYY-MM-DD/i);
+    expect(currentWork).toMatch(/title.*word boundar|word.*title/i);
+    expect(currentWork).not.toMatch(/date.*pending|title.*pending/i);
 
     expect(guide).toMatch(/private|incognito/i);
     expect(guide).toContain('feature/memorying-mvp');
@@ -66,11 +69,11 @@ describe('Codespaces continuity handoff', () => {
     expect(currentWork).not.toMatch(/UI Task 2.*pending/i);
     expect(currentWork).toMatch(/visible.*\[data-writing-item\].*resolved/i);
     expect(currentWork).toMatch(/Astro check.*0 errors.*0 warnings.*0 hints/i);
-    expect(currentWork).toMatch(/7.*unit test files.*58.*tests/i);
+    expect(currentWork).toMatch(/7.*unit test files.*59.*tests/i);
     expect(currentWork).toMatch(/source image check.*passed/i);
     expect(currentWork).toMatch(/6 pages.*built/i);
     expect(currentWork).toMatch(/6 generated HTML files.*no broken internal links/i);
-    expect(currentWork).toMatch(/54.*E2E tests.*passed/i);
+    expect(currentWork).toMatch(/55.*E2E tests.*passed/i);
     expect(currentWork).toMatch(/Cloudflare.*domain.*not started/i);
 
     const resumePrompt = currentWork.slice(currentWork.indexOf('## Resume prompt'));

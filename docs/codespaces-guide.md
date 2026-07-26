@@ -23,7 +23,7 @@ git status --short
 curl -fsSL https://chatgpt.com/codex/install.sh | sh
 ```
 
-그 다음 `codex login`으로 로그인합니다. 브라우저 콜백이 되지 않으면 `codex login --device-auth`를 사용하세요. API 키를 저장소 파일이나 셸 기록에 입력하거나 보관하지 마세요.
+그 다음 `codex login`으로 로그인합니다. 브라우저 콜백이 되지 않으면 `codex login --device-auth`를 사용하세요. API 키를 저장소 파일이나 셸 기록에 입력하거나 보관하지 마세요. `~/.codex/auth.json`을 커밋하거나 복사하지 마세요.
 
 ## 작업 재개
 
@@ -35,12 +35,12 @@ npm run dev -- --host 0.0.0.0
 
 ## 작업 종료
 
-필요한 검증을 실행하고 변경 내용을 확인한 뒤 커밋합니다. `git push`로 원격 브랜치에 푸시하고 clean/tracked branch 상태를 확인한 다음 `codex logout`을 실행하세요. 이어서 ChatGPT와 GitHub에서 로그아웃하고 private 창을 닫습니다.
+필요한 검증을 실행하고 변경 내용을 확인한 뒤 커밋합니다. `git push`로 원격 브랜치에 푸시하고 clean/tracked branch 상태를 확인한 다음 `codex logout`을 실행하세요. Codespace를 중지하거나 삭제하기 전에는 항상 `codex logout`을 실행하세요. 이어서 ChatGPT와 GitHub에서 로그아웃하고 private 창을 닫습니다.
 
 ## Codespace 삭제
 
-원하는 모든 작업이 `git push`로 푸시된 뒤에만 Codespace를 삭제하세요. 아직 푸시하지 않은 작업이 있다면 삭제하지 말고 Codespace를 중지한 뒤 나중에 다시 이어서 작업하세요.
+원하는 모든 작업이 `git push`로 푸시된 뒤에만 Codespace를 삭제하세요. 푸시하지 않은 작업이 있다면 먼저 `codex logout`을 실행하고 Codespace를 중지한 뒤 나중에 다시 이어서 작업하세요.
 
 ## 문제 복구
 
-생성 로그를 확인하고, 제공되면 recovery container를 사용하세요. 추적되는 설정을 고친 뒤 컨테이너를 rebuild합니다. 일반 실행이 계속 실패하면 GitHub의 [변경 내용을 브랜치로 내보내는 경로](https://docs.github.com/en/codespaces/developing-in-a-codespace/using-source-control-in-your-codespace)를 사용하세요.
+생성 로그를 확인하고, 제공되면 recovery container를 사용하세요. 추적되는 설정을 고친 뒤 컨테이너를 rebuild합니다. 일반 실행이 계속 실패하면 GitHub의 [변경 내용을 브랜치로 내보내는 경로](https://docs.github.com/en/codespaces/troubleshooting/exporting-changes-to-a-branch)를 사용하세요.

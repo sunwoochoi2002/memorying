@@ -48,6 +48,12 @@ describe('Codespaces continuity handoff', () => {
     expect(guide).toContain('git status --short');
     expect(guide).toMatch(/private.*4321|4321.*private/i);
     expect(guide).toMatch(/git push[\s\S]*삭제|푸시[\s\S]*삭제/i);
+    expect(guide).toContain('`~/.codex/auth.json`을 커밋하거나 복사하지 마세요.');
+    expect(guide).toContain('Codespace를 중지하거나 삭제하기 전에는 항상 `codex logout`을 실행하세요.');
+    expect(guide).toContain('푸시하지 않은 작업이 있다면 먼저 `codex logout`을 실행하고 Codespace를 중지한 뒤 나중에 다시 이어서 작업하세요.');
+    expect(guide).toContain(
+      'https://docs.github.com/en/codespaces/troubleshooting/exporting-changes-to-a-branch',
+    );
 
     expect(readme).toContain('docs/CURRENT_WORK.md');
     expect(readme).toContain('docs/codespaces-guide.md');

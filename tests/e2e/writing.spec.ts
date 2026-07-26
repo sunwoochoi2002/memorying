@@ -168,6 +168,27 @@ test('renders original-first bilingual articles at one stable URL', async ({ pag
   await noJavaScriptContext.close();
 });
 
+test('wraps Korean and English detail titles only at word boundaries', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto('/writing/memorying-start/');
+
+  const koreanTitle = page.locator('h1[data-language-fragment="ko"]');
+  await expect(koreanTitle).toBeVisible();
+  await expect(koreanTitle).toHaveCSS('word-break', 'keep-all');
+  await expect(koreanTitle).toHaveCSS('overflow-wrap', 'normal');
+  await expect(koreanTitle).toHaveCSS('hyphens', 'none');
+
+  await page.getByRole('button', { name: 'English' }).click();
+  const englishTitle = page.locator('h1[data-language-fragment="en"]');
+  await expect(englishTitle).toBeVisible();
+  await expect(englishTitle).toHaveCSS('word-break', 'keep-all');
+  await expect(englishTitle).toHaveCSS('overflow-wrap', 'normal');
+  await expect(englishTitle).toHaveCSS('hyphens', 'none');
+
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+});
+
 test('keeps navigation available on the noindex 404 page', async ({ page }) => {
   const response = await page.goto('/missing-memory/');
   expect(response?.status()).toBe(404);

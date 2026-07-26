@@ -20,6 +20,7 @@ test('filters writing with canonical URL history, restores state, and focuses re
   await typeFilters.getByRole('button', { name: 'Note' }).click();
   await expect(page).toHaveURL('/writing/?type=note');
   await expect(status).toHaveText(statusText(1, 'Note'));
+  await expect(page.locator('[data-writing-item]:visible')).toHaveCount(1);
   await expect(page.evaluate(() => history.length)).resolves.toBe(initialHistoryLength + 1);
   await expect(page.getByRole('link', { name: 'Memorying을 시작하며' })).toBeHidden();
   await expect(page.getByRole('link', { name: 'A small beginning' })).toBeVisible();

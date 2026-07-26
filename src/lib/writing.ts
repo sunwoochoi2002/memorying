@@ -8,21 +8,6 @@ export interface WritingFilters {
   type: WritingTypeFilter;
 }
 
-export interface WritingItem {
-  slug: string;
-  title: string;
-  description: string;
-  publishedAt: Date;
-  updatedAt?: Date;
-  type: WritingType;
-  language: WritingLanguage;
-  draft: boolean;
-  featured: boolean;
-  canonicalUrl?: string;
-  coverImage?: ImageMetadata;
-  coverImageAlt?: string;
-}
-
 export interface WritingTranslation {
   language: WritingLanguage;
   title: string;
@@ -83,24 +68,15 @@ export function compareCodePointStrings(left: string, right: string): number {
 }
 
 export function compareWritingItems(
-  left: Pick<WritingItem, 'publishedAt' | 'slug'>,
-  right: Pick<WritingItem, 'publishedAt' | 'slug'>,
+  left: Pick<WritingArticle, 'publishedAt' | 'slug'>,
+  right: Pick<WritingArticle, 'publishedAt' | 'slug'>,
 ): number {
   const byDate = right.publishedAt.getTime() - left.publishedAt.getTime();
   return byDate || compareCodePointStrings(left.slug, right.slug);
 }
 
-export function sortWriting<T extends Pick<WritingItem, 'publishedAt' | 'slug'>>(entries: T[]): T[] {
-  return [...entries].sort(compareWritingItems);
-}
-
 export function sortWritingArticles(entries: WritingArticle[]): WritingArticle[] {
   return [...entries].sort(compareWritingItems);
-}
-
-export function selectFeatured(entries: WritingItem[]): WritingItem | undefined {
-  const essays = sortWriting(entries.filter((entry) => entry.type === 'essay'));
-  return essays.find((entry) => entry.featured) ?? essays[0];
 }
 
 export function selectFeaturedArticle(entries: WritingArticle[]): WritingArticle | undefined {
@@ -133,15 +109,6 @@ export function buildWritingSearch(filters: WritingFilters): string {
   return value ? `?${value}` : '';
 }
 
-export function assertWritingInvariants(entries: WritingItem[]): void {
-  assertWritingSlugInvariants(entries);
-
-  const featured = entries.filter(
-    (entry) => !entry.draft && entry.type === 'essay' && entry.featured,
-  );
-  if (featured.length > 1) throw new Error('Only one published essay may be featured.');
-}
-
 export function assertWritingArticleInvariants(entries: WritingArticle[]): void {
   assertWritingSlugInvariants(entries);
 
@@ -151,7 +118,7 @@ export function assertWritingArticleInvariants(entries: WritingArticle[]): void 
   if (featured.length > 1) throw new Error('Only one published essay may be featured.');
 }
 
-function assertWritingSlugInvariants(entries: Array<Pick<WritingItem, 'slug'>>): void {
+function assertWritingSlugInvariants(entries: Array<Pick<WritingArticle, 'slug'>>): void {
   const slugs = new Set<string>();
   for (const entry of entries) {
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(entry.slug)) {

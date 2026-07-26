@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import {
-  assertWritingInvariants,
   buildWritingSearch,
   filterWriting,
   filterWritingArticles,
@@ -11,25 +10,10 @@ import {
   parseWritingTranslationId,
   parseWritingFilters,
   selectFeaturedArticle,
-  selectFeatured,
   sortWritingArticles,
-  sortWriting,
   assertWritingArticleInvariants,
   type WritingArticle,
-  type WritingItem,
 } from '../../src/lib/writing';
-
-const item = (overrides: Partial<WritingItem>): WritingItem => ({
-  slug: 'base',
-  title: 'Base',
-  description: 'Base description',
-  publishedAt: new Date('2026-07-01T00:00:00Z'),
-  type: 'essay',
-  language: 'ko',
-  draft: false,
-  featured: false,
-  ...overrides,
-});
 
 const article = (overrides: Partial<WritingArticle> = {}): WritingArticle => ({
   slug: 'base',
@@ -45,7 +29,7 @@ const article = (overrides: Partial<WritingArticle> = {}): WritingArticle => ({
   ...overrides,
 });
 
-describe('writing domain', () => {
+describe('writing article domain', () => {
   it('keeps flat and folder-index source IDs distinct until route normalization', () => {
     const sourceIds = [
       getWritingSourceId('same.mdx'),
@@ -57,7 +41,7 @@ describe('writing domain', () => {
 
     const slugs = sourceIds.map(normalizeWritingSlug);
     expect(slugs).toEqual(['same', 'same']);
-    expect(() => assertWritingInvariants(slugs.map((slug) => item({ slug })))).toThrow(
+    expect(() => assertWritingArticleInvariants(slugs.map((slug) => article({ slug })))).toThrow(
       'Duplicate writing slug: same',
     );
   });
@@ -67,57 +51,8 @@ describe('writing domain', () => {
     expect(normalizeWritingSlug('small-beginning')).toBe('small-beginning');
   });
 
-  it('sorts newest first and uses code-point slug order as a deterministic tie-breaker', () => {
-    const entries = [
-      item({ slug: 'z', publishedAt: new Date('2026-07-01') }),
-      item({ slug: 'a', publishedAt: new Date('2026-07-01') }),
-      item({ slug: 'B', publishedAt: new Date('2026-07-01') }),
-      item({ slug: 'new', publishedAt: new Date('2026-07-02') }),
-    ];
-    expect(sortWriting(entries).map(({ slug }) => slug)).toEqual(['new', 'B', 'a', 'z']);
-  });
-
-  it('sorts without mutating the input array', () => {
-    const entries = [
-      item({ slug: 'old', publishedAt: new Date('2026-07-01') }),
-      item({ slug: 'new', publishedAt: new Date('2026-07-02') }),
-    ];
-
-    sortWriting(entries);
-
-    expect(entries.map(({ slug }) => slug)).toEqual(['old', 'new']);
-  });
-
-  it('selects an explicit featured essay from unsorted input', () => {
-    const entries = [
-      item({ slug: 'new', publishedAt: new Date('2026-07-01') }),
-      item({ slug: 'note', type: 'note', publishedAt: new Date('2026-07-02') }),
-      item({ slug: 'old-featured', featured: true, publishedAt: new Date('2026-06-01') }),
-    ];
-
-    expect(selectFeatured(entries)?.slug).toBe('old-featured');
-  });
-
-  it('falls back to the newest essay with code-point slug tie-breaking from unsorted input', () => {
-    const entries = [
-      item({ slug: 'z', publishedAt: new Date('2026-07-01') }),
-      item({ slug: 'note', type: 'note', publishedAt: new Date('2026-07-02') }),
-      item({ slug: 'a', publishedAt: new Date('2026-07-01') }),
-      item({ slug: 'old', publishedAt: new Date('2026-06-01') }),
-    ];
-
-    expect(selectFeatured(entries)?.slug).toBe('a');
-  });
-
-  it('returns no featured item when only notes exist', () => {
-    expect(selectFeatured([item({ type: 'note' })])).toBeUndefined();
-  });
-
   it('filters logical articles by type only', () => {
-    const entries = [
-      article({ slug: 'essay' }),
-      article({ slug: 'note', type: 'note' }),
-    ];
+    const entries = [article({ slug: 'essay' }), article({ slug: 'note', type: 'note' })];
     expect(filterWriting(entries, { type: 'essay' }).map(({ slug }) => slug)).toEqual(['essay']);
     expect(filterWriting(entries, { type: 'all' })).toHaveLength(2);
     expect(filterWriting(entries, { type: 'note' }).map(({ slug }) => slug)).toEqual(['note']);
@@ -128,49 +63,6 @@ describe('writing domain', () => {
     expect(parseWritingFilters('?type=article&lang=ko')).toEqual({ type: 'all' });
     expect(buildWritingSearch({ type: 'note' })).toBe('?type=note');
     expect(buildWritingSearch({ type: 'all' })).toBe('');
-  });
-
-  it('rejects duplicate normalized slugs and multiple published featured essays', () => {
-    expect(() => assertWritingInvariants([
-      item({ slug: 'same' }),
-      item({ slug: 'same' }),
-    ])).toThrow('Duplicate writing slug: same');
-
-    expect(() => assertWritingInvariants([
-      item({ slug: 'one', featured: true }),
-      item({ slug: 'two', featured: true }),
-    ])).toThrow('Only one published essay may be featured.');
-  });
-
-  it('rejects slugs outside the stable lowercase ASCII hyphen policy', () => {
-    const invalidSlugs = [
-      'two words',
-      'Uppercase',
-      '글',
-      'nested/path',
-      '-leading',
-      'trailing-',
-      'two--hyphens',
-    ];
-
-    for (const slug of invalidSlugs) {
-      expect(() => assertWritingInvariants([item({ slug })])).toThrow(
-        `Invalid writing slug: "${slug}". Slugs must use lowercase ASCII letters and numbers separated by single hyphens.`,
-      );
-    }
-  });
-
-  it('accepts stable lowercase ASCII alphanumeric slugs separated by single hyphens', () => {
-    const validSlugs = ['a', 'memorying-start', 'essay-2', '2026'];
-
-    expect(() => assertWritingInvariants(validSlugs.map((slug) => item({ slug })))).not.toThrow();
-  });
-
-  it('does not count draft featured essays toward the published featured invariant', () => {
-    expect(() => assertWritingInvariants([
-      item({ slug: 'published', featured: true }),
-      item({ slug: 'draft', draft: true, featured: true }),
-    ])).not.toThrow();
   });
 });
 
@@ -221,6 +113,24 @@ describe('bilingual writing article domain', () => {
     ];
 
     expect(selectFeaturedArticle(entries)?.slug).toBe('old-featured');
+  });
+
+  it('falls back to the newest essay and returns no featured article when only notes exist', () => {
+    const entries = [
+      article({ slug: 'z', publishedAt: new Date('2026-07-01') }),
+      article({ slug: 'note', type: 'note', publishedAt: new Date('2026-07-02') }),
+      article({ slug: 'a', publishedAt: new Date('2026-07-01') }),
+      article({ slug: 'old', publishedAt: new Date('2026-06-01') }),
+    ];
+
+    expect(selectFeaturedArticle(entries)?.slug).toBe('a');
+    expect(selectFeaturedArticle([article({ type: 'note' })])).toBeUndefined();
+  });
+
+  it('accepts stable lowercase ASCII alphanumeric slugs separated by single hyphens', () => {
+    const validSlugs = ['a', 'memorying-start', 'essay-2', '2026'];
+
+    expect(() => assertWritingArticleInvariants(validSlugs.map((slug) => article({ slug })))).not.toThrow();
   });
 
   it('rejects article slugs outside the stable lowercase ASCII hyphen policy', () => {

@@ -61,3 +61,48 @@ test('Writing navigation and filters provide 44px touch targets at 320px', async
   expect(Number.parseFloat(filterFocus.outlineWidth)).toBeGreaterThanOrEqual(3);
   expect(filterFocus.boxShadow).not.toBe('none');
 });
+
+test('home keeps intentional heading and statement geometry across compact viewports', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto('/');
+
+  const desktopLines = page.locator('[data-home-heading-line]');
+  await expect(desktopLines).toHaveCount(2);
+  const firstDesktopLine = await desktopLines.nth(0).boundingBox();
+  const secondDesktopLine = await desktopLines.nth(1).boundingBox();
+  expect(firstDesktopLine).not.toBeNull();
+  expect(secondDesktopLine).not.toBeNull();
+  expect(Math.abs(
+    (firstDesktopLine!.y + firstDesktopLine!.height / 2)
+      - (secondDesktopLine!.y + secondDesktopLine!.height / 2),
+  )).toBeLessThanOrEqual(1);
+
+  for (const width of [320, 390, 1280]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('/');
+    const statement = page.locator('.hero__statement');
+    const metrics = await statement.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        height: element.getBoundingClientRect().height,
+        lineHeight: Number.parseFloat(style.lineHeight),
+        scrollWidth: element.scrollWidth,
+        clientWidth: element.clientWidth,
+      };
+    });
+    expect(metrics.height).toBeLessThanOrEqual(metrics.lineHeight * 1.2);
+    expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1);
+  }
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  const mobileLines = page.locator('[data-home-heading-line]');
+  const firstMobileLine = await mobileLines.nth(0).boundingBox();
+  const secondMobileLine = await mobileLines.nth(1).boundingBox();
+  expect(firstMobileLine).not.toBeNull();
+  expect(secondMobileLine).not.toBeNull();
+  expect(secondMobileLine!.y).toBeGreaterThan(firstMobileLine!.y + firstMobileLine!.height);
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeGreaterThan(844);
+  await page.getByRole('contentinfo').scrollIntoViewIfNeeded();
+  await expect(page.getByRole('contentinfo')).toBeVisible();
+});

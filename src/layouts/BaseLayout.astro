@@ -9,8 +9,9 @@ interface Props {
   canonicalUrl?: string;
   type?: 'website' | 'article';
   noindex?: boolean;
+  bodyClass?: string;
 }
-const { title, description, lang = 'ko', canonicalUrl, type = 'website', noindex = false } = Astro.props;
+const { title, description, lang = 'ko', canonicalUrl, type = 'website', noindex = false, bodyClass } = Astro.props;
 const pageTitle = title === 'Home' ? 'Sunwoo Choi' : `${title} — Sunwoo Choi`;
 const site = Astro.site ?? new URL('http://localhost:4321');
 const canonical = canonicalUrl ?? new URL(Astro.url.pathname, site).toString();
@@ -36,7 +37,7 @@ const socialImage = new URL('/og-default.png', site).toString();
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImage} />
   </head>
-  <body>
+  <body class={bodyClass}>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <SiteHeader />
     <main id="main-content" tabindex="-1"><slot /></main>

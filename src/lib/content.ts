@@ -3,12 +3,9 @@ import {
   prepareWritingData,
   resolveIncludeDrafts,
   sortWorkData,
-  toWritingItem,
   type PreparedWritingPair,
 } from './content-data';
-import type { WritingArticle, WritingItem } from './writing';
-
-export { toWritingItem } from './content-data';
+import type { WritingArticle } from './writing';
 
 export type WritingEntry = CollectionEntry<'writing'>;
 export type WritingMetaEntry = CollectionEntry<'writingMeta'>;
@@ -35,11 +32,6 @@ export async function loadWritingArticleEntries(
 ): Promise<LoadedWritingArticle[]> {
   const includeDrafts = resolveIncludeDrafts(options.includeDrafts, import.meta.env.DEV);
   return (await loadPreparedWriting(includeDrafts)).pairs;
-}
-
-export async function loadWriting(options: { includeDrafts?: boolean } = {}): Promise<WritingItem[]> {
-  const includeDrafts = resolveIncludeDrafts(options.includeDrafts, import.meta.env.DEV);
-  return (await loadPreparedWriting(includeDrafts)).items.map(toWritingItem);
 }
 
 export async function loadWork(): Promise<WorkEntry[]> {

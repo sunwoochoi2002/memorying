@@ -3,7 +3,6 @@ import {
   prepareWritingData,
   resolveIncludeDrafts,
   sortWorkData,
-  toWritingItem,
   type WritingMetadataEntryData,
   type WritingTranslationEntryData,
 } from '../../src/lib/content-data';
@@ -80,7 +79,7 @@ describe('content data preparation', () => {
     expect(result.pairs[0].entries.en.id).toBe('memorying-start/en');
   });
 
-  it('adapts an English-original article to the existing one-entry writing view', () => {
+  it('keeps an English-original article complete while exposing its declared original translation', () => {
     const coverImage = {
       src: '/images/cover.svg',
       width: 1200,
@@ -100,17 +99,13 @@ describe('content data preparation', () => {
       true,
     );
 
-    const item = toWritingItem(result.items[0]);
+    const item = result.items[0];
+    const original = originalTranslation(item);
 
     expect(result.pairs[0].entries[result.items[0].originalLanguage].id).toBe('english-original/en');
-    expect(item).toMatchObject({
-      slug: 'english-original',
-      title: 'English title',
-      description: 'English description',
-      language: 'en',
-      coverImageAlt: 'English alternative text',
-    });
+    expect(original).toMatchObject({ language: 'en', title: 'English title', description: 'English description' });
     expect(item.coverImage).toBe(coverImage);
+    expect(item.coverImageAlt?.en).toBe('English alternative text');
   });
 
   it('rejects a missing English translation with the article slug and language', () => {

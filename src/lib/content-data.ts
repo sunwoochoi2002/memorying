@@ -1,11 +1,9 @@
 import {
   assertWritingArticleInvariants,
   compareCodePointStrings,
-  originalTranslation,
   parseWritingTranslationId,
   sortWritingArticles,
   type WritingArticle,
-  type WritingItem,
   type WritingLanguage,
   type WritingTranslation,
 } from './writing';
@@ -53,24 +51,6 @@ export interface PreparedWritingData<
 > {
   items: WritingArticle[];
   pairs: Array<PreparedWritingPair<TMeta, TTranslation>>;
-}
-
-export function toWritingItem(article: WritingArticle): WritingItem {
-  const translation = originalTranslation(article);
-  return {
-    slug: article.slug,
-    title: translation.title,
-    description: translation.description,
-    publishedAt: article.publishedAt,
-    updatedAt: article.updatedAt,
-    type: article.type,
-    language: translation.language,
-    draft: article.draft,
-    featured: article.featured,
-    canonicalUrl: article.canonicalUrl,
-    coverImage: article.coverImage,
-    coverImageAlt: article.coverImageAlt?.[translation.language],
-  };
 }
 
 export function resolveIncludeDrafts(

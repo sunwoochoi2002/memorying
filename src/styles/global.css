@@ -78,7 +78,7 @@ button { cursor: pointer; }
 .work-item h2 { margin: 0; font-size: 1.6rem; font-weight: 400; }
 .work-item p { margin: 0.5rem 0 0; color: var(--muted); }
 .article-header { width: min(calc(100% - 2rem), var(--prose)); margin-inline: auto; padding-block: clamp(4rem, 10vw, 8rem) 2rem; }
-.article-header h1 { margin: 0.75rem 0 1rem; font-size: clamp(2.6rem, 7vw, 5rem); font-weight: 400; letter-spacing: -0.045em; line-height: 1; word-break: keep-all; overflow-wrap: normal; hyphens: none; }
+.article-header h1 { margin: 0.75rem 0 1rem; font-size: clamp(2.08rem, 5.6vw, 4rem); font-weight: 400; letter-spacing: -0.045em; line-height: 1; word-break: keep-all; overflow-wrap: normal; hyphens: none; }
 .article-header__description { color: var(--muted); font-size: 1.15rem; }
 .language-toggle { display: flex; align-items: center; gap: 0.5rem; margin-top: 1.25rem; color: var(--faint); font: 600 0.76rem/1 var(--sans); }
 .language-toggle button { min-width: 2.75rem; min-height: 2.75rem; border: 0; border-bottom: 1px solid transparent; background: transparent; color: inherit; padding: 0.4rem 0; }

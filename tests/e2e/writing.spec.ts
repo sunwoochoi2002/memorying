@@ -174,6 +174,7 @@ test('wraps Korean and English detail titles only at word boundaries', async ({ 
 
   const koreanTitle = page.locator('h1[data-language-fragment="ko"]');
   await expect(koreanTitle).toBeVisible();
+  await expect(koreanTitle).toHaveCSS('font-size', '33.28px');
   await expect(koreanTitle).toHaveCSS('word-break', 'keep-all');
   await expect(koreanTitle).toHaveCSS('overflow-wrap', 'normal');
   await expect(koreanTitle).toHaveCSS('hyphens', 'none');
@@ -181,6 +182,7 @@ test('wraps Korean and English detail titles only at word boundaries', async ({ 
   await page.getByRole('button', { name: 'English' }).click();
   const englishTitle = page.locator('h1[data-language-fragment="en"]');
   await expect(englishTitle).toBeVisible();
+  await expect(englishTitle).toHaveCSS('font-size', '33.28px');
   await expect(englishTitle).toHaveCSS('word-break', 'keep-all');
   await expect(englishTitle).toHaveCSS('overflow-wrap', 'normal');
   await expect(englishTitle).toHaveCSS('hyphens', 'none');

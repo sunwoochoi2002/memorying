@@ -36,6 +36,7 @@ test('about and work explain the person without becoming a full résumé', async
   await expect(page.getByText('안녕하세요, 최선우입니다.')).toBeVisible();
 
   await page.goto('/work/');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.getByRole('heading', { level: 1, name: 'Selected work' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Memorying' })).toBeVisible();
 });

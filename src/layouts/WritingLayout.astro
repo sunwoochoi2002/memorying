@@ -25,7 +25,7 @@ const { originalLanguage } = item;
   <article>
     <header class="article-header">
       <ContentMetadata item={item} />
-      <div class="language-toggle" role="group" aria-label="Language" data-language-toggle>
+      <div class="language-toggle" role="group" aria-label="Language" data-language-toggle hidden>
         <button type="button" data-language-button="ko" aria-pressed={originalLanguage === 'ko'}>
           <span lang="ko">한국어</span> {originalLanguage === 'ko' && <small lang="en">Original</small>}
         </button>
@@ -92,5 +92,6 @@ const { originalLanguage } = item;
         if (image) image.alt = language === 'ko' ? cover.dataset.altKo ?? '' : cover.dataset.altEn ?? '';
       }
     });
+    toggle.hidden = false;
   }
 </script>

@@ -165,6 +165,9 @@ test('renders original-first bilingual articles at one stable URL', async ({ pag
   await expect(noJavaScriptPage.locator('[data-language-panel="ko"]')).toBeVisible();
   await expect(noJavaScriptPage.locator('[data-language-panel="ko"]')).toContainText('시간이 지나도 잊고 싶지 않은 것들을 기록합니다.');
   await expect(noJavaScriptPage.locator('[data-language-panel="en"]')).toBeHidden();
+  await expect(noJavaScriptPage.locator('[data-language-toggle]')).toBeHidden();
+  await expect(noJavaScriptPage.getByRole('button', { name: /한국어.*Original/ })).toHaveCount(0);
+  await expect(noJavaScriptPage.getByRole('button', { name: 'English' })).toHaveCount(0);
   await noJavaScriptContext.close();
 });
 

@@ -16,6 +16,11 @@ npm run check:links
 npm run verify
 ```
 
+## Resume in Codespaces
+
+- Current implementation checkpoint: [`docs/CURRENT_WORK.md`](docs/CURRENT_WORK.md)
+- Shared-computer and Codespaces runbook: [`docs/codespaces-guide.md`](docs/codespaces-guide.md)
+
 ## Content
 
 - Writing: `src/content/writing/`

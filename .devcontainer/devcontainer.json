@@ -1,0 +1,13 @@
+{
+  "name": "Memorying",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "postCreateCommand": "npm ci && npx playwright install --with-deps chromium",
+  "forwardPorts": [4321],
+  "portsAttributes": {
+    "4321": {
+      "label": "Memorying Astro preview",
+      "onAutoForward": "notify",
+      "visibility": "private"
+    }
+  }
+}

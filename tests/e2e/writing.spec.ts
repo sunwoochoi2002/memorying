@@ -17,6 +17,16 @@ test('filters writing with canonical URL history, restores state, and focuses re
   await expect(page.locator('[data-writing-archive] img')).toHaveCount(0);
   await expect(status).toHaveText(statusText(2, 'All'));
 
+  const koreanWriting = page.locator('[data-writing-item]').filter({ hasText: 'Memorying을 시작하며' });
+  await expect(koreanWriting.locator('h2')).toHaveAttribute('lang', 'ko');
+  await expect(koreanWriting.locator('.writing-list-item__copy > p')).toHaveAttribute('lang', 'ko');
+  await expect(koreanWriting.locator('time')).toHaveAttribute('lang', 'ko');
+
+  const englishWriting = page.locator('[data-writing-item]').filter({ hasText: 'A small beginning' });
+  await expect(englishWriting.locator('h2')).toHaveAttribute('lang', 'en');
+  await expect(englishWriting.locator('.writing-list-item__copy > p')).toHaveAttribute('lang', 'en');
+  await expect(englishWriting.locator('time')).toHaveAttribute('lang', 'en');
+
   await typeFilters.getByRole('button', { name: 'Note' }).click();
   await expect(page).toHaveURL('/writing/?type=note');
   await expect(status).toHaveText(statusText(1, 'Note'));
@@ -42,7 +52,27 @@ test('filters writing with canonical URL history, restores state, and focuses re
   await expect(page.getByRole('link', { name: 'A small beginning' })).toBeVisible();
 
   await page.goForward();
+  await expect(page).toHaveURL('/writing/');
   await expect(status).toHaveText(statusText(2, 'All'));
+
+  await page.locator('[data-writing-item]').evaluateAll((items) => {
+    for (const item of items) (item as HTMLElement).dataset.type = 'essay';
+  });
+  const historyBeforeEmptyState = await page.evaluate(() => history.length);
+  await typeFilters.getByRole('button', { name: 'Note' }).click();
+  await expect(page).toHaveURL('/writing/?type=note');
+  await expect(status).toHaveText(statusText(0, 'Note'));
+  await expect(page.locator('[data-writing-item]:visible')).toHaveCount(0);
+  const reset = page.locator('[data-reset-filters]');
+  await expect(reset).toBeVisible();
+  await expect(page.evaluate(() => history.length)).resolves.toBe(historyBeforeEmptyState + 1);
+
+  await reset.click();
+  await expect(page).toHaveURL('/writing/');
+  await expect(status).toHaveText(statusText(2, 'All'));
+  await expect(page.locator('[data-writing-item]:visible')).toHaveCount(2);
+  await expect(typeFilters.getByRole('button', { name: 'All' })).toBeFocused();
+  await expect(page.evaluate(() => history.length)).resolves.toBe(historyBeforeEmptyState + 2);
 });
 
 test('ignores legacy language queries before canonical interaction', async ({ page }) => {

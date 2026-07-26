@@ -15,12 +15,12 @@ const locale = item.originalLanguage === 'ko' ? 'ko-KR' : 'en-US';
 
 <article class:list={['writing-list-item', { 'writing-list-item--compact': compact }]}>
   <div class="writing-list-item__copy">
-    <Heading><a href={`/writing/${item.slug}/`}>{translation.title}</a></Heading>
-    <p>{translation.description}</p>
+    <Heading lang={item.originalLanguage}><a href={`/writing/${item.slug}/`}>{translation.title}</a></Heading>
+    <p lang={item.originalLanguage}>{translation.description}</p>
   </div>
   <p class="writing-list-item__meta">
-    <span>{item.type === 'essay' ? 'Essay' : 'Note'}</span>
-    <time datetime={item.publishedAt.toISOString()}>
+    <span lang="en">{item.type === 'essay' ? 'Essay' : 'Note'}</span>
+    <time lang={item.originalLanguage} datetime={item.publishedAt.toISOString()}>
       {new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' }).format(item.publishedAt)}
     </time>
   </p>

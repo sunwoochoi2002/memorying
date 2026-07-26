@@ -17,13 +17,15 @@ for (const width of widths) {
   }
 }
 
-test('Writing navigation and filters provide 44px touch targets at 320px', async ({ page }) => {
+test('site writing actions provide 44px touch targets at 320px', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 900 });
   await page.goto('/writing/');
 
   const controls = [
+    page.getByRole('link', { name: 'Sunwoo Choi' }),
     ...await page.getByRole('navigation', { name: 'Primary' }).getByRole('link').all(),
     ...await page.locator('[data-writing-filters]').getByRole('button').all(),
+    ...await page.locator('[data-writing-item]').getByRole('link').all(),
   ];
 
   expect(controls.length).toBeGreaterThan(0);
@@ -60,6 +62,28 @@ test('Writing navigation and filters provide 44px touch targets at 320px', async
   });
   expect(Number.parseFloat(filterFocus.outlineWidth)).toBeGreaterThanOrEqual(3);
   expect(filterFocus.boxShadow).not.toBe('none');
+
+  await page.goto('/');
+  for (const control of [
+    page.getByRole('link', { name: 'View all →' }),
+    ...await page.locator('.home-writing .writing-list-item').getByRole('link').all(),
+  ]) {
+    const box = await control.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.width).toBeGreaterThanOrEqual(44);
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+  }
+
+  await page.goto('/writing/memorying-start/');
+  for (const control of [
+    ...await page.getByRole('group', { name: 'Language' }).getByRole('button').all(),
+    page.getByRole('link', { name: 'Back to Writing' }),
+  ]) {
+    const box = await control.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.width).toBeGreaterThanOrEqual(44);
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+  }
 });
 
 test('home keeps intentional heading and statement geometry across compact viewports', async ({ page }) => {

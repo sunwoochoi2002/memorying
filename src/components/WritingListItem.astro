@@ -1,5 +1,5 @@
 ---
-import { originalTranslation, type WritingArticle } from '../lib/writing';
+import { formatWritingDate, originalTranslation, type WritingArticle } from '../lib/writing';
 
 interface Props {
   item: WritingArticle;
@@ -10,7 +10,6 @@ interface Props {
 const { item, headingLevel = 2, compact = false } = Astro.props;
 const translation = originalTranslation(item);
 const Heading = headingLevel === 2 ? 'h2' : 'h3';
-const locale = item.originalLanguage === 'ko' ? 'ko-KR' : 'en-US';
 ---
 
 <article class:list={['writing-list-item', { 'writing-list-item--compact': compact }]}>
@@ -21,7 +20,7 @@ const locale = item.originalLanguage === 'ko' ? 'ko-KR' : 'en-US';
   <p class="writing-list-item__meta">
     <span lang="en">{item.type === 'essay' ? 'Essay' : 'Note'}</span>
     <time lang={item.originalLanguage} datetime={item.publishedAt.toISOString()}>
-      {new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' }).format(item.publishedAt)}
+      {formatWritingDate(item.publishedAt)}
     </time>
   </p>
 </article>

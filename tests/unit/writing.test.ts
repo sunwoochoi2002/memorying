@@ -3,6 +3,7 @@ import {
   buildWritingSearch,
   filterWriting,
   filterWritingArticles,
+  formatWritingDate,
   getWritingMetaSourceId,
   getWritingSourceId,
   normalizeWritingSlug,
@@ -30,6 +31,11 @@ const article = (overrides: Partial<WritingArticle> = {}): WritingArticle => ({
 });
 
 describe('writing article domain', () => {
+  it('formats visible writing dates as zero-padded UTC calendar dates', () => {
+    expect(formatWritingDate(new Date('2026-07-24T00:30:00Z'))).toBe('2026-07-24');
+    expect(formatWritingDate(new Date('2026-01-02T23:30:00-11:00'))).toBe('2026-01-03');
+  });
+
   it('keeps flat and folder-index source IDs distinct until route normalization', () => {
     const sourceIds = [
       getWritingSourceId('same.mdx'),

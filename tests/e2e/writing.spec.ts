@@ -21,11 +21,13 @@ test('filters writing with canonical URL history, restores state, and focuses re
   await expect(koreanWriting.locator('h2')).toHaveAttribute('lang', 'ko');
   await expect(koreanWriting.locator('.writing-list-item__copy > p')).toHaveAttribute('lang', 'ko');
   await expect(koreanWriting.locator('time')).toHaveAttribute('lang', 'ko');
+  await expect(koreanWriting.locator('time')).toHaveText('2026-07-24');
 
   const englishWriting = page.locator('[data-writing-item]').filter({ hasText: 'A small beginning' });
   await expect(englishWriting.locator('h2')).toHaveAttribute('lang', 'en');
   await expect(englishWriting.locator('.writing-list-item__copy > p')).toHaveAttribute('lang', 'en');
   await expect(englishWriting.locator('time')).toHaveAttribute('lang', 'en');
+  await expect(englishWriting.locator('time')).toHaveText('2026-07-23');
 
   await typeFilters.getByRole('button', { name: 'Note' }).click();
   await expect(page).toHaveURL('/writing/?type=note');
@@ -134,6 +136,9 @@ test('renders original-first bilingual articles at one stable URL', async ({ pag
     'http://localhost:4321/writing/memorying-start/',
   );
   await expect(page.getByRole('link', { name: 'Back to Writing' })).toBeVisible();
+  const publishedDate = page.locator('.meta time').first();
+  await expect(publishedDate).toHaveText('2026-07-24');
+  await expect(publishedDate).toHaveAttribute('datetime', '2026-07-24T00:00:00.000Z');
 
   const initialUrl = page.url();
   await page.getByRole('button', { name: 'English' }).click();
@@ -141,6 +146,7 @@ test('renders original-first bilingual articles at one stable URL', async ({ pag
   await expect(page.locator('[data-language-panel="en"]')).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.locator('[data-writing-cover] img')).toHaveAttribute('alt', 'Layered memory landscapes in evening light');
+  await expect(publishedDate).toHaveText('2026-07-24');
   expect(page.url()).toBe(initialUrl);
 
   await page.reload();

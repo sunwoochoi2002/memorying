@@ -1,19 +1,17 @@
 ---
-import type { WritingArticle } from '../lib/writing';
+import { formatWritingDate, type WritingArticle } from '../lib/writing';
 
 interface Props {
   item: WritingArticle;
 }
 
 const { item } = Astro.props;
-const locale = item.originalLanguage === 'ko' ? 'ko-KR' : 'en-US';
-const formatter = new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' });
 ---
 
 <p class="meta" lang={item.originalLanguage}>
   <span>{item.type === 'essay' ? 'Essay' : 'Note'}</span>
-  <span> · <time datetime={item.publishedAt.toISOString()}>{formatter.format(item.publishedAt)}</time></span>
+  <span> · <time datetime={item.publishedAt.toISOString()}>{formatWritingDate(item.publishedAt)}</time></span>
   {item.updatedAt && (
-    <span> · Updated <time datetime={item.updatedAt.toISOString()}>{formatter.format(item.updatedAt)}</time></span>
+    <span> · Updated <time datetime={item.updatedAt.toISOString()}>{formatWritingDate(item.updatedAt)}</time></span>
   )}
 </p>

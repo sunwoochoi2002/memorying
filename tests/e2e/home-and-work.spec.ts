@@ -16,6 +16,12 @@ test('home is a compact person-first introduction with recent original-language 
   await expect(englishWriting.locator('h3')).toHaveAttribute('lang', 'en');
   await expect(englishWriting.locator('.writing-list-item__copy > p')).toHaveAttribute('lang', 'en');
   await expect(englishWriting.locator('time')).toHaveAttribute('lang', 'en');
+  await expect(
+    page.locator('.home-writing .writing-list-item').filter({ hasText: 'Memorying을 시작하며' }).locator('time'),
+  ).toHaveText('2026-07-24');
+  await expect(
+    page.locator('.home-writing .writing-list-item').filter({ hasText: 'A small beginning' }).locator('time'),
+  ).toHaveText('2026-07-23');
   await expect(page.locator('.home-writing img')).toHaveCount(0);
 
   const footer = await page.getByRole('contentinfo').boundingBox();

@@ -34,7 +34,9 @@ describe('Codespaces continuity handoff', () => {
 
     expect(currentWork).toMatch(/stable branch.*`main`/i);
     expect(currentWork).toMatch(/MVP.*merged/i);
-    expect(currentWork).toMatch(/CI.*continuity.*complete/i);
+    expect(currentWork).toMatch(/local implementation.*review.*complete/i);
+    expect(currentWork).toMatch(/GitHub.*workflow acceptance.*artifact execution.*merge.*successful main run.*pending/is);
+    expect(currentWork).toMatch(/post-main-success documentation update.*delivery step/i);
     expect(currentWork).toMatch(/real content.*Buttondown.*Cloudflare Pages.*domain/is);
     expect(currentWork).not.toContain('feature/memorying-mvp');
     expect(currentWork).not.toContain('8865a80d36eeffca09252f1f4f4fc1f9a062ab6e');
@@ -44,6 +46,7 @@ describe('Codespaces continuity handoff', () => {
     expect(resumePrompt).toContain('git pull --ff-only origin main');
     expect(resumePrompt).toContain('git status --short');
     expect(resumePrompt).toMatch(/feature branch/i);
+    expect(resumePrompt).toMatch(/non-empty.*stop.*current branch.*commit.*push.*switch.*pull/is);
 
     expect(guide).toMatch(/private|incognito/i);
     expect(guide).toContain('codex login');
@@ -63,6 +66,8 @@ describe('Codespaces continuity handoff', () => {
     expect(guide).toContain('npm ci');
     expect(guide).toContain('git switch main');
     expect(guide).toContain('git pull --ff-only origin main');
+    expect(guide).toMatch(/출력이 비어 있지 않으면 여기서 멈추세요/);
+    expect(guide).toMatch(/현재 브랜치.*안전하게 커밋.*push.*git switch main.*git pull --ff-only origin main/is);
     expect(guide).toContain('git switch -c feature/next-writing-update');
     expect(guide).toContain('npm run verify');
     expect(guide).not.toContain('feature/memorying-mvp');

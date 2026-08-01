@@ -17,6 +17,8 @@ git pull --ff-only origin main
 npm ci
 ```
 
+`git status --short` 출력이 비어 있지 않으면 여기서 멈추세요. 현재 브랜치의 기존 작업을 이해하고 해당 브랜치에서 안전하게 커밋하고 push한 후에만 `git switch main`과 `git pull --ff-only origin main`을 실행하세요.
+
 수정 전에는 작업 목적을 나타내는 새 브랜치를 만드세요. 예를 들어 다음 글을 준비한다면:
 
 ```bash

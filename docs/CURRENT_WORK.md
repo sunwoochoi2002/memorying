@@ -1,43 +1,53 @@
 # Current work checkpoint
 
-Update this checkpoint before every handoff and before pushing, so a fresh human or agent can resume from the repository rather than local chat history.
+This file is the durable handoff for a fresh human or agent. Read it with `AGENTS.md` before changing the repository.
 
-## Branch and checkpoints
+## Stable state
 
-- Active branch: `feature/memorying-mvp`
-- Last product-code checkpoint: `8865a80d36eeffca09252f1f4f4fc1f9a062ab6e`
-- Continuity design checkpoint: `f6673f8`
+- Stable branch: `main`.
+- The person-first bilingual Memorying MVP is merged.
+- Local verification passed after the merge.
+- CI-continuity local implementation and review are complete. GitHub workflow acceptance, artifact execution, merge, and a successful main run remain pending platform validation.
 
-## Status
+## CI-continuity delivery gates
 
-- The bilingual writing Foundation plan is complete.
-- Compact-home UI Task 1 is complete.
-- Compact-home UI Task 2 is complete.
-- Final UI review and writing-presentation fixes are complete at `8865a80d36eeffca09252f1f4f4fc1f9a062ab6e`.
-- Writing dates are standardized to `YYYY-MM-DD`.
-- Bilingual detail titles wrap at word boundaries.
-- The deferred visible `[data-writing-item]` assertion after selecting Note is resolved.
-- Cloudflare and domain work have not started.
+1. Open and accept the CI-continuity pull request, then confirm the `Verify` workflow accepts and runs on it.
+2. Confirm the Playwright diagnostics artifact executes with the expected report and result paths.
+3. Merge the accepted pull request into `main`.
+4. Confirm the `Verify` workflow succeeds on the resulting `main` commit.
+5. Make the post-main-success documentation update an explicit delivery step: record completed platform validation in this checkpoint only after the successful main run.
 
-## Last fresh evidence
+## Product invariants
 
-- Astro check: 0 errors, 0 warnings, 0 hints.
-- Unit tests: 7 unit test files, 59 tests passed.
-- Source image check passed: no image exceeds 25 MiB.
-- Production build: 6 pages built successfully.
-- Built-link check: Checked 6 generated HTML files: no broken internal links.
-- Playwright: 55 E2E tests passed.
+- Each article keeps `meta.yaml`, `ko.mdx`, and `en.mdx` together under `src/content/writing/<slug>/`.
+- Archive and home views show the declared original language first.
+- Article detail pages switch language at one stable URL and identify the original.
+- Published dates use `YYYY-MM-DD`, and bilingual titles preserve word boundaries.
+- Deployment and publication remain secondary to the person-first archive.
 
-## Approved references
+## Next independent work
 
-- Design: [`docs/superpowers/specs/2026-07-25-compact-home-bilingual-writing-design.md`](superpowers/specs/2026-07-25-compact-home-bilingual-writing-design.md)
-- Foundation implementation plan: [`docs/superpowers/plans/2026-07-25-bilingual-writing-foundation.md`](superpowers/plans/2026-07-25-bilingual-writing-foundation.md)
-- Compact-home UI implementation plan: [`docs/superpowers/plans/2026-07-25-compact-home-writing-ui.md`](superpowers/plans/2026-07-25-compact-home-writing-ui.md)
-- Writing-presentation design: [`docs/superpowers/specs/2026-07-26-consistent-writing-dates-title-wrapping-design.md`](superpowers/specs/2026-07-26-consistent-writing-dates-title-wrapping-design.md)
-- Writing-presentation implementation plan: [`docs/superpowers/plans/2026-07-26-consistent-writing-dates-title-wrapping.md`](superpowers/plans/2026-07-26-consistent-writing-dates-title-wrapping.md)
+Proceed one project at a time:
+
+1. replace starter copy with reviewed real content and migrate the one-time Notion archive;
+2. configure and test the real Buttondown account;
+3. connect Cloudflare Pages with test deployment settings;
+4. choose the production domain, configure DNS, and set the final `SITE_URL`; and
+5. complete post-deployment checks from `docs/publishing.md`.
+
+Cloudflare, DNS, a custom domain, final production `SITE_URL`, Buttondown delivery, and Notion automation are not part of the CI-continuity project.
+
+## Resume checklist
+
+1. Run `git status --short`. If its output is non-empty, stop; understand the existing work on its current branch and safely commit and push it before switching or pulling.
+2. Finish the pending CI-continuity delivery gates before treating it as complete.
+3. Resume from updated `main`.
+4. Create a purpose-specific feature branch before editing.
+5. Follow strict TDD and the approved Superpowers plan for implementation.
+6. Run focused tests and `npm run verify` before pushing.
 
 ## Resume prompt
 
 ```text
-Read AGENTS.md and docs/CURRENT_WORK.md. Verify that the branch is feature/memorying-mvp, inspect git status --short, and confirm product-code checkpoint 8865a80d36eeffca09252f1f4f4fc1f9a062ab6e. Do not redo the completed Foundation, compact-home UI, or writing-presentation fixes. Run the final MVP confirmation against the recorded full verification gate, review the complete MVP against the approved designs, then use the finishing-development-branch workflow to choose the integration path. Preserve unrelated changes. Cloudflare, DNS, the final production SITE_URL, Buttondown delivery, and Notion integration remain outside this confirmation and integration step.
+Read AGENTS.md and docs/CURRENT_WORK.md. Run git status --short. If its output is non-empty, stop; understand the existing work on its current branch and safely commit and push it before running git switch main and git pull --ff-only origin main. Finish the pending CI-continuity delivery gates—workflow acceptance, artifact execution, merge, and a successful main run—and make the post-main-success documentation update before treating CI-continuity as complete. Before editing unrelated work, create a purpose-specific feature branch. Preserve the person-first bilingual writing invariants and unrelated user changes. Treat real content, Buttondown, Cloudflare Pages, the production domain, and final SITE_URL as separate projects requiring explicit scope.
 ```

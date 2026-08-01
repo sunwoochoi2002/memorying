@@ -1,11 +1,13 @@
 # Memorying
 
+[![Verify](https://github.com/sunwoochoi2002/memorying/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/sunwoochoi2002/memorying/actions/workflows/verify.yml)
+
 Sunwoo Choi's person-first personal writing and archival site.
 
 ## Commands
 
 ```bash
-npm install
+npm ci
 npm run dev
 npm run check
 npm test
@@ -16,10 +18,13 @@ npm run check:links
 npm run verify
 ```
 
+GitHub Actions runs `npm run verify` for `main` pushes and pull requests.
+
 ## Resume in Codespaces
 
 - Current implementation checkpoint: [`docs/CURRENT_WORK.md`](docs/CURRENT_WORK.md)
 - Shared-computer and Codespaces runbook: [`docs/codespaces-guide.md`](docs/codespaces-guide.md)
+- Publishing and launch checklist: [`docs/publishing.md`](docs/publishing.md)
 
 ## Content
 

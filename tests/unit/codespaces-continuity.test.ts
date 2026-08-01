@@ -34,9 +34,9 @@ describe('Codespaces continuity handoff', () => {
 
     expect(currentWork).toMatch(/stable branch.*`main`/i);
     expect(currentWork).toMatch(/MVP.*merged/i);
-    expect(currentWork).toMatch(/local implementation.*review.*complete/i);
-    expect(currentWork).toMatch(/GitHub.*workflow acceptance.*artifact execution.*merge.*successful main run.*pending/is);
-    expect(currentWork).toMatch(/post-main-success documentation update.*delivery step/i);
+    expect(currentWork).toMatch(/CI-continuity.*complete/i);
+    expect(currentWork).toMatch(/pull request.*artifact.*merged.*main.*Verify.*succeeded/is);
+    expect(currentWork).not.toMatch(/remain pending platform validation/i);
     expect(currentWork).toMatch(/real content.*Buttondown.*Cloudflare Pages.*domain/is);
     expect(currentWork).not.toContain('feature/memorying-mvp');
     expect(currentWork).not.toContain('8865a80d36eeffca09252f1f4f4fc1f9a062ab6e');
@@ -47,6 +47,7 @@ describe('Codespaces continuity handoff', () => {
     expect(resumePrompt).toContain('git status --short');
     expect(resumePrompt).toMatch(/feature branch/i);
     expect(resumePrompt).toMatch(/non-empty.*stop.*current branch.*commit.*push.*switch.*pull/is);
+    expect(resumePrompt).not.toMatch(/finish the pending CI-continuity delivery gates/i);
 
     expect(guide).toMatch(/private|incognito/i);
     expect(guide).toContain('codex login');

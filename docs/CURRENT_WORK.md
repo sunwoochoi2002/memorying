@@ -7,15 +7,15 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 - Stable branch: `main`.
 - The person-first bilingual Memorying MVP is merged.
 - Local verification passed after the merge.
-- CI-continuity local implementation and review are complete. GitHub workflow acceptance, artifact execution, merge, and a successful main run remain pending platform validation.
+- CI-continuity is complete. Local implementation, review, GitHub platform validation, and the post-merge `main` verification all succeeded.
 
-## CI-continuity delivery gates
+## CI-continuity delivery record
 
-1. Open and accept the CI-continuity pull request, then confirm the `Verify` workflow accepts and runs on it.
-2. Confirm the Playwright diagnostics artifact executes with the expected report and result paths.
-3. Merge the accepted pull request into `main`.
-4. Confirm the `Verify` workflow succeeds on the resulting `main` commit.
-5. Make the post-main-success documentation update an explicit delivery step: record completed platform validation in this checkpoint only after the successful main run.
+1. Pull request [#1](https://github.com/sunwoochoi2002/memorying/pull/1) ran and passed the GitHub-hosted `Verify` workflow.
+2. The `playwright-diagnostics-1` artifact was created from the expected report and result paths.
+3. The accepted pull request was merged into `main` as `e3a11dd`.
+4. The push-triggered [`main` `Verify` run](https://github.com/sunwoochoi2002/memorying/actions/runs/30691473470) succeeded for that merge commit.
+5. This checkpoint is the required post-main-success documentation update.
 
 ## Product invariants
 
@@ -40,14 +40,13 @@ Cloudflare, DNS, a custom domain, final production `SITE_URL`, Buttondown delive
 ## Resume checklist
 
 1. Run `git status --short`. If its output is non-empty, stop; understand the existing work on its current branch and safely commit and push it before switching or pulling.
-2. Finish the pending CI-continuity delivery gates before treating it as complete.
-3. Resume from updated `main`.
-4. Create a purpose-specific feature branch before editing.
-5. Follow strict TDD and the approved Superpowers plan for implementation.
-6. Run focused tests and `npm run verify` before pushing.
+2. Resume from updated `main`.
+3. Create a purpose-specific feature branch before editing.
+4. Follow strict TDD and the approved Superpowers plan for implementation.
+5. Run focused tests and `npm run verify` before pushing.
 
 ## Resume prompt
 
 ```text
-Read AGENTS.md and docs/CURRENT_WORK.md. Run git status --short. If its output is non-empty, stop; understand the existing work on its current branch and safely commit and push it before running git switch main and git pull --ff-only origin main. Finish the pending CI-continuity delivery gates—workflow acceptance, artifact execution, merge, and a successful main run—and make the post-main-success documentation update before treating CI-continuity as complete. Before editing unrelated work, create a purpose-specific feature branch. Preserve the person-first bilingual writing invariants and unrelated user changes. Treat real content, Buttondown, Cloudflare Pages, the production domain, and final SITE_URL as separate projects requiring explicit scope.
+Read AGENTS.md and docs/CURRENT_WORK.md. Run git status --short. If its output is non-empty, stop; understand the existing work on its current branch and safely commit and push it before running git switch main and git pull --ff-only origin main. Resume from updated main and create a purpose-specific feature branch before editing. Preserve the person-first bilingual writing invariants and unrelated user changes. Treat real content, Buttondown, Cloudflare Pages, the production domain, and final SITE_URL as separate projects requiring explicit scope.
 ```

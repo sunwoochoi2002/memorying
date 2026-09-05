@@ -1,0 +1,2 @@
+# Preserve line endings in raw source exports while accepting their CRLF records.
+docs/imports/** whitespace=cr-at-eol

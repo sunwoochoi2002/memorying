@@ -26,6 +26,8 @@ describe('production draft exclusion', () => {
       'meta.yaml',
     ]);
     expect(readdirSync('src/content/writing/memorying-start').sort()).toEqual([
+      'cover.alt.en.txt',
+      'cover.alt.ko.txt',
       'cover.svg',
       'en.mdx',
       'ko.mdx',

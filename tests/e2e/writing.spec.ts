@@ -180,6 +180,23 @@ test('renders original-first bilingual articles at one stable URL', async ({ pag
   await noJavaScriptContext.close();
 });
 
+test('renders the imported Korean-original Alone essay at one stable URL', async ({ page }) => {
+  await page.goto('/writing/alone/');
+  await expect(page.getByRole('heading', { level: 1, name: '홀로-' })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
+  await expect(page.getByRole('button', { name: /한국어.*Original/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('[data-language-panel="ko"]')).toContainText('변하지 않는 것은 없다.');
+  await expect(page.locator('.meta time').first()).toHaveText('2025-11-21');
+  await expect(page.locator('[data-writing-cover]')).toHaveCount(0);
+
+  const initialUrl = page.url();
+  await page.getByRole('button', { name: 'English' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Alone—' })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('[data-language-panel="en"]')).toContainText('I do not regret buying the headphones impulsively early this month at all.');
+  expect(page.url()).toBe(initialUrl);
+});
+
 test('wraps Korean and English detail titles only at word boundaries', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 900 });
   await page.goto('/writing/memorying-start/');

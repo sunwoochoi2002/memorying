@@ -7,6 +7,13 @@ const drafts = [
   { slug: 'small-beginning', title: 'A small beginning' },
 ];
 
+const imported = [
+  { slug: 'alone', title: '홀로-' },
+  { slug: 'keep-it-up', title: 'Keep it up!' },
+  { slug: 'time-for-change', title: '변화가 필요한 시점.' },
+  { slug: 'teammates', title: 'Teammates' },
+];
+
 describe('production draft exclusion', () => {
   let homepage: string;
   let archive: string;
@@ -41,10 +48,16 @@ describe('production draft exclusion', () => {
       .join('\n');
   }, 30_000);
 
-  it('builds a public-empty writing archive', () => {
-    expect(archive).toContain('아직 공개된 글이 없습니다. 곧 이곳에 Essay와 Note를 기록할 예정입니다.');
-    expect(archive).not.toContain('data-writing-filters');
-    expect(archive).not.toContain('이 조건에 해당하는 글이 아직 없습니다.');
+  it('builds the four imported Korean-original essays into the public prototype', () => {
+    expect(archive).not.toContain('아직 공개된 글이 없습니다. 곧 이곳에 Essay와 Note를 기록할 예정입니다.');
+    expect(archive).toContain('data-writing-filters');
+
+    for (const article of imported) {
+      expect(archive).toContain(article.title);
+      expect(homepage).toContain(article.title);
+      expect(existsSync(`dist/writing/${article.slug}/index.html`)).toBe(true);
+      expect(sitemap).toContain(`https://example.com/writing/${article.slug}/`);
+    }
     for (const draft of drafts) expect(archive).not.toContain(draft.title);
   });
 

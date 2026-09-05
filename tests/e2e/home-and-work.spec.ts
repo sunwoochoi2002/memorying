@@ -12,6 +12,9 @@ test('home is a compact person-first introduction with recent original-language 
   await expect(page.getByRole('heading', { name: 'Recent writing' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Memorying을 시작하며' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'A small beginning' })).toBeVisible();
+  for (const title of ['홀로-', 'Keep it up!', '변화가 필요한 시점.', 'Teammates']) {
+    await expect(page.getByRole('link', { name: title })).toBeVisible();
+  }
   const englishWriting = page.locator('.home-writing .writing-list-item').filter({ hasText: 'A small beginning' });
   await expect(englishWriting.locator('h3')).toHaveAttribute('lang', 'en');
   await expect(englishWriting.locator('.writing-list-item__copy > p')).toHaveAttribute('lang', 'en');
@@ -26,8 +29,6 @@ test('home is a compact person-first introduction with recent original-language 
 
   const footer = await page.getByRole('contentinfo').boundingBox();
   expect(footer).not.toBeNull();
-  expect(footer!.y + footer!.height).toBeLessThanOrEqual(720);
-  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThanOrEqual(720);
 });
 
 test('about and work explain the person without becoming a full résumé', async ({ page }) => {

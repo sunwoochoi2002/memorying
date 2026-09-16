@@ -8,6 +8,8 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 - The person-first bilingual Memorying MVP is merged.
 - Local verification passed after the merge.
 - CI-continuity is complete. Local implementation, review, GitHub platform validation, and the post-merge `main` verification all succeeded.
+- The one-time Notion archive migration is complete and published on `main`.
+- Convention-based optional writing covers and the root folder guide are complete.
 
 ## CI-continuity delivery record
 
@@ -25,11 +27,19 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 - Published dates use `YYYY-MM-DD`, and bilingual titles preserve word boundaries.
 - Deployment and publication remain secondary to the person-first archive.
 
+## Notion archive and cover delivery record
+
+1. Four reviewed Korean-original essays from the September 5, 2026 Notion export are published at stable `/writing/<slug>/` URLs: `alone`, `keep-it-up`, `time-for-change`, and `teammates`.
+2. Their English counterparts are stored as complete `en.mdx` files; original-language Korean remains first on the home, archive, and detail pages.
+3. A writing folder may include one optional `cover.{avif,jpeg,jpg,png,svg,webp}`. It appears only on the detail page when both `cover.alt.ko.txt` and `cover.alt.en.txt` are present. Missing files leave the article text-only.
+4. [`PROJECT_STRUCTURE.md`](../PROJECT_STRUCTURE.md) is at the repository root and explains direct-edit locations, generated folders, and the content/translation workflow.
+5. Migration and cover behavior were independently reviewed. The final `main` verification passed with 68 unit tests, type checks, asset checks, build, internal-link checks, and browser tests.
+
 ## Next independent work
 
 Proceed one project at a time:
 
-1. replace starter copy with reviewed real content and migrate the one-time Notion archive;
+1. Review or replace writing copy directly in `src/content/writing/<slug>/`; after the original-language edits are ready, request one batch translation for all affected `ko.mdx`, `en.mdx`, and any `cover.alt.*.txt` files.
 2. configure and test the real Buttondown account;
 3. connect Cloudflare Pages with test deployment settings;
 4. choose the production domain, configure DNS, and set the final `SITE_URL`; and

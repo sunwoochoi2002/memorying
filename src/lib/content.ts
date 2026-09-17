@@ -17,12 +17,17 @@ export type WritingMetaEntry = CollectionEntry<'writingMeta'>;
 export type WorkEntry = CollectionEntry<'work'>;
 export type LoadedWritingArticle = PreparedWritingPair<WritingMetaEntry, WritingEntry>;
 
+// Covers attach by slug, so fixture covers are inert unless WRITING_FIXTURES=1 loaded
+// the matching fixture article (see src/lib/writing-sources.ts).
 const coverModules = import.meta.glob<{ default: ImageMetadata }>(
-  '../content/writing/*/cover.{avif,jpeg,jpg,png,svg,webp}',
+  [
+    '../content/writing/*/cover.{avif,jpeg,jpg,png,svg,webp}',
+    '../../tests/fixtures/writing/*/cover.{avif,jpeg,jpg,png,svg,webp}',
+  ],
   { eager: true },
 );
 const coverAltModules = import.meta.glob<string>(
-  '../content/writing/*/cover.alt.{ko,en}.txt',
+  ['../content/writing/*/cover.alt.{ko,en}.txt', '../../tests/fixtures/writing/*/cover.alt.{ko,en}.txt'],
   { eager: true, import: 'default', query: '?raw' },
 );
 

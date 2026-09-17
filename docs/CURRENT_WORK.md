@@ -10,7 +10,8 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 - CI-continuity is complete. Local implementation, review, GitHub platform validation, and the post-merge `main` verification all succeeded.
 - The one-time Notion archive migration is complete and published on `main`.
 - Convention-based optional writing covers and the root folder guide are complete.
-- On 2026-09-17 the user authorized committing and pushing the Buttondown handoff checkpoint; local `main` and `origin/main` are in sync at `fd647d2`.
+- On 2026-09-17 the user authorized committing and pushing the Buttondown handoff checkpoint; pull request #3 then restored a green `main`.
+- Sample draft articles were moved out of the real archive into `tests/fixtures/writing/` on 2026-09-17 (branch `feature/writing-test-fixtures`); see the fixture record below.
 - That push was made without a preceding `npm run verify`, and the `main` `Verify` run [35212577168](https://github.com/sunwoochoi2002/memorying/actions/runs/35212577168) failed on `tests/unit/codespaces-continuity.test.ts` because the test still asserted the pre-handoff checkpoint wording. Branch `feature/buttondown-verification` updates the test and this checkpoint together so `main` returns to green.
 
 ## CI-continuity delivery record
@@ -37,6 +38,14 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 4. [`PROJECT_STRUCTURE.md`](../PROJECT_STRUCTURE.md) is at the repository root and explains direct-edit locations, generated folders, and the content/translation workflow.
 5. Migration and cover behavior were independently reviewed. The final `main` verification passed with 68 unit tests, type checks, asset checks, build, internal-link checks, and browser tests.
 
+## Writing test fixtures record
+
+1. The user intentionally deleted the two sample drafts (`memorying-start`, a Korean-original Essay with a cover, and `small-beginning`, an English-original Note) from `src/content/writing/` so the archive holds only real writing.
+2. Those samples were the only articles exercising Note filtering, English-original ordering, convention-based covers, and production draft exclusion, so they now live unchanged under `tests/fixtures/writing/<slug>/`.
+3. `src/lib/writing-sources.ts` resolves the content directories; `src/content.config.ts` reads `tests/fixtures/writing/` only when `WRITING_FIXTURES=1`. Playwright's dev server sets the flag; `tests/unit/production-writing.test.ts` builds once without it (fixtures never loaded) and once with it (drafts still excluded).
+4. Known cosmetic side effect: the tiny fixture `cover.svg` is discovered by an eager `import.meta.glob` and is emitted as an unreferenced asset in `dist/_astro/` even in default builds. Nothing links to it.
+5. Design: [`docs/superpowers/specs/2026-09-17-writing-test-fixtures-design.md`](superpowers/specs/2026-09-17-writing-test-fixtures-design.md); plan: [`docs/superpowers/plans/2026-09-17-writing-test-fixtures.md`](superpowers/plans/2026-09-17-writing-test-fixtures.md).
+
 ## Buttondown handoff
 
 - A real Buttondown account has been created and email-verified by the user.
@@ -53,20 +62,20 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 2. GET requests (never POST) confirmed that `https://buttondown.com/sunwoochoi` serves the public page titled `Sunwoo’s Archive • Buttondown` and that the `embed-subscribe/sunwoochoi` endpoint responds by redirecting to that page. Buttondown's own public page references the same `embed-subscribe/sunwoochoi` path.
 3. Automated tests still use the mock username `memorying-test` in `playwright.config.ts` and CI; the newsletter browser tests intercept the request and never reach Buttondown. No real subscription has been submitted.
 
-### Next Buttondown work (requires explicit user approval)
+4. On 2026-09-17 the user ran the live test themselves from a local preview started with `PUBLIC_BUTTONDOWN_USERNAME=sunwoochoi` and confirmed the subscription, confirmation email, and unsubscribe flow with their own test email. The Buttondown form verification project is complete.
 
-1. With the user's own test email and consent, verify Buttondown's subscription, confirmation, and unsubscribe experience against a local preview started with `PUBLIC_BUTTONDOWN_USERNAME=sunwoochoi`. The user performs any real dashboard or email confirmation action.
-2. After a separate Cloudflare Pages project is approved and configured, set `PUBLIC_BUTTONDOWN_USERNAME=sunwoochoi` in Cloudflare's environment settings, then repeat the live test. Cloudflare, DNS, custom domain, and final `SITE_URL` remain separate projects.
+### Remaining Buttondown work (requires explicit user approval)
+
+1. After a separate Cloudflare Pages project is approved and configured, set `PUBLIC_BUTTONDOWN_USERNAME=sunwoochoi` in Cloudflare's environment settings, then repeat the live test on the deployed preview. Until then, do not claim that the live site is connected to Buttondown. Cloudflare, DNS, custom domain, and final `SITE_URL` remain separate projects.
 
 ## Next independent work
 
 Proceed one project at a time:
 
-1. Finish the remaining Buttondown work above: the user-performed live subscription test, then the Cloudflare environment variable once that project is approved.
-2. Review or replace writing copy directly in `src/content/writing/<slug>/`; after the original-language edits are ready, request one batch translation for all affected `ko.mdx`, `en.mdx`, and any `cover.alt.*.txt` files.
-3. connect Cloudflare Pages with test deployment settings;
-4. choose the production domain, configure DNS, and set the final `SITE_URL`; and
-5. complete post-deployment checks from `docs/publishing.md`.
+1. Review or replace writing copy directly in `src/content/writing/<slug>/` (now only the four real essays); after the original-language edits are ready, request one batch translation for all affected `ko.mdx`, `en.mdx`, and any `cover.alt.*.txt` files.
+2. connect Cloudflare Pages with test deployment settings, then set `PUBLIC_BUTTONDOWN_USERNAME=sunwoochoi` there and repeat the live subscription test;
+3. choose the production domain, configure DNS, and set the final `SITE_URL`; and
+4. complete post-deployment checks from `docs/publishing.md`.
 
 Cloudflare, DNS, a custom domain, final production `SITE_URL`, Buttondown delivery, and Notion automation are not part of the CI-continuity project.
 
@@ -81,5 +90,5 @@ Cloudflare, DNS, a custom domain, final production `SITE_URL`, Buttondown delive
 ## Resume prompt
 
 ```text
-Read AGENTS.md and docs/CURRENT_WORK.md. Run git status --short. If its output is non-empty, stop; understand the existing work on its current branch and safely commit and push it before running git switch main and git pull --ff-only origin main. Resume from updated main and create a purpose-specific feature branch before editing. Run verification as env -u CLAUDECODE npm run verify from an agent shell. Preserve the person-first bilingual writing invariants and unrelated user changes. The user has a verified Buttondown account with username sunwoochoi and newsletter name Sunwoo’s Archive; the site form is verified against it locally, but no live subscription test, deployment, or Cloudflare setting has been authorized. Treat the live Buttondown verification, Cloudflare Pages, the production domain, and final SITE_URL as separate projects requiring explicit scope.
+Read AGENTS.md and docs/CURRENT_WORK.md. Run git status --short. If its output is non-empty, stop; understand the existing work on its current branch and safely commit and push it before running git switch main and git pull --ff-only origin main. Resume from updated main and create a purpose-specific feature branch before editing. Run verification as env -u CLAUDECODE npm run verify from an agent shell. Preserve the person-first bilingual writing invariants and unrelated user changes. The user has a verified Buttondown account with username sunwoochoi and newsletter name Sunwoo’s Archive; the site form and the live subscribe/confirm/unsubscribe flow are verified from a local preview, but no deployment or Cloudflare setting exists yet. Treat Cloudflare Pages, the Buttondown environment variable there, the production domain, and final SITE_URL as separate projects requiring explicit scope.
 ```

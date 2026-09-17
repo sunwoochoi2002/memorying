@@ -24,6 +24,7 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     env: {
       PUBLIC_BUTTONDOWN_USERNAME: 'memorying-test',
+      WRITING_FIXTURES: '1',
     },
   },
 });

@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { beforeAll, describe, expect, it } from 'vitest';
 
-const drafts = [
+const fixtures = [
   { slug: 'memorying-start', title: 'Memorying을 시작하며' },
   { slug: 'small-beginning', title: 'A small beginning' },
 ];
@@ -14,18 +14,63 @@ const imported = [
   { slug: 'teammates', title: 'Teammates' },
 ];
 
-describe('production draft exclusion', () => {
-  let homepage: string;
-  let archive: string;
-  let sitemap: string;
+interface BuiltSite {
+  homepage: string;
+  archive: string;
+  sitemap: string;
+  /** The content-layer store Astro writes during the build; it lists every loaded entry. */
+  loadedEntries: string;
+}
 
-  beforeAll(() => {
-    expect(readdirSync('src/content/writing/small-beginning').sort()).toEqual([
-      'en.mdx',
-      'ko.mdx',
-      'meta.yaml',
-    ]);
-    expect(readdirSync('src/content/writing/memorying-start').sort()).toEqual([
+function buildSite(extraEnv: Record<string, string>): BuiltSite {
+  execFileSync('npm', ['run', 'build'], {
+    cwd: process.cwd(),
+    env: {
+      NODE_ENV: 'production',
+      PATH: process.env.PATH,
+      SITE_URL: 'https://example.com',
+      ...extraEnv,
+    },
+    stdio: 'pipe',
+  });
+  return {
+    homepage: readFileSync('dist/index.html', 'utf8'),
+    archive: readFileSync('dist/writing/index.html', 'utf8'),
+    sitemap: readdirSync('dist')
+      .filter((name) => /^sitemap.*\.xml$/.test(name))
+      .map((name) => readFileSync(`dist/${name}`, 'utf8'))
+      .join('\n'),
+    loadedEntries: readFileSync('node_modules/.astro/data-store.json', 'utf8'),
+  };
+}
+
+function expectImportedEssays(site: BuiltSite) {
+  expect(site.archive).not.toContain('아직 공개된 글이 없습니다. 곧 이곳에 Essay와 Note를 기록할 예정입니다.');
+  expect(site.archive).toContain('data-writing-filters');
+
+  for (const article of imported) {
+    expect(site.archive).toContain(article.title);
+    expect(site.homepage).toContain(article.title);
+    expect(existsSync(`dist/writing/${article.slug}/index.html`)).toBe(true);
+    expect(site.sitemap).toContain(`https://example.com/writing/${article.slug}/`);
+  }
+}
+
+function expectFixturesAbsent(site: BuiltSite) {
+  expect(site.sitemap).toContain('https://example.com/writing/');
+  for (const fixture of fixtures) {
+    expect(site.archive).not.toContain(fixture.title);
+    expect(site.homepage).not.toContain(fixture.title);
+    expect(existsSync(`dist/writing/${fixture.slug}/index.html`)).toBe(false);
+    expect(site.sitemap).not.toContain(`/writing/${fixture.slug}/`);
+  }
+}
+
+describe('sample drafts live only in test fixtures', () => {
+  it('keeps the real archive free of sample articles', () => {
+    expect(readdirSync('src/content/writing').sort()).toEqual(imported.map(({ slug }) => slug).sort());
+    expect(readdirSync('tests/fixtures/writing/small-beginning').sort()).toEqual(['en.mdx', 'ko.mdx', 'meta.yaml']);
+    expect(readdirSync('tests/fixtures/writing/memorying-start').sort()).toEqual([
       'cover.alt.en.txt',
       'cover.alt.ko.txt',
       'cover.svg',
@@ -33,48 +78,42 @@ describe('production draft exclusion', () => {
       'ko.mdx',
       'meta.yaml',
     ]);
-    execFileSync('npm', ['run', 'build'], {
-      cwd: process.cwd(),
-      env: {
-        NODE_ENV: 'production',
-        PATH: process.env.PATH,
-        SITE_URL: 'https://example.com',
-      },
-      stdio: 'pipe',
-    });
-    homepage = readFileSync('dist/index.html', 'utf8');
-    archive = readFileSync('dist/writing/index.html', 'utf8');
-    sitemap = readdirSync('dist')
-      .filter((name) => /^sitemap.*\.xml$/.test(name))
-      .map((name) => readFileSync(`dist/${name}`, 'utf8'))
-      .join('\n');
+  });
+});
+
+describe('default production build', () => {
+  let site: BuiltSite;
+
+  beforeAll(() => {
+    site = buildSite({});
   }, 30_000);
 
   it('builds the four imported Korean-original essays into the public prototype', () => {
-    expect(archive).not.toContain('아직 공개된 글이 없습니다. 곧 이곳에 Essay와 Note를 기록할 예정입니다.');
-    expect(archive).toContain('data-writing-filters');
-
-    for (const article of imported) {
-      expect(archive).toContain(article.title);
-      expect(homepage).toContain(article.title);
-      expect(existsSync(`dist/writing/${article.slug}/index.html`)).toBe(true);
-      expect(sitemap).toContain(`https://example.com/writing/${article.slug}/`);
-    }
-    for (const draft of drafts) expect(archive).not.toContain(draft.title);
+    expectImportedEssays(site);
   });
 
-  it('omits both draft starter posts from the homepage', () => {
-    for (const draft of drafts) expect(homepage).not.toContain(draft.title);
+  it('never reads the test fixtures without WRITING_FIXTURES=1', () => {
+    expectFixturesAbsent(site);
+    expect(site.loadedEntries).toContain('src/content/writing/alone/');
+    expect(site.loadedEntries).not.toContain('tests/fixtures/');
+    for (const fixture of fixtures) expect(site.loadedEntries).not.toContain(fixture.slug);
+  });
+});
+
+describe('production build with test fixtures loaded', () => {
+  let site: BuiltSite;
+
+  beforeAll(() => {
+    site = buildSite({ WRITING_FIXTURES: '1' });
+  }, 30_000);
+
+  it('still builds the four imported essays', () => {
+    expectImportedEssays(site);
   });
 
-  it('does not generate article routes for either draft starter post', () => {
-    for (const draft of drafts) {
-      expect(existsSync(`dist/writing/${draft.slug}/index.html`)).toBe(false);
-    }
-  });
-
-  it('omits both draft starter posts from the sitemap', () => {
-    expect(sitemap).toContain('https://example.com/writing/');
-    for (const draft of drafts) expect(sitemap).not.toContain(`/writing/${draft.slug}/`);
+  it('loads the fixtures but excludes both drafts from the homepage, archive, routes, and sitemap', () => {
+    expect(site.loadedEntries).toContain('tests/fixtures/writing/memorying-start/');
+    expect(site.loadedEntries).toContain('tests/fixtures/writing/small-beginning/');
+    expectFixturesAbsent(site);
   });
 });

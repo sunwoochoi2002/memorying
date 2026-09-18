@@ -115,11 +115,11 @@ Cloudflare Pages 배포, DNS 변경, 도메인 연결, 최종 `SITE_URL` 설정�
 
 배포를 시작할 때는 아래 항목을 별도로 확인합니다.
 
-- [ ] GitHub 저장소를 Cloudflare Pages에 연결한다.
-- [ ] 빌드 명령을 `npm run build`, 출력 디렉터리를 `dist`로 설정한다.
+- [x] GitHub 저장소를 Cloudflare Pages에 연결한다. (2026-09-18, 프로젝트 `memorying`, 테스트 주소 `https://memorying.pages.dev`)
+- [x] 빌드 명령을 `npm run build`, 출력 디렉터리를 `dist`로 설정한다. (`NODE_VERSION=22` 포함)
 - [ ] 최종 HTTPS 도메인을 정한 뒤 `SITE_URL`을 설정한다.
-- [ ] 실제 Buttondown 사용자명으로 `PUBLIC_BUTTONDOWN_USERNAME`을 설정한다.
-- [ ] 미리 보기와 실제 배포에서 sitemap, canonical URL, `_headers`, 구독 폼을 확인한다.
+- [x] 실제 Buttondown 사용자명으로 `PUBLIC_BUTTONDOWN_USERNAME`을 설정한다.
+- [ ] 미리 보기와 실제 배포에서 sitemap, canonical URL, `_headers`, 구독 폼을 확인한다. (테스트 주소에서는 2026-09-18 확인 완료. 최종 도메인 연결 후 다시 확인)
 
 ## 출시 전 확인
 

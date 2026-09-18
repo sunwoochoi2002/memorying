@@ -11,7 +11,8 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 - The one-time Notion archive migration is complete and published on `main`.
 - Convention-based optional writing covers and the root folder guide are complete.
 - On 2026-09-17 the user authorized committing and pushing the Buttondown handoff checkpoint; pull request #3 then restored a green `main`.
-- Sample draft articles were moved out of the real archive into `tests/fixtures/writing/` on 2026-09-17 (branch `feature/writing-test-fixtures`); see the fixture record below.
+- Sample draft articles were moved out of the real archive into `tests/fixtures/writing/` on 2026-09-17 (pull request #4); see the fixture record below.
+- A Cloudflare Pages test deployment of `main` is live at `https://memorying.pages.dev` since 2026-09-18 and passed the post-deployment checks below. The production domain is not connected yet.
 - That push was made without a preceding `npm run verify`, and the `main` `Verify` run [35212577168](https://github.com/sunwoochoi2002/memorying/actions/runs/35212577168) failed on `tests/unit/codespaces-continuity.test.ts` because the test still asserted the pre-handoff checkpoint wording. Branch `feature/buttondown-verification` updates the test and this checkpoint together so `main` returns to green.
 
 ## CI-continuity delivery record
@@ -53,7 +54,7 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 - Newsletter name configured in Buttondown: `Sunwoo’s Archive`.
 - Never request, store, commit, or paste the Buttondown password, authentication cookies, API keys, or subscriber email addresses.
 - The existing site implementation in `src/components/NewsletterSignup.astro` is already a direct POST form. When `PUBLIC_BUTTONDOWN_USERNAME` is set, it submits to `https://buttondown.com/api/emails/embed-subscribe/<username>` and sends only `email` plus `embed=1`; Memorying does not store the address.
-- No code, local environment file, Cloudflare environment variable, deployment setting, real subscription submission, email delivery, or Buttondown dashboard setting beyond the account/name above has been changed yet. In particular, do not claim that the live site is connected to Buttondown.
+- No code, local environment file, or Buttondown dashboard setting beyond the account/name above has been changed. The only deployment-side change is the `PUBLIC_BUTTONDOWN_USERNAME=sunwoochoi` variable in the Cloudflare Pages project, so the deployed form at `https://memorying.pages.dev` submits to the real account.
 - Essays remain manually sent from the Buttondown dashboard; publishing a site article must never trigger an email automatically. Notes are not newsletter sends by default.
 
 ### Buttondown verification record (2026-09-17, branch `feature/buttondown-verification`)
@@ -64,20 +65,30 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 
 4. On 2026-09-17 the user ran the live test themselves from a local preview started with `PUBLIC_BUTTONDOWN_USERNAME=sunwoochoi` and confirmed the subscription, confirmation email, and unsubscribe flow with their own test email. The Buttondown form verification project is complete.
 
-### Remaining Buttondown work (requires explicit user approval)
+5. On 2026-09-18 the deployed `https://memorying.pages.dev/writing/` form renders `action="https://buttondown.com/api/emails/embed-subscribe/sunwoochoi"` with the Subscribe button enabled. A live subscription from the deployed site has not been repeated; the local live test above used the identical form action.
 
-1. After a separate Cloudflare Pages project is approved and configured, set `PUBLIC_BUTTONDOWN_USERNAME=sunwoochoi` in Cloudflare's environment settings, then repeat the live test on the deployed preview. Until then, do not claim that the live site is connected to Buttondown. Cloudflare, DNS, custom domain, and final `SITE_URL` remain separate projects.
+## Cloudflare Pages test deployment record
+
+1. On 2026-09-18 the user created the Cloudflare Pages project `memorying` from the dashboard (Pages → Connect to Git, not the Workers flow with `npx wrangler deploy`), connected `sunwoochoi2002/memorying`, production branch `main`, build command `npm run build`, output directory `dist`.
+2. Plain-text environment variables set in Cloudflare: `NODE_VERSION=22`, `SITE_URL=https://memorying.pages.dev`, `PUBLIC_BUTTONDOWN_USERNAME=sunwoochoi`. No secrets exist or are needed; never request a Cloudflare API token.
+3. Post-deployment checks passed with GET requests only: home, about, writing, work, privacy, and the four essays return 200; unknown paths and the fixture-only `/writing/memorying-start/` return 404; `sitemap-index.xml` and `sitemap-0.xml` list exactly the nine public pages under `https://memorying.pages.dev`; canonical and `og:url` use that origin; no page mentions `localhost`.
+4. `public/_headers` is applied: the security headers (CSP, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`) are present on HTML, and `/_astro/*` assets return `cache-control: public, max-age=31536000, immutable`.
+5. The user owns `sunwoochoi.com` and wants it as the production domain. It is intentionally not connected yet so that `SITE_URL` keeps matching the address that actually serves the site.
+
+### Next Cloudflare work (requires explicit user approval)
+
+1. Add `sunwoochoi.com` (and decide about `www.sunwoochoi.com`) under the Pages project's Custom domains. If the domain is registered outside Cloudflare, the user adds the CNAME record Cloudflare shows at the registrar's DNS; the user performs every registrar and dashboard action.
+2. Once the domain serves the site, change `SITE_URL` to `https://sunwoochoi.com`, redeploy, and repeat the post-deployment checks against the new origin, including a live subscription test from the deployed form.
 
 ## Next independent work
 
 Proceed one project at a time:
 
-1. Review or replace writing copy directly in `src/content/writing/<slug>/` (now only the four real essays); after the original-language edits are ready, request one batch translation for all affected `ko.mdx`, `en.mdx`, and any `cover.alt.*.txt` files.
-2. connect Cloudflare Pages with test deployment settings, then set `PUBLIC_BUTTONDOWN_USERNAME=sunwoochoi` there and repeat the live subscription test;
-3. choose the production domain, configure DNS, and set the final `SITE_URL`; and
-4. complete post-deployment checks from `docs/publishing.md`.
+1. Connect the production domain `sunwoochoi.com` per the Cloudflare work above, set the final `SITE_URL`, and repeat the post-deployment checks from `docs/publishing.md` on the new origin.
+2. Review or replace writing copy directly in `src/content/writing/<slug>/` (now only the four real essays); after the original-language edits are ready, request one batch translation for all affected `ko.mdx`, `en.mdx`, and any `cover.alt.*.txt` files.
+3. Complete the remaining launch checklist in `docs/publishing.md`.
 
-Cloudflare, DNS, a custom domain, final production `SITE_URL`, Buttondown delivery, and Notion automation are not part of the CI-continuity project.
+DNS, the custom domain, final production `SITE_URL`, Buttondown delivery, and Notion automation remain separate projects. A Cloudflare Pages test deployment exists; changing it is still a deployment change that needs explicit authorization.
 
 ## Resume checklist
 
@@ -90,5 +101,5 @@ Cloudflare, DNS, a custom domain, final production `SITE_URL`, Buttondown delive
 ## Resume prompt
 
 ```text
-Read AGENTS.md and docs/CURRENT_WORK.md. Run git status --short. If its output is non-empty, stop; understand the existing work on its current branch and safely commit and push it before running git switch main and git pull --ff-only origin main. Resume from updated main and create a purpose-specific feature branch before editing. Run verification as env -u CLAUDECODE npm run verify from an agent shell. Preserve the person-first bilingual writing invariants and unrelated user changes. The user has a verified Buttondown account with username sunwoochoi and newsletter name Sunwoo’s Archive; the site form and the live subscribe/confirm/unsubscribe flow are verified from a local preview, but no deployment or Cloudflare setting exists yet. Treat Cloudflare Pages, the Buttondown environment variable there, the production domain, and final SITE_URL as separate projects requiring explicit scope.
+Read AGENTS.md and docs/CURRENT_WORK.md. Run git status --short. If its output is non-empty, stop; understand the existing work on its current branch and safely commit and push it before running git switch main and git pull --ff-only origin main. Resume from updated main and create a purpose-specific feature branch before editing. Run verification as env -u CLAUDECODE npm run verify from an agent shell. Preserve the person-first bilingual writing invariants and unrelated user changes. The user has a verified Buttondown account with username sunwoochoi and newsletter name Sunwoo’s Archive; the live subscribe/confirm/unsubscribe flow is verified. A Cloudflare Pages test deployment is live at https://memorying.pages.dev with SITE_URL set to that origin and PUBLIC_BUTTONDOWN_USERNAME=sunwoochoi. The user owns sunwoochoi.com but it is not connected yet. Treat the custom domain, DNS, final SITE_URL, and any Cloudflare setting change as separate projects requiring explicit scope; never ask for Cloudflare or Buttondown credentials.
 ```

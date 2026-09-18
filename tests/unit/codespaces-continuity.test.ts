@@ -39,8 +39,9 @@ describe('Codespaces continuity handoff', () => {
     expect(currentWork).not.toMatch(/remain pending platform validation/i);
     expect(currentWork).toMatch(/Buttondown username: `sunwoochoi`/);
     expect(currentWork).toMatch(/never.*password.*API keys.*subscriber email/is);
-    expect(currentWork).toMatch(/do not claim that the live site is connected to Buttondown/i);
-    expect(currentWork).toMatch(/Buttondown verification.*Cloudflare Pages.*domain.*SITE_URL.*separate projects/is);
+    expect(currentWork).toContain('https://memorying.pages.dev');
+    expect(currentWork).toMatch(/never request a Cloudflare API token/i);
+    expect(currentWork).toMatch(/custom domain.*DNS.*SITE_URL.*separate projects/is);
     expect(currentWork).not.toContain('feature/memorying-mvp');
     expect(currentWork).not.toContain('8865a80d36eeffca09252f1f4f4fc1f9a062ab6e');
 

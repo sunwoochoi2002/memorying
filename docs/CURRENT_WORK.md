@@ -75,10 +75,16 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 4. `public/_headers` is applied: the security headers (CSP, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`) are present on HTML, and `/_astro/*` assets return `cache-control: public, max-age=31536000, immutable`.
 5. The user owns `sunwoochoi.com` and wants it as the production domain. It is intentionally not connected yet so that `SITE_URL` keeps matching the address that actually serves the site.
 
+### Domain connection in progress (2026-09-18)
+
+- `sunwoochoi.com` is registered at Gabia. Because Gabia cannot serve a CNAME at the zone apex, the user chose the Cloudflare "Add a site" (Full DNS) path: the zone was added to Cloudflare and the user changed the nameservers at Gabia to the two Cloudflare nameservers.
+- As of the end of 2026-09-18 the zone is waiting for nameserver propagation; it is not yet `Active`, no Pages custom domain has been added, and `SITE_URL` is still `https://memorying.pages.dev`.
+- Cloudflare's scan found one A record (`121.254.178.253`), which is Gabia's parking server, not the site. It should be replaced by the Pages custom-domain record in the next step. The user has not said whether email at `@sunwoochoi.com` is in use; if it is, MX records must be recreated in Cloudflare.
+
 ### Next Cloudflare work (requires explicit user approval)
 
-1. Add `sunwoochoi.com` (and decide about `www.sunwoochoi.com`) under the Pages project's Custom domains. If the domain is registered outside Cloudflare, the user adds the CNAME record Cloudflare shows at the registrar's DNS; the user performs every registrar and dashboard action.
-2. Once the domain serves the site, change `SITE_URL` to `https://sunwoochoi.com`, redeploy, and repeat the post-deployment checks against the new origin, including a live subscription test from the deployed form.
+1. When the zone shows `Active`, add `sunwoochoi.com` (and decide about `www.sunwoochoi.com`) under the Pages project's Custom domains; accept replacing the parking A record. The user performs every registrar and dashboard action.
+2. Once `https://sunwoochoi.com` serves the site, change `SITE_URL` to `https://sunwoochoi.com`, redeploy, and repeat the post-deployment checks against the new origin, including a live subscription test from the deployed form. Then update this checkpoint and `docs/publishing.md`.
 
 ## Next independent work
 
@@ -101,5 +107,5 @@ DNS, the custom domain, final production `SITE_URL`, Buttondown delivery, and No
 ## Resume prompt
 
 ```text
-Read AGENTS.md and docs/CURRENT_WORK.md. Run git status --short. If its output is non-empty, stop; understand the existing work on its current branch and safely commit and push it before running git switch main and git pull --ff-only origin main. Resume from updated main and create a purpose-specific feature branch before editing. Run verification as env -u CLAUDECODE npm run verify from an agent shell. Preserve the person-first bilingual writing invariants and unrelated user changes. The user has a verified Buttondown account with username sunwoochoi and newsletter name Sunwoo’s Archive; the live subscribe/confirm/unsubscribe flow is verified. A Cloudflare Pages test deployment is live at https://memorying.pages.dev with SITE_URL set to that origin and PUBLIC_BUTTONDOWN_USERNAME=sunwoochoi. The user owns sunwoochoi.com but it is not connected yet. Treat the custom domain, DNS, final SITE_URL, and any Cloudflare setting change as separate projects requiring explicit scope; never ask for Cloudflare or Buttondown credentials.
+Read AGENTS.md and docs/CURRENT_WORK.md. Run git status --short. If its output is non-empty, stop; understand the existing work on its current branch and safely commit and push it before running git switch main and git pull --ff-only origin main. Resume from updated main and create a purpose-specific feature branch before editing. Run verification as env -u CLAUDECODE npm run verify from an agent shell. Preserve the person-first bilingual writing invariants and unrelated user changes. The user has a verified Buttondown account with username sunwoochoi and newsletter name Sunwoo’s Archive; the live subscribe/confirm/unsubscribe flow is verified. A Cloudflare Pages test deployment is live at https://memorying.pages.dev with SITE_URL set to that origin and PUBLIC_BUTTONDOWN_USERNAME=sunwoochoi. The user owns sunwoochoi.com (Gabia); its nameservers were pointed at Cloudflare on 2026-09-18 and the zone is awaiting activation, so the domain is not connected yet. Treat the custom domain, DNS, final SITE_URL, and any Cloudflare setting change as separate projects requiring explicit scope; never ask for Cloudflare or Buttondown credentials.
 ```

@@ -15,7 +15,6 @@ const Heading = headingLevel === 2 ? 'h2' : 'h3';
 <article class:list={['writing-list-item', { 'writing-list-item--compact': compact }]}>
   <div class="writing-list-item__copy">
     <Heading lang={item.originalLanguage}><a href={`/writing/${item.slug}/`}>{translation.title}</a></Heading>
-    <p lang={item.originalLanguage}>{translation.description}</p>
   </div>
   <p class="writing-list-item__meta">
     <span lang="en">{item.type === 'essay' ? 'Essay' : 'Note'}</span>

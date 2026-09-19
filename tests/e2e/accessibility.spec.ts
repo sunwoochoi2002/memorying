@@ -5,6 +5,8 @@ for (const path of ['/', '/about/', '/writing/', '/writing/memorying-start/', '/
   test(`${path} has no serious or critical axe violations`, async ({ page }) => {
     const response = await page.goto(path);
     expect(response?.status()).toBe(path === '/404/' ? 404 : 200);
+    // The dev server can reload once while it optimizes dependencies on the first request.
+    await page.waitForLoadState('networkidle');
     const results = await new AxeBuilder({ page }).analyze();
     const blocking = results.violations.filter(({ impact }) => impact === 'serious' || impact === 'critical');
     expect(blocking).toEqual([]);

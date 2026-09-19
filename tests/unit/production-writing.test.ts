@@ -92,6 +92,24 @@ describe('default production build', () => {
     expectImportedEssays(site);
   });
 
+  it('ships self-hosted fonts that the Content-Security-Policy allows', () => {
+    const cssFiles = readdirSync('dist/_astro').filter((name) => name.endsWith('.css'));
+    expect(cssFiles.length).toBeGreaterThan(0);
+    const css = cssFiles.map((name) => readFileSync(`dist/_astro/${name}`, 'utf8')).join('\n');
+
+    expect(css).toContain('Instrument Serif');
+    expect(css).toContain('Noto Serif KR Variable');
+    expect(css).not.toMatch(/url\(\s*["']?data:/);
+
+    const fontFiles = readdirSync('dist/_astro').filter((name) => /\.woff2?$/.test(name));
+    expect(fontFiles.some((name) => name.startsWith('instrument-serif-latin-400-normal'))).toBe(true);
+    expect(fontFiles.filter((name) => name.startsWith('noto-serif-kr-')).length).toBeGreaterThan(100);
+
+    const headers = readFileSync('public/_headers', 'utf8');
+    expect(headers).toMatch(/default-src 'self'/);
+    expect(headers).not.toMatch(/font-src[^;\n]*(https?:|\*)/);
+  });
+
   it('never reads the test fixtures without WRITING_FIXTURES=1', () => {
     expectFixturesAbsent(site);
     expect(site.loadedEntries).toContain('src/content/writing/alone/');

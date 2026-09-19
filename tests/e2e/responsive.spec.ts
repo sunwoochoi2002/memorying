@@ -65,7 +65,7 @@ test('site writing actions provide 44px touch targets at 320px', async ({ page }
 
   await page.goto('/');
   for (const control of [
-    page.getByRole('link', { name: 'View all →' }),
+    page.getByRole('link', { name: '전체 글 보기' }),
     ...await page.locator('.home-writing .writing-list-item').getByRole('link').all(),
   ]) {
     const box = await control.boundingBox();
@@ -86,47 +86,38 @@ test('site writing actions provide 44px touch targets at 320px', async ({ page }
   }
 });
 
-test('home keeps intentional heading and statement geometry across compact viewports', async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 720 });
-  await page.goto('/');
-
-  const desktopLines = page.locator('[data-home-heading-line]');
-  await expect(desktopLines).toHaveCount(2);
-  const firstDesktopLine = await desktopLines.nth(0).boundingBox();
-  const secondDesktopLine = await desktopLines.nth(1).boundingBox();
-  expect(firstDesktopLine).not.toBeNull();
-  expect(secondDesktopLine).not.toBeNull();
-  expect(Math.abs(
-    (firstDesktopLine!.y + firstDesktopLine!.height / 2)
-      - (secondDesktopLine!.y + secondDesktopLine!.height / 2),
-  )).toBeLessThanOrEqual(1);
-
-  for (const width of [320, 390, 1280]) {
+test('home keeps the name and tagline inside the viewport and wraps only at word boundaries', async ({ page }) => {
+  for (const width of [320, 390, 768, 1280]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/');
+
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(1);
+
+    const title = page.getByRole('heading', { level: 1, name: 'Sunwoo Choi' });
+    const titleMetrics = await title.evaluate((element) => ({
+      scrollWidth: element.scrollWidth,
+      clientWidth: element.clientWidth,
+      fontSize: Number.parseFloat(getComputedStyle(element).fontSize),
+    }));
+    expect(titleMetrics.scrollWidth).toBeLessThanOrEqual(titleMetrics.clientWidth + 1);
+    expect(titleMetrics.fontSize).toBeLessThanOrEqual(76);
+
     const statement = page.locator('.hero__statement');
-    const metrics = await statement.evaluate((element) => {
-      const style = getComputedStyle(element);
-      return {
-        height: element.getBoundingClientRect().height,
-        lineHeight: Number.parseFloat(style.lineHeight),
-        scrollWidth: element.scrollWidth,
-        clientWidth: element.clientWidth,
-      };
-    });
-    expect(metrics.height).toBeLessThanOrEqual(metrics.lineHeight * 1.2);
-    expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1);
+    await expect(statement).toHaveCSS('word-break', 'keep-all');
+    const statementMetrics = await statement.evaluate((element) => ({
+      scrollWidth: element.scrollWidth,
+      clientWidth: element.clientWidth,
+    }));
+    expect(statementMetrics.scrollWidth).toBeLessThanOrEqual(statementMetrics.clientWidth + 1);
   }
+
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1, name: 'Sunwoo Choi' })).toHaveCSS('font-size', '76px');
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  const mobileLines = page.locator('[data-home-heading-line]');
-  const firstMobileLine = await mobileLines.nth(0).boundingBox();
-  const secondMobileLine = await mobileLines.nth(1).boundingBox();
-  expect(firstMobileLine).not.toBeNull();
-  expect(secondMobileLine).not.toBeNull();
-  expect(secondMobileLine!.y).toBeGreaterThan(firstMobileLine!.y + firstMobileLine!.height);
-  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeGreaterThan(844);
   await page.getByRole('contentinfo').scrollIntoViewIfNeeded();
   await expect(page.getByRole('contentinfo')).toBeVisible();
 });

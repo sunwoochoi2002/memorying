@@ -191,7 +191,7 @@ test('renders the imported Korean-original Alone essay at one stable URL', async
   await expect(page.getByRole('button', { name: /한국어.*Original/ })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('[data-language-panel="ko"]')).toContainText('변하지 않는 것은 없다.');
   await expect(page.locator('.meta time').first()).toHaveText('2025-11-21');
-  await expect(page.locator('[data-writing-cover]')).toHaveCount(0);
+  await expect(page.locator('[data-writing-cover]')).toHaveCount(1);
 
   const initialUrl = page.url();
   await page.getByRole('button', { name: 'English' }).click();
@@ -207,7 +207,7 @@ test('wraps Korean and English detail titles only at word boundaries', async ({ 
 
   const koreanTitle = page.locator('h1[data-language-fragment="ko"]');
   await expect(koreanTitle).toBeVisible();
-  await expect(koreanTitle).toHaveCSS('font-size', '36px');
+  await expect(koreanTitle).toHaveCSS('font-size', '32px');
   await expect(koreanTitle).toHaveCSS('word-break', 'keep-all');
   await expect(koreanTitle).toHaveCSS('overflow-wrap', 'normal');
   await expect(koreanTitle).toHaveCSS('hyphens', 'none');
@@ -215,7 +215,7 @@ test('wraps Korean and English detail titles only at word boundaries', async ({ 
   await page.getByRole('button', { name: 'English' }).click();
   const englishTitle = page.locator('h1[data-language-fragment="en"]');
   await expect(englishTitle).toBeVisible();
-  await expect(englishTitle).toHaveCSS('font-size', '36px');
+  await expect(englishTitle).toHaveCSS('font-size', '32px');
   await expect(englishTitle).toHaveCSS('word-break', 'keep-all');
   await expect(englishTitle).toHaveCSS('overflow-wrap', 'normal');
   await expect(englishTitle).toHaveCSS('hyphens', 'none');
@@ -224,7 +224,7 @@ test('wraps Korean and English detail titles only at word boundaries', async ({ 
   expect(overflow).toBeLessThanOrEqual(1);
 
   await page.setViewportSize({ width: 1280, height: 900 });
-  await expect(englishTitle).toHaveCSS('font-size', '64px');
+  await expect(englishTitle).toHaveCSS('font-size', '38px');
 });
 
 test('sets writing in the self-hosted serif typefaces', async ({ page }) => {
@@ -237,12 +237,12 @@ test('sets writing in the self-hosted serif typefaces', async ({ page }) => {
 
   const koreanBody = page.locator('[data-language-panel="ko"] p').first();
   await expect(koreanBody).toHaveCSS('font-family', /^"?Noto Serif KR Variable"?,/);
-  await expect(koreanBody).toHaveCSS('font-size', '19px');
+  await expect(koreanBody).toHaveCSS('font-size', '17px');
 
   await page.getByRole('button', { name: 'English' }).click();
   const englishBody = page.locator('[data-language-panel="en"] p').first();
   await expect(englishBody).toHaveCSS('font-family', /^"?Instrument Serif"?,/);
-  await expect(englishBody).toHaveCSS('font-size', '24px');
+  await expect(englishBody).toHaveCSS('font-size', '21px');
 
   const loadedFamilies = await page.evaluate(async () => {
     await document.fonts.ready;
@@ -250,6 +250,52 @@ test('sets writing in the self-hosted serif typefaces', async ({ page }) => {
   });
   expect(loadedFamilies).toContain('Instrument Serif');
   expect(loadedFamilies).toContain('Noto Serif KR Variable');
+});
+
+const realCoverSlugs = ['alone', 'keep-it-up', 'time-for-change', 'teammates'];
+
+for (const [width, side] of [[1280, 624], [390, 342]] as const) {
+  test(`frames every real cover in the same white square at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    const frames: { width: number; height: number }[] = [];
+
+    for (const slug of realCoverSlugs) {
+      await page.goto(`/writing/${slug}/`);
+      const frame = page.locator('[data-writing-cover]');
+      await expect(frame, slug).toHaveCount(1);
+      const image = frame.locator('img');
+
+      await expect(frame).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+      await expect(frame).toHaveCSS('border-top-width', '1px');
+      await expect(image).toHaveCSS('object-fit', 'contain');
+      await expect(image).toHaveAttribute('alt', '');
+      await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0), { message: slug }).toBe(true);
+
+      const box = await frame.boundingBox();
+      expect(box, slug).not.toBeNull();
+      expect(Math.abs(box!.width - side), `${slug} frame width`).toBeLessThanOrEqual(1);
+      expect(Math.abs(box!.height - box!.width), `${slug} frame is square`).toBeLessThanOrEqual(1);
+      frames.push({ width: box!.width, height: box!.height });
+
+      const imageBox = await image.boundingBox();
+      expect(imageBox!.width).toBeLessThanOrEqual(box!.width);
+      expect(imageBox!.height).toBeLessThanOrEqual(box!.height);
+    }
+
+    for (const size of frames) {
+      expect(Math.abs(size.width - frames[0].width)).toBeLessThanOrEqual(1);
+      expect(Math.abs(size.height - frames[0].height)).toBeLessThanOrEqual(1);
+    }
+  });
+}
+
+test('places the cover between the article header and the text', async ({ page }) => {
+  await page.goto('/writing/teammates/');
+  const header = await page.locator('.article-header').boundingBox();
+  const cover = await page.locator('[data-writing-cover]').boundingBox();
+  const prose = await page.locator('.prose').boundingBox();
+  expect(header!.y + header!.height).toBeLessThanOrEqual(cover!.y + 1);
+  expect(cover!.y + cover!.height).toBeLessThanOrEqual(prose!.y + 1);
 });
 
 test('keeps navigation available on the noindex 404 page', async ({ page }) => {

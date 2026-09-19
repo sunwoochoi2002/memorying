@@ -27,9 +27,9 @@ export function collectAutomaticWritingCovers(
     }
     coverSlugs.add(slug);
 
-    const ko = coverAltModules[`${directory}/cover.alt.ko.txt`]?.trim();
-    const en = coverAltModules[`${directory}/cover.alt.en.txt`]?.trim();
-    if (!ko || !en) continue;
+    // Alt-text files are optional: without one the photo is decorative (empty alt).
+    const ko = coverAltModules[`${directory}/cover.alt.ko.txt`]?.trim() ?? '';
+    const en = coverAltModules[`${directory}/cover.alt.en.txt`]?.trim() ?? '';
 
     covers[slug] = { image: module.default, alt: { ko, en } };
   }

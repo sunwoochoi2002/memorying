@@ -101,7 +101,7 @@ test('home keeps the name and tagline inside the viewport and wraps only at word
       fontSize: Number.parseFloat(getComputedStyle(element).fontSize),
     }));
     expect(titleMetrics.scrollWidth).toBeLessThanOrEqual(titleMetrics.clientWidth + 1);
-    expect(titleMetrics.fontSize).toBeLessThanOrEqual(76);
+    expect(titleMetrics.fontSize).toBeLessThanOrEqual(48);
 
     const statement = page.locator('.hero__statement');
     await expect(statement).toHaveCSS('word-break', 'keep-all');
@@ -114,7 +114,7 @@ test('home keeps the name and tagline inside the viewport and wraps only at word
 
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1, name: 'Sunwoo’s Archive' })).toHaveCSS('font-size', '76px');
+  await expect(page.getByRole('heading', { level: 1, name: 'Sunwoo’s Archive' })).toHaveCSS('font-size', '48px');
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');

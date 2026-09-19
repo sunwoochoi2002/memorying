@@ -21,7 +21,9 @@ describe('Korean maintenance guide', () => {
       expect(guide).toContain(path);
     }
     expect(guide).toContain('https://sunwoochoi.com');
-    expect(guide).toMatch(/자동 검사.*(실패|고쳐)/s);
+    expect(guide).toContain('자동 검사가 확인하는 것');
+    expect(guide).toContain('tests/support/writing-rules.ts');
+    expect(guide).not.toContain('검사가 옛 목록을 기준으로 하기 때문입니다');
   });
 
   it('never asks the reader to store secrets and stays linked from the README', async () => {

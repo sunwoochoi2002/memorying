@@ -9,7 +9,7 @@ Give Memorying a quiet, serif-led minimal look that no longer reads as a templat
 - **Ground and ink:** paper `#fcfcfa`, ink `#1b1b1b`, muted `#6a6a6a`, one accent `#2438d1` used only for text points (dates, section labels, current navigation item, selected filter, subscribe button, link hover). No cards, gradients, shadows, or radii.
 - **Type:** Instrument Serif for Latin display and UI text; Noto Serif KR (variable) for Hangul and Korean reading text. Korean prose is set at 19px/2; English prose in Instrument Serif at 24px/1.7 because the face is compact.
 - **Layout:** header spans the container; content is one left-aligned column of 40rem starting at the header's left edge (gutter 96px at 1280px, shrinking on small screens).
-- **Home:** name `Sunwoo Choi`, the existing tagline, then a `Writing` heading with `전체 글 보기` on the same line at the right edge of the list. No eyebrow, no greeting paragraph (the About page keeps the greeting).
+- **Home:** heading `Sunwoo’s Archive` (changed from the demo's `Sunwoo Choi` after approval), the existing tagline, then a `Writing` heading with `전체 글 보기` on the same line at the right edge of the list. No eyebrow, no greeting paragraph (the About page keeps the greeting).
 - **Writing:** title, plain text filters, list rows of date, title, and type. The sentence "시간이 지나도 잊고 싶지 않은 Essay와 Note를 최신순으로 모았습니다." is removed.
 - **Summaries:** article descriptions are no longer shown in lists or on article pages. They stay in `<meta name="description">` and social tags.
 - **Subscribe block:** no box; hairline above, heading `새 에세이를 이메일로 받아 보세요.`, copy `새 에세이가 올라오면 남겨 주신 이메일 주소로 보내 드립니다. 구독은 언제든 취소할 수 있습니다.` plus the Privacy link, and an underlined email field with a text `Subscribe` button.

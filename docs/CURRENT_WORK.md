@@ -39,6 +39,14 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 4. [`PROJECT_STRUCTURE.md`](../PROJECT_STRUCTURE.md) is at the repository root and explains direct-edit locations, generated folders, and the content/translation workflow.
 5. Migration and cover behavior were independently reviewed. The final `main` verification passed with 68 unit tests, type checks, asset checks, build, internal-link checks, and browser tests.
 
+## Serif redesign record
+
+1. On 2026-09-19 the approved design canvas "Memorying 디자인 확정안 v1" (paper `#fcfcfa`, ink `#1b1b1b`, one blue text accent `#2438d1`, Instrument Serif plus Noto Serif KR, one left-aligned 40rem column) was applied site-wide on branch `feature/serif-redesign`. Design: [`docs/superpowers/specs/2026-09-19-serif-redesign-design.md`](superpowers/specs/2026-09-19-serif-redesign-design.md); plan: [`docs/superpowers/plans/2026-09-19-serif-redesign.md`](superpowers/plans/2026-09-19-serif-redesign.md).
+2. Content changes that came with it: article and list summaries are no longer shown (descriptions stay in meta tags), the Writing page intro sentence and every small uppercase eyebrow label are gone, the home page shows only the name and tagline with `전체 글 보기` on the `Writing` heading line, and the subscribe block reads `새 에세이를 이메일로 받아 보세요.` with `새 에세이가 올라오면 남겨 주신 이메일 주소로 보내 드립니다. 구독은 언제든 취소할 수 있습니다.` The greeting paragraph removed from the home page still lives on the About page.
+3. Fonts are self-hosted from the OFL-1.1 Fontsource npm packages. `public/_headers` allows only same-origin resources (`default-src 'self'`), so `astro.config.mjs` sets `assetsInlineLimit: 0` and `tests/unit/production-writing.test.ts` fails if any font is inlined as a `data:` URI. Korean text uses 124 unicode-range slices (about 6 MB in `dist/_astro/`); browsers fetch only the slices a page needs.
+4. Dates remain `YYYY-MM-DD` (product invariant); the demo's dotted dates were not adopted. English article text is set in Instrument Serif at 24px with extra word spacing; if it reads too dense, Newsreader was the compared alternative.
+5. Known content nit, not changed: `src/content/writing/alone/ko.mdx` contains `신경쓰지는`, which standard spelling writes as `신경 쓰지는`. Content edits need the author's approval.
+
 ## Writing test fixtures record
 
 1. The user intentionally deleted the two sample drafts (`memorying-start`, a Korean-original Essay with a cover, and `small-beginning`, an English-original Note) from `src/content/writing/` so the archive holds only real writing.

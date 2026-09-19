@@ -26,15 +26,17 @@ test('filters writing with canonical URL history, restores state, and focuses re
 
   const koreanWriting = page.locator('[data-writing-item]').filter({ hasText: 'Memorying을 시작하며' });
   await expect(koreanWriting.locator('h2')).toHaveAttribute('lang', 'ko');
-  await expect(koreanWriting.locator('.writing-list-item__copy > p')).toHaveAttribute('lang', 'ko');
   await expect(koreanWriting.locator('time')).toHaveAttribute('lang', 'ko');
   await expect(koreanWriting.locator('time')).toHaveText('2026-07-24');
 
   const englishWriting = page.locator('[data-writing-item]').filter({ hasText: 'A small beginning' });
   await expect(englishWriting.locator('h2')).toHaveAttribute('lang', 'en');
-  await expect(englishWriting.locator('.writing-list-item__copy > p')).toHaveAttribute('lang', 'en');
   await expect(englishWriting.locator('time')).toHaveAttribute('lang', 'en');
   await expect(englishWriting.locator('time')).toHaveText('2026-07-23');
+
+  await expect(page.locator('[data-writing-archive] .writing-list-item__copy > p')).toHaveCount(0);
+  await expect(page.getByText('최신순으로 모았습니다')).toHaveCount(0);
+  await expect(page.locator('.eyebrow')).toHaveCount(0);
 
   await typeFilters.getByRole('button', { name: 'Note' }).click();
   await expect(page).toHaveURL('/writing/?type=note');
@@ -145,6 +147,8 @@ test('renders original-first bilingual articles at one stable URL', async ({ pag
     'http://localhost:4321/writing/memorying-start/',
   );
   await expect(page.getByRole('link', { name: 'Back to Writing' })).toBeVisible();
+  await expect(page.locator('.article-header__description')).toHaveCount(0);
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /\S/);
   const publishedDate = page.locator('.meta time').first();
   await expect(publishedDate).toHaveText('2026-07-24');
   await expect(publishedDate).toHaveAttribute('datetime', '2026-07-24T00:00:00.000Z');
@@ -203,7 +207,7 @@ test('wraps Korean and English detail titles only at word boundaries', async ({ 
 
   const koreanTitle = page.locator('h1[data-language-fragment="ko"]');
   await expect(koreanTitle).toBeVisible();
-  await expect(koreanTitle).toHaveCSS('font-size', '33.28px');
+  await expect(koreanTitle).toHaveCSS('font-size', '36px');
   await expect(koreanTitle).toHaveCSS('word-break', 'keep-all');
   await expect(koreanTitle).toHaveCSS('overflow-wrap', 'normal');
   await expect(koreanTitle).toHaveCSS('hyphens', 'none');
@@ -211,13 +215,41 @@ test('wraps Korean and English detail titles only at word boundaries', async ({ 
   await page.getByRole('button', { name: 'English' }).click();
   const englishTitle = page.locator('h1[data-language-fragment="en"]');
   await expect(englishTitle).toBeVisible();
-  await expect(englishTitle).toHaveCSS('font-size', '33.28px');
+  await expect(englishTitle).toHaveCSS('font-size', '36px');
   await expect(englishTitle).toHaveCSS('word-break', 'keep-all');
   await expect(englishTitle).toHaveCSS('overflow-wrap', 'normal');
   await expect(englishTitle).toHaveCSS('hyphens', 'none');
 
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(1);
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await expect(englishTitle).toHaveCSS('font-size', '64px');
+});
+
+test('sets writing in the self-hosted serif typefaces', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/writing/alone/');
+
+  const brand = page.getByRole('link', { name: 'Sunwoo Choi' });
+  await expect(brand).toHaveCSS('font-family', /^"?Instrument Serif"?,/);
+  await expect(page.locator('h1[data-language-fragment="ko"]')).toHaveCSS('font-family', /^"?Instrument Serif"?,.*Noto Serif KR Variable/);
+
+  const koreanBody = page.locator('[data-language-panel="ko"] p').first();
+  await expect(koreanBody).toHaveCSS('font-family', /^"?Noto Serif KR Variable"?,/);
+  await expect(koreanBody).toHaveCSS('font-size', '19px');
+
+  await page.getByRole('button', { name: 'English' }).click();
+  const englishBody = page.locator('[data-language-panel="en"] p').first();
+  await expect(englishBody).toHaveCSS('font-family', /^"?Instrument Serif"?,/);
+  await expect(englishBody).toHaveCSS('font-size', '24px');
+
+  const loadedFamilies = await page.evaluate(async () => {
+    await document.fonts.ready;
+    return [...document.fonts].filter((face) => face.status === 'loaded').map((face) => face.family.replaceAll('"', ''));
+  });
+  expect(loadedFamilies).toContain('Instrument Serif');
+  expect(loadedFamilies).toContain('Noto Serif KR Variable');
 });
 
 test('keeps navigation available on the noindex 404 page', async ({ page }) => {

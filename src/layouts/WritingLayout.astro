@@ -22,49 +22,43 @@ const { originalLanguage } = item;
   canonicalUrl={item.canonicalUrl}
   type="article"
 >
-  <article>
-    <header class="article-header">
-      <ContentMetadata item={item} />
-      <div class="language-toggle" role="group" aria-label="Language" data-language-toggle hidden>
-        <button type="button" data-language-button="ko" aria-pressed={originalLanguage === 'ko'}>
-          <span lang="ko">한국어</span> {originalLanguage === 'ko' && <small lang="en">Original</small>}
-        </button>
-        <span aria-hidden="true">/</span>
-        <button type="button" data-language-button="en" aria-pressed={originalLanguage === 'en'}>
-          <span lang="en">English</span> {originalLanguage === 'en' && <small lang="en">Original</small>}
-        </button>
+  <article class="container article">
+    <div class="column">
+      <header class="article-header">
+        <ContentMetadata item={item} />
+        <h1 lang="ko" data-language-fragment="ko" hidden={originalLanguage !== 'ko'}>{ko.title}</h1>
+        <h1 lang="en" data-language-fragment="en" hidden={originalLanguage !== 'en'}>{en.title}</h1>
+        <div class="language-toggle" role="group" aria-label="Language" data-language-toggle hidden>
+          <button type="button" data-language-button="ko" aria-pressed={originalLanguage === 'ko'}>
+            <span lang="ko">한국어</span> {originalLanguage === 'ko' && <small lang="en">Original</small>}
+          </button>
+          <span aria-hidden="true">/</span>
+          <button type="button" data-language-button="en" aria-pressed={originalLanguage === 'en'}>
+            <span lang="en">English</span> {originalLanguage === 'en' && <small lang="en">Original</small>}
+          </button>
+        </div>
+      </header>
+      {item.coverImage && item.coverImageAlt && (
+        <div
+          class="writing-cover"
+          data-writing-cover
+          data-alt-ko={item.coverImageAlt.ko}
+          data-alt-en={item.coverImageAlt.en}
+        >
+          <Image
+            src={item.coverImage}
+            alt={item.coverImageAlt[originalLanguage]}
+            widths={[640, 960, 1280]}
+            sizes="(max-width: 720px) 100vw, 640px"
+          />
+        </div>
+      )}
+      <div class="prose">
+        <div lang="ko" data-language-panel="ko" hidden={originalLanguage !== 'ko'}><slot name="ko" /></div>
+        <div lang="en" data-language-panel="en" hidden={originalLanguage !== 'en'}><slot name="en" /></div>
       </div>
-      <h1 lang="ko" data-language-fragment="ko" hidden={originalLanguage !== 'ko'}>{ko.title}</h1>
-      <h1 lang="en" data-language-fragment="en" hidden={originalLanguage !== 'en'}>{en.title}</h1>
-      <p class="article-header__description" lang="ko" data-language-fragment="ko" hidden={originalLanguage !== 'ko'}>{ko.description}</p>
-      <p class="article-header__description" lang="en" data-language-fragment="en" hidden={originalLanguage !== 'en'}>{en.description}</p>
-    </header>
-    {item.coverImage && item.coverImageAlt && (
-      <div
-        class="writing-cover"
-        data-writing-cover
-        data-alt-ko={item.coverImageAlt.ko}
-        data-alt-en={item.coverImageAlt.en}
-      >
-        <Image
-          src={item.coverImage}
-          alt={item.coverImageAlt[originalLanguage]}
-          widths={[640, 960, 1280]}
-          sizes="(max-width: 720px) 100vw, 704px"
-        />
-      </div>
-    )}
-    <div class="prose">
-      <div lang="ko" data-language-panel="ko" hidden={originalLanguage !== 'ko'}><slot name="ko" /></div>
-      <div lang="en" data-language-panel="en" hidden={originalLanguage !== 'en'}><slot name="en" /></div>
-    </div>
-    {item.type === 'essay' && (
-      <div class="container" style="padding-bottom: 3rem">
-        <NewsletterSignup id="essay-end" compact={true} />
-      </div>
-    )}
-    <div class="container" style="padding-bottom: 3rem">
-      <a class="text-link" href="/writing/">← Back to Writing</a>
+      {item.type === 'essay' && <NewsletterSignup id="essay-end" />}
+      <p class="article-back"><a class="text-link" href="/writing/" lang="en">← Back to Writing</a></p>
     </div>
   </article>
 </BaseLayout>

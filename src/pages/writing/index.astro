@@ -10,9 +10,8 @@ const writing = await loadWritingArticles();
 
 <BaseLayout title="Writing" description="Essays and notes by Sunwoo Choi.">
   <section class="container section">
-    <p class="eyebrow">Essays and notes</p>
+    <div class="column">
     <h1 class="section-title">Writing</h1>
-    <p>시간이 지나도 잊고 싶지 않은 Essay와 Note를 최신순으로 모았습니다.</p>
     {writing.length ? (
       <div data-writing-archive>
         <WritingFilters />
@@ -27,6 +26,7 @@ const writing = await loadWritingArticles();
     ) : (
       <p class="empty-state">아직 공개된 글이 없습니다. 곧 이곳에 Essay와 Note를 기록할 예정입니다.</p>
     )}
-    <div style="margin-top: 4rem"><NewsletterSignup id="writing-archive" /></div>
+    <NewsletterSignup id="writing-archive" />
+    </div>
   </section>
 </BaseLayout>

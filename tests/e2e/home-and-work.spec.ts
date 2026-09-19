@@ -3,13 +3,15 @@ import { expect, test } from '@playwright/test';
 test('home is a compact person-first introduction with recent original-language writing', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('/');
-  const heading = page.getByRole('heading', { level: 1, name: "Hello, I’m Sunwoo." });
+  const heading = page.getByRole('heading', { level: 1, name: 'Sunwoo Choi' });
   await expect(heading).toBeVisible();
   await expect(heading).toHaveAttribute('lang', 'en');
-  await expect(page.locator('[data-home-heading-line]')).toHaveCount(2);
   await expect(page.getByText('시간이 지나도 잊고 싶지 않은 것들을 기록합니다.')).toBeVisible();
-  await expect(page.getByText('이 공간에 도착한 당신을 환영합니다.')).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Recent writing' })).toBeVisible();
+  await expect(page.getByText('이 공간에 도착한 당신을 환영합니다.')).toHaveCount(0);
+  await expect(page.locator('.eyebrow')).toHaveCount(0);
+  await expect(page.getByRole('heading', { level: 2, name: 'Writing' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Recent writing' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: '전체 글 보기' })).toHaveAttribute('href', '/writing/');
   await expect(page.getByRole('link', { name: 'Memorying을 시작하며' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'A small beginning' })).toBeVisible();
   for (const title of ['홀로-', 'Keep it up!', '변화가 필요한 시점.', 'Teammates']) {
@@ -17,7 +19,7 @@ test('home is a compact person-first introduction with recent original-language 
   }
   const englishWriting = page.locator('.home-writing .writing-list-item').filter({ hasText: 'A small beginning' });
   await expect(englishWriting.locator('h3')).toHaveAttribute('lang', 'en');
-  await expect(englishWriting.locator('.writing-list-item__copy > p')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('.home-writing .writing-list-item__copy > p')).toHaveCount(0);
   await expect(englishWriting.locator('time')).toHaveAttribute('lang', 'en');
   await expect(
     page.locator('.home-writing .writing-list-item').filter({ hasText: 'Memorying을 시작하며' }).locator('time'),
@@ -29,6 +31,23 @@ test('home is a compact person-first introduction with recent original-language 
 
   const footer = await page.getByRole('contentinfo').boundingBox();
   expect(footer).not.toBeNull();
+});
+
+test('home puts the all-writing link on the Writing heading line at the list edge', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto('/');
+
+  const heading = await page.getByRole('heading', { level: 2, name: 'Writing' }).boundingBox();
+  const link = await page.getByRole('link', { name: '전체 글 보기' }).boundingBox();
+  const list = await page.locator('.home-writing .writing-list').boundingBox();
+  expect(heading).not.toBeNull();
+  expect(link).not.toBeNull();
+  expect(list).not.toBeNull();
+
+  expect(link!.y).toBeLessThan(heading!.y + heading!.height);
+  expect(heading!.y).toBeLessThan(link!.y + link!.height);
+  expect(link!.x).toBeGreaterThan(heading!.x + heading!.width);
+  expect(Math.abs(link!.x + link!.width - (list!.x + list!.width))).toBeLessThanOrEqual(2);
 });
 
 test('about and work explain the person without becoming a full résumé', async ({ page }) => {

@@ -1,7 +1,18 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { articlePath, loadWritingCases } from '../support/writing-content';
 
-for (const path of ['/', '/about/', '/writing/', '/writing/memorying-start/', '/work/', '/privacy/', '/404/']) {
+const cases = loadWritingCases({ fixtures: true });
+const koreanOriginal = cases.find((item) => item.originalLanguage === 'ko');
+const englishOriginal = cases.find((item) => item.originalLanguage === 'en');
+// Articles are checked by kind (Essay, Note, with a cover) rather than by name.
+const articleKinds = [...new Set([
+  cases.find((item) => item.type === 'essay'),
+  cases.find((item) => item.type === 'note'),
+  cases.find((item) => item.cover),
+].filter((item) => item !== undefined))];
+
+for (const path of ['/', '/about/', '/writing/', ...articleKinds.map(articlePath), '/work/', '/privacy/', '/404/']) {
   test(`${path} has no serious or critical axe violations`, async ({ page }) => {
     const response = await page.goto(path);
     expect(response?.status()).toBe(path === '/404/' ? 404 : 200);
@@ -22,14 +33,22 @@ test('skip link and primary navigation work by keyboard', async ({ page }) => {
 });
 
 test('article language controls expose their selected language', async ({ page }) => {
-  await page.goto('/writing/memorying-start/');
+  expect(koreanOriginal, 'a Korean-original article (a fixture guarantees one)').toBeDefined();
+  expect(englishOriginal, 'an English-original article (a fixture guarantees one)').toBeDefined();
+
+  await page.goto(articlePath(koreanOriginal!));
   await expect(page.getByRole('group', { name: 'Language' })).toBeVisible();
   await expect(page.getByRole('button', { name: /한국어.*Original/ })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: 'English' })).toHaveAttribute('aria-pressed', 'false');
+
+  await page.goto(articlePath(englishOriginal!));
+  await expect(page.getByRole('button', { name: /English.*Original/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: '한국어' })).toHaveAttribute('aria-pressed', 'false');
 });
 
 test('article controls and static metadata retain their own language annotations after switching', async ({ page }) => {
-  await page.goto('/writing/memorying-start/');
+  expect(koreanOriginal, 'a Korean-original article (a fixture guarantees one)').toBeDefined();
+  await page.goto(articlePath(koreanOriginal!));
   const metadata = page.locator('.article-header .meta');
 
   await expect(metadata).toHaveAttribute('lang', 'ko');

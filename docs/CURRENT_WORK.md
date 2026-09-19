@@ -59,7 +59,15 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 ## Maintenance guide record
 
 1. `MAINTENANCE.md` (root, Korean) is the user's routine-operations guide: new writing, edits, Essay and Note switching, hiding and deleting, photos, dates, non-writing copy, newsletter sending, the deploy flow with Cloudflare preview URLs, rollback, and what needs a conversation first. `tests/unit/maintenance-guide.test.ts` keeps it from rotting (commands, metadata fields, headings, README link).
-2. Known trap documented there: several tests hard-code the four real essays (`tests/unit/production-writing.test.ts` lists the writing folders, `tests/e2e/writing.spec.ts` counts six items including two fixtures, `tests/e2e/home-and-work.spec.ts` checks titles), so publishing a new essay or renaming one fails `verify` until the tests are updated. A worthwhile follow-up is to derive those expectations from the content instead.
+2. The trap first documented there (tests hard-coded the four essays, so publishing a new one failed `verify`) was removed by the content-driven checks below.
+
+## Content-driven checks record
+
+1. On 2026-09-20 the user asked for flexible checks: define the rules once, look only at the writing that exists in the repository, and approve it when it follows the rules. Design: [`docs/superpowers/specs/2026-09-20-content-driven-checks-design.md`](superpowers/specs/2026-09-20-content-driven-checks-design.md); plan: [`docs/superpowers/plans/2026-09-20-content-driven-checks.md`](superpowers/plans/2026-09-20-content-driven-checks.md).
+2. `tests/support/writing-content.ts` reads every article folder (real content, plus the fixtures for browser tests) into plain data. `tests/support/writing-rules.ts` holds the rules and returns readable Korean problem messages; it reuses the site's own zod schemas so it cannot drift from the build.
+3. Browser specs loop over whatever articles exist and compare each with its own files (title, date, type, original language, cover, alt text, subscription form); `tests/unit/production-writing.test.ts` compares the built site with the published set. No test names a real article any more. Fixtures still guarantee that at least one Essay, one Note, one Korean original, one English original, one cover, and one draft exist for the browser tests.
+4. Proof: the refactored tests passed on the old content (97 unit, 92 browser), passed unchanged after the four essays became Notes, and passed after a temporary published English-original Essay with a cover was added and removed. A deliberately broken article (a `[Draft]` marker on published writing) failed with that article named.
+5. On 2026-09-20 the user converted `alone`, `keep-it-up`, `teammates`, and `time-for-change` from Essay to Note and removed the trailing "댓글은 카톡으로…" lines from `time-for-change`. Consequences: no article page shows the subscribe block any more (it appears on Essays only) and the Writing Essay filter is empty until an Essay exists.
 
 ## Writing test fixtures record
 

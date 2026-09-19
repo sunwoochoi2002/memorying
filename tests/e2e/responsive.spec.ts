@@ -1,7 +1,10 @@
 import { expect, test } from '@playwright/test';
+import { articlePath, loadWritingCases, representativeCases } from '../support/writing-content';
 
+const cases = loadWritingCases({ fixtures: true });
 const widths = [320, 390, 768, 1024, 1440];
-const paths = ['/', '/writing/', '/writing/memorying-start/', '/work/', '/privacy/', '/404/'];
+// One article with a cover and one without stand in for every article.
+const paths = ['/', '/writing/', ...representativeCases(cases).map(articlePath), '/work/', '/privacy/', '/404/'];
 
 for (const width of widths) {
   for (const path of paths) {
@@ -74,7 +77,7 @@ test('site writing actions provide 44px touch targets at 320px', async ({ page }
     expect(box!.height).toBeGreaterThanOrEqual(44);
   }
 
-  await page.goto('/writing/memorying-start/');
+  await page.goto(articlePath(cases[0]));
   for (const control of [
     ...await page.getByRole('group', { name: 'Language' }).getByRole('button').all(),
     page.getByRole('link', { name: 'Back to Writing' }),

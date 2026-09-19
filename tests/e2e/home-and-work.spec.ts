@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { articlePath, isoDatetime, loadWritingCases, originalTitle } from '../support/writing-content';
+
+// The dev server shows drafts and loads the test fixtures, so the home list is the newest few of all of them.
+const HOME_LIST_LENGTH = 6;
+const recent = loadWritingCases({ fixtures: true }).slice(0, HOME_LIST_LENGTH);
 
 test('home is a compact person-first introduction with recent original-language writing', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
@@ -12,21 +17,19 @@ test('home is a compact person-first introduction with recent original-language 
   await expect(page.getByRole('heading', { level: 2, name: 'Writing' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Recent writing' })).toHaveCount(0);
   await expect(page.getByRole('link', { name: '전체 글 보기' })).toHaveAttribute('href', '/writing/');
-  await expect(page.getByRole('link', { name: 'Memorying을 시작하며' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'A small beginning' })).toBeVisible();
-  for (const title of ['홀로-', 'Keep it up!', '변화가 필요한 시점.', 'Teammates']) {
-    await expect(page.getByRole('link', { name: title })).toBeVisible();
+
+  const rows = page.locator('.home-writing .writing-list-item');
+  await expect(rows).toHaveCount(recent.length);
+  for (const [index, item] of recent.entries()) {
+    const row = rows.nth(index);
+    await expect(row.locator('h3'), item.slug).toHaveAttribute('lang', item.originalLanguage);
+    await expect(row.getByRole('link'), item.slug).toHaveText(originalTitle(item));
+    await expect(row.getByRole('link'), item.slug).toHaveAttribute('href', articlePath(item));
+    await expect(row.locator('time'), item.slug).toHaveText(item.publishedAt);
+    await expect(row.locator('time'), item.slug).toHaveAttribute('lang', item.originalLanguage);
+    await expect(row.locator('time'), item.slug).toHaveAttribute('datetime', isoDatetime(item));
   }
-  const englishWriting = page.locator('.home-writing .writing-list-item').filter({ hasText: 'A small beginning' });
-  await expect(englishWriting.locator('h3')).toHaveAttribute('lang', 'en');
   await expect(page.locator('.home-writing .writing-list-item__copy > p')).toHaveCount(0);
-  await expect(englishWriting.locator('time')).toHaveAttribute('lang', 'en');
-  await expect(
-    page.locator('.home-writing .writing-list-item').filter({ hasText: 'Memorying을 시작하며' }).locator('time'),
-  ).toHaveText('2026-07-24');
-  await expect(
-    page.locator('.home-writing .writing-list-item').filter({ hasText: 'A small beginning' }).locator('time'),
-  ).toHaveText('2026-07-23');
   await expect(page.locator('.home-writing img')).toHaveCount(0);
 
   const footer = await page.getByRole('contentinfo').boundingBox();

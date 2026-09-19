@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test('home is a compact person-first introduction with recent original-language writing', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('/');
-  const heading = page.getByRole('heading', { level: 1, name: 'Sunwoo Choi' });
+  const heading = page.getByRole('heading', { level: 1, name: 'Sunwoo’s Archive' });
   await expect(heading).toBeVisible();
   await expect(heading).toHaveAttribute('lang', 'en');
   await expect(page.getByText('시간이 지나도 잊고 싶지 않은 것들을 기록합니다.')).toBeVisible();
@@ -54,6 +54,8 @@ test('about and work explain the person without becoming a full résumé', async
   await page.goto('/about/');
   await expect(page.getByRole('heading', { level: 1, name: 'About' })).toBeVisible();
   await expect(page.getByText('안녕하세요, 최선우입니다.')).toBeVisible();
+  await expect(page.getByText('시간이 지나도 잊고 싶지 않은 것들을 기록하고')).toBeVisible();
+  await expect(page.getByText('Memorying은 작업과 생각을 천천히 쌓아가는 개인적인 공간입니다.')).toHaveCount(0);
 
   await page.goto('/work/');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');

@@ -94,7 +94,7 @@ test('home keeps the name and tagline inside the viewport and wraps only at word
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(1);
 
-    const title = page.getByRole('heading', { level: 1, name: 'Sunwoo Choi' });
+    const title = page.getByRole('heading', { level: 1, name: 'Sunwoo’s Archive' });
     const titleMetrics = await title.evaluate((element) => ({
       scrollWidth: element.scrollWidth,
       clientWidth: element.clientWidth,
@@ -114,7 +114,7 @@ test('home keeps the name and tagline inside the viewport and wraps only at word
 
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1, name: 'Sunwoo Choi' })).toHaveCSS('font-size', '76px');
+  await expect(page.getByRole('heading', { level: 1, name: 'Sunwoo’s Archive' })).toHaveCSS('font-size', '76px');
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');

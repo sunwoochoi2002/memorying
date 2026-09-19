@@ -47,6 +47,15 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 4. Dates remain `YYYY-MM-DD` (product invariant); the demo's dotted dates were not adopted. English article text is set in Instrument Serif at 24px with extra word spacing; if it reads too dense, Newsreader was the compared alternative.
 5. Known content nit, not changed: `src/content/writing/alone/ko.mdx` contains `신경쓰지는`, which standard spelling writes as `신경 쓰지는`. Content edits need the author's approval.
 
+## Compact layout and photo covers record
+
+1. On 2026-09-19 the user asked for a compact, centered layout modeled on yoonchulyi.com and for consistent photos. Design: [`docs/superpowers/specs/2026-09-19-compact-layout-photo-covers-design.md`](superpowers/specs/2026-09-19-compact-layout-photo-covers-design.md); plan: [`docs/superpowers/plans/2026-09-19-compact-layout-photo-covers.md`](superpowers/plans/2026-09-19-compact-layout-photo-covers.md).
+2. The whole site (header, content, footer) now sits in one centered `39rem` column with a smaller type scale (home heading 48px, titles 38px, Korean prose 17px on desktop; smaller again below 45rem).
+3. The user's four photos are the covers of `alone`, `keep-it-up`, `time-for-change`, and `teammates` (`cover.png` / `cover.jpeg`). Every cover sits in the same square white frame with a hairline border and `object-fit: contain`, so photos are never cropped and every article shows an identical frame.
+4. The user chose empty alt text: `cover.alt.*.txt` files are now optional, and a cover without them is decorative (`alt=""`). The old rule that a cover needed both alt files is retired; covers declared in `meta.yaml` still need both alt values.
+5. The user accepted publishing the photos as they are, including a Slack screenshot naming a work channel and colleague, a photo of two other people, and a lyrics screenshot. The raised concerns (workplace information, consent of people shown, lyrics copyright) were recorded, not resolved; revisit if any of them changes.
+6. Known trade-off: wide screenshots shrink inside the square frame, so small text is hard to read on phones. A tap-to-enlarge viewer could be added later.
+
 ## Writing test fixtures record
 
 1. The user intentionally deleted the two sample drafts (`memorying-start`, a Korean-original Essay with a cover, and `small-beginning`, an English-original Note) from `src/content/writing/` so the archive holds only real writing.

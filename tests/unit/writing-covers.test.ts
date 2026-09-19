@@ -43,20 +43,44 @@ describe('automatic writing covers', () => {
     expect(resolved.coverImageAlt).toEqual(covers.alone.alt);
   });
 
-  it('leaves an article text-only when no complete cover pair exists', () => {
+  it('leaves an article text-only when no cover image exists', () => {
     const [resolved] = applyAutomaticWritingCovers([article()], {});
 
     expect(resolved.coverImage).toBeUndefined();
     expect(resolved.coverImageAlt).toBeUndefined();
   });
 
-  it('ignores a photo when either localized alt-text file is missing', () => {
+  it('shows a photo without alt-text files as decorative with empty alt text', () => {
     const covers = collectAutomaticWritingCovers(
       { '../content/writing/alone/cover.png': { default: image } },
-      { '../content/writing/alone/cover.alt.ko.txt': '창가에 놓인 헤드폰' },
+      {},
     );
 
-    expect(covers).toEqual({});
+    expect(covers).toEqual({ alone: { image, alt: { ko: '', en: '' } } });
+  });
+
+  it('uses a provided alt-text file for its language and empty text for the other', () => {
+    const covers = collectAutomaticWritingCovers(
+      { '../content/writing/alone/cover.png': { default: image } },
+      { '../content/writing/alone/cover.alt.ko.txt': '  창가에 놓인 헤드폰\n' },
+    );
+
+    expect(covers.alone.alt).toEqual({ ko: '창가에 놓인 헤드폰', en: '' });
+  });
+
+  it('gives an article its cover while other articles stay text-only', () => {
+    const covers = collectAutomaticWritingCovers(
+      { '../content/writing/alone/cover.png': { default: image } },
+      {},
+    );
+    const [alone, other] = applyAutomaticWritingCovers(
+      [article(), article({ slug: 'teammates' })],
+      covers,
+    );
+
+    expect(alone.coverImage).toBe(image);
+    expect(alone.coverImageAlt).toEqual({ ko: '', en: '' });
+    expect(other.coverImage).toBeUndefined();
   });
 
   it('rejects multiple cover images for one article instead of choosing one arbitrarily', () => {

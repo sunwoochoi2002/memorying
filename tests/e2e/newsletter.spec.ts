@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { articlePath, loadWritingCases } from '../support/writing-content';
+
+const cases = loadWritingCases({ fixtures: true });
+const essay = cases.find((item) => item.type === 'essay');
+const note = cases.find((item) => item.type === 'note');
 
 test('collects only an email and links to the privacy notice', async ({ page }) => {
   await page.goto('/writing/');
@@ -21,7 +26,8 @@ test('invites subscription in plain words without boxes or old copy', async ({ p
   await expect(newsletter).toHaveCSS('border-top-width', '1px');
   await expect(newsletter).toHaveCSS('border-left-width', '0px');
 
-  await page.goto('/writing/alone/');
+  expect(essay, 'an Essay (a fixture guarantees one)').toBeDefined();
+  await page.goto(articlePath(essay!));
   await expect(page.getByRole('heading', { level: 2, name: '새 에세이를 이메일로 받아 보세요.' })).toBeVisible();
 });
 
@@ -51,8 +57,10 @@ test('uses browser validation and posts valid email directly to Buttondown', asy
 });
 
 test('shows the secondary subscription form after an Essay but not a Note', async ({ page }) => {
-  await page.goto('/writing/memorying-start/');
+  expect(essay, 'an Essay (a fixture guarantees one)').toBeDefined();
+  expect(note, 'a Note (a fixture guarantees one)').toBeDefined();
+  await page.goto(articlePath(essay!));
   await expect(page.getByRole('form', { name: 'Newsletter subscription' })).toBeVisible();
-  await page.goto('/writing/small-beginning/');
+  await page.goto(articlePath(note!));
   await expect(page.getByRole('form', { name: 'Newsletter subscription' })).toHaveCount(0);
 });

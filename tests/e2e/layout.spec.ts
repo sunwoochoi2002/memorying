@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { articlePath, loadWritingCases } from '../support/writing-content';
 
-const pages = ['/', '/writing/', '/writing/alone/', '/about/', '/work/', '/privacy/'];
+const cases = loadWritingCases({ fixtures: true });
+const koreanOriginal = cases.find((item) => item.originalLanguage === 'ko')!;
+const pages = ['/', '/writing/', articlePath(cases[0]), '/about/', '/work/', '/privacy/'];
 
 for (const width of [390, 1280, 1440]) {
   test(`keeps every page in one centered 39rem column at ${width}px`, async ({ page }) => {
@@ -43,7 +46,7 @@ test('uses the compact type scale on desktop', async ({ page }) => {
   await expect(page.locator('.site-brand')).toHaveCSS('font-size', '26px');
   await expect(page.locator('.home-writing .writing-list-item h3').first()).toHaveCSS('font-size', '22px');
 
-  await page.goto('/writing/alone/');
+  await page.goto(articlePath(koreanOriginal));
   await expect(page.locator('h1[data-language-fragment="ko"]')).toHaveCSS('font-size', '38px');
   await expect(page.locator('[data-language-panel="ko"] p').first()).toHaveCSS('font-size', '17px');
 });
@@ -56,7 +59,7 @@ test('uses the compact type scale on phones', async ({ page }) => {
   await expect(page.locator('.hero__statement')).toHaveCSS('font-size', '16px');
   await expect(page.locator('.home-writing .writing-list-item h3').first()).toHaveCSS('font-size', '20px');
 
-  await page.goto('/writing/alone/');
+  await page.goto(articlePath(koreanOriginal));
   await expect(page.locator('h1[data-language-fragment="ko"]')).toHaveCSS('font-size', '32px');
   await expect(page.locator('[data-language-panel="ko"] p').first()).toHaveCSS('font-size', '16px');
 });

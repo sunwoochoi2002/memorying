@@ -1,78 +1,116 @@
 import { expect, test } from '@playwright/test';
+import {
+  articlePath,
+  firstPlainLine,
+  isoDatetime,
+  loadWritingCases,
+  originalDescription,
+  originalTitle,
+  otherLanguage,
+  typeLabel,
+  type Language,
+  type WritingType,
+} from '../support/writing-content';
+
+/**
+ * Every expectation about the writing itself is read from the repository, so
+ * adding, renaming, or converting an article never needs a test change. The
+ * dev server used here shows drafts and loads the test fixtures, so those are
+ * part of the expected archive.
+ */
+const cases = loadWritingCases({ fixtures: true });
+const SITE = 'http://localhost:4321';
 
 const statusText = (count: number, type: string) =>
   `Showing ${count} writing item${count === 1 ? '' : 's'}: Type ${type}.`;
+const withType = (type: WritingType) => cases.filter((item) => item.type === type);
+const buttonName = (language: Language, original: boolean) =>
+  language === 'ko' ? (original ? /한국어.*Original/ : /^한국어$/) : (original ? /English.*Original/ : /^English$/);
+const link = (slug: string) => `[data-writing-item] a[href="/writing/${slug}/"]`;
 
-const importedKoreanTitles = ['홀로-', 'Keep it up!', '변화가 필요한 시점.', 'Teammates'];
+// The filter scenarios use whichever type actually exists, so they work for any mix of Essays and Notes.
+const filterType: WritingType = withType('note').length > 0 ? 'note' : 'essay';
+const filterLabel = typeLabel(filterType);
+const otherType: WritingType = filterType === 'note' ? 'essay' : 'note';
 
-test('filters writing with canonical URL history, restores state, and focuses reset', async ({ page }) => {
+test('the repository has writing to check', () => {
+  expect(cases.length).toBeGreaterThan(0);
+});
+
+test('lists every article newest first with its original-language title, date, and type', async ({ page }) => {
   await page.goto('/writing/');
-  const typeFilters = page.locator('[data-filter-group="type"]');
-  const status = page.locator('[data-filter-status]');
-  const initialHistoryLength = await page.evaluate(() => history.length);
+  const items = page.locator('[data-writing-item]');
+  await expect(items).toHaveCount(cases.length);
+  await expect(page.locator('[data-filter-status]')).toHaveText(statusText(cases.length, 'All'));
+
+  for (const [index, item] of cases.entries()) {
+    const row = items.nth(index);
+    const titleLink = row.locator('h2').getByRole('link');
+    await expect(row.locator('h2'), item.slug).toHaveAttribute('lang', item.originalLanguage);
+    await expect(titleLink, item.slug).toHaveText(originalTitle(item));
+    await expect(titleLink, item.slug).toHaveAttribute('href', articlePath(item));
+    await expect(row.locator('time'), item.slug).toHaveText(item.publishedAt);
+    await expect(row.locator('time'), item.slug).toHaveAttribute('lang', item.originalLanguage);
+    await expect(row.locator('time'), item.slug).toHaveAttribute('datetime', isoDatetime(item));
+    await expect(row.locator('.writing-list-item__meta > span'), item.slug).toHaveText(typeLabel(item.type));
+    await expect(row, item.slug).toHaveAttribute('data-type', item.type);
+  }
 
   await expect(page.locator('[data-filter-group="language"]')).toHaveCount(0);
   await expect(page.getByRole('button', { name: '한국어' })).toHaveCount(0);
-  await expect(page.getByRole('link', { name: 'Memorying을 시작하며' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'A small beginning' })).toBeVisible();
-  for (const title of importedKoreanTitles) await expect(page.getByRole('link', { name: title })).toBeVisible();
-  await expect(page.locator('[data-writing-item]')).toHaveCount(6);
   await expect(page.locator('[data-writing-archive] img')).toHaveCount(0);
-  await expect(status).toHaveText(statusText(6, 'All'));
-
-  const importedKoreanWriting = page.locator('[data-writing-item]').filter({ hasText: '홀로-' });
-  await expect(importedKoreanWriting.locator('h2')).toHaveAttribute('lang', 'ko');
-  await expect(importedKoreanWriting.locator('time')).toHaveText('2025-11-21');
-
-  const koreanWriting = page.locator('[data-writing-item]').filter({ hasText: 'Memorying을 시작하며' });
-  await expect(koreanWriting.locator('h2')).toHaveAttribute('lang', 'ko');
-  await expect(koreanWriting.locator('time')).toHaveAttribute('lang', 'ko');
-  await expect(koreanWriting.locator('time')).toHaveText('2026-07-24');
-
-  const englishWriting = page.locator('[data-writing-item]').filter({ hasText: 'A small beginning' });
-  await expect(englishWriting.locator('h2')).toHaveAttribute('lang', 'en');
-  await expect(englishWriting.locator('time')).toHaveAttribute('lang', 'en');
-  await expect(englishWriting.locator('time')).toHaveText('2026-07-23');
-
   await expect(page.locator('[data-writing-archive] .writing-list-item__copy > p')).toHaveCount(0);
   await expect(page.getByText('최신순으로 모았습니다')).toHaveCount(0);
   await expect(page.locator('.eyebrow')).toHaveCount(0);
+});
 
-  await typeFilters.getByRole('button', { name: 'Note' }).click();
-  await expect(page).toHaveURL('/writing/?type=note');
-  await expect(status).toHaveText(statusText(1, 'Note'));
-  await expect(page.locator('[data-writing-item]:visible')).toHaveCount(1);
-  await expect(page.evaluate(() => history.length)).resolves.toBe(initialHistoryLength + 1);
-  await expect(page.getByRole('link', { name: 'Memorying을 시작하며' })).toBeHidden();
-  await expect(page.getByRole('link', { name: 'A small beginning' })).toBeVisible();
+test('filters writing with canonical URL history, restores state, and focuses reset', async ({ page }) => {
+  const matching = withType(filterType);
+  const typeFilters = page.locator('[data-filter-group="type"]');
+  const status = page.locator('[data-filter-status]');
+  await page.goto('/writing/');
+  const initialHistoryLength = await page.evaluate(() => history.length);
 
-  await typeFilters.getByRole('button', { name: 'Note' }).click();
+  const expectFilteredList = async () => {
+    await expect(status).toHaveText(statusText(matching.length, filterLabel));
+    await expect(page.locator('[data-writing-item]:visible')).toHaveCount(matching.length);
+    for (const item of cases) {
+      const shown = item.type === filterType;
+      await (shown ? expect(page.locator(link(item.slug)), item.slug).toBeVisible() : expect(page.locator(link(item.slug)), item.slug).toBeHidden());
+    }
+  };
+
+  await typeFilters.getByRole('button', { name: filterLabel }).click();
+  await expect(page).toHaveURL(`/writing/?type=${filterType}`);
+  await expectFilteredList();
   await expect(page.evaluate(() => history.length)).resolves.toBe(initialHistoryLength + 1);
-  await expect(status).toHaveText(statusText(1, 'Note'));
+
+  await typeFilters.getByRole('button', { name: filterLabel }).click();
+  await expect(page.evaluate(() => history.length)).resolves.toBe(initialHistoryLength + 1);
+  await expectFilteredList();
 
   await typeFilters.getByRole('button', { name: 'All' }).click();
   await expect(page).toHaveURL('/writing/');
-  await expect(status).toHaveText(statusText(6, 'All'));
+  await expect(status).toHaveText(statusText(cases.length, 'All'));
   await expect(typeFilters.getByRole('button', { name: 'All' })).toBeFocused();
   await expect(page.evaluate(() => history.length)).resolves.toBe(initialHistoryLength + 2);
 
   await page.goBack();
-  await expect(page).toHaveURL('/writing/?type=note');
-  await expect(typeFilters.getByRole('button', { name: 'Note' })).toHaveAttribute('aria-pressed', 'true');
-  await expect(status).toHaveText(statusText(1, 'Note'));
-  await expect(page.getByRole('link', { name: 'A small beginning' })).toBeVisible();
+  await expect(page).toHaveURL(`/writing/?type=${filterType}`);
+  await expect(typeFilters.getByRole('button', { name: filterLabel })).toHaveAttribute('aria-pressed', 'true');
+  await expectFilteredList();
 
   await page.goForward();
   await expect(page).toHaveURL('/writing/');
-  await expect(status).toHaveText(statusText(6, 'All'));
+  await expect(status).toHaveText(statusText(cases.length, 'All'));
 
-  await page.locator('[data-writing-item]').evaluateAll((items) => {
-    for (const item of items) (item as HTMLElement).dataset.type = 'essay';
-  });
+  await page.locator('[data-writing-item]').evaluateAll((items, type) => {
+    for (const item of items) (item as HTMLElement).dataset.type = type;
+  }, otherType);
   const historyBeforeEmptyState = await page.evaluate(() => history.length);
-  await typeFilters.getByRole('button', { name: 'Note' }).click();
-  await expect(page).toHaveURL('/writing/?type=note');
-  await expect(status).toHaveText(statusText(0, 'Note'));
+  await typeFilters.getByRole('button', { name: filterLabel }).click();
+  await expect(page).toHaveURL(`/writing/?type=${filterType}`);
+  await expect(status).toHaveText(statusText(0, filterLabel));
   await expect(page.locator('[data-writing-item]:visible')).toHaveCount(0);
   const reset = page.locator('[data-reset-filters]');
   await expect(reset).toBeVisible();
@@ -80,20 +118,21 @@ test('filters writing with canonical URL history, restores state, and focuses re
 
   await reset.click();
   await expect(page).toHaveURL('/writing/');
-  await expect(status).toHaveText(statusText(6, 'All'));
-  await expect(page.locator('[data-writing-item]:visible')).toHaveCount(6);
+  await expect(status).toHaveText(statusText(cases.length, 'All'));
+  await expect(page.locator('[data-writing-item]:visible')).toHaveCount(cases.length);
   await expect(typeFilters.getByRole('button', { name: 'All' })).toBeFocused();
   await expect(page.evaluate(() => history.length)).resolves.toBe(historyBeforeEmptyState + 2);
 });
 
 test('ignores legacy language queries before canonical interaction', async ({ page }) => {
-  await page.goto('/writing/?type=essay&lang=en');
+  await page.goto(`/writing/?type=${filterType}&lang=en`);
   const typeFilters = page.locator('[data-filter-group="type"]');
-  await expect(typeFilters.getByRole('button', { name: 'Essay' })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByRole('link', { name: 'Memorying을 시작하며' })).toBeVisible();
-  for (const title of importedKoreanTitles) await expect(page.getByRole('link', { name: title })).toBeVisible();
-  await typeFilters.getByRole('button', { name: 'Note' }).click();
-  await expect(page).toHaveURL('/writing/?type=note');
+  await expect(typeFilters.getByRole('button', { name: filterLabel })).toHaveAttribute('aria-pressed', 'true');
+  for (const item of cases) {
+    await (item.type === filterType ? expect(page.locator(link(item.slug)), item.slug).toBeVisible() : expect(page.locator(link(item.slug)), item.slug).toBeHidden());
+  }
+  await typeFilters.getByRole('button', { name: typeLabel(otherType) }).click();
+  await expect(page).toHaveURL(`/writing/?type=${otherType}`);
 });
 
 test('synchronizes dynamically added writing archives after a filter click', async ({ page }) => {
@@ -105,131 +144,121 @@ test('synchronizes dynamically added writing archives after a filter click', asy
 
   const firstArchive = page.locator('[data-writing-archive]').nth(0);
   const secondArchive = page.locator('[data-writing-archive]').nth(1);
-  await firstArchive.locator('[data-filter-group="type"]').getByRole('button', { name: 'Note' }).click();
+  await firstArchive.locator('[data-filter-group="type"]').getByRole('button', { name: filterLabel }).click();
 
-  await expect(page).toHaveURL('/writing/?type=note');
-  await expect(firstArchive.locator('[data-filter-group="type"]').getByRole('button', { name: 'Note' })).toHaveAttribute('aria-pressed', 'true');
-  await expect(secondArchive.locator('[data-filter-group="type"]').getByRole('button', { name: 'Note' })).toHaveAttribute('aria-pressed', 'true');
-  await expect(firstArchive.locator('[data-filter-status]')).toHaveText(statusText(1, 'Note'));
-  await expect(secondArchive.locator('[data-filter-status]')).toHaveText(statusText(1, 'Note'));
-  await expect(firstArchive.getByRole('link', { name: 'Memorying을 시작하며' })).toBeHidden();
-  await expect(secondArchive.getByRole('link', { name: 'Memorying을 시작하며' })).toBeHidden();
-  await expect(firstArchive.getByRole('link', { name: 'A small beginning' })).toBeVisible();
-  await expect(secondArchive.getByRole('link', { name: 'A small beginning' })).toBeVisible();
+  await expect(page).toHaveURL(`/writing/?type=${filterType}`);
+  for (const archive of [firstArchive, secondArchive]) {
+    await expect(archive.locator('[data-filter-group="type"]').getByRole('button', { name: filterLabel })).toHaveAttribute('aria-pressed', 'true');
+    await expect(archive.locator('[data-filter-status]')).toHaveText(statusText(withType(filterType).length, filterLabel));
+    for (const item of cases) {
+      const row = archive.locator(`a[href="/writing/${item.slug}/"]`);
+      await (item.type === filterType ? expect(row, item.slug).toBeVisible() : expect(row, item.slug).toBeHidden());
+    }
+  }
 });
 
 test('server-renders a visible archive list but hides inert enhancement controls without JavaScript', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto('/writing/');
-  await expect(page.getByRole('link', { name: 'Memorying을 시작하며' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'A small beginning' })).toBeVisible();
-  for (const title of importedKoreanTitles) await expect(page.getByRole('link', { name: title })).toBeVisible();
-  await expect(page.locator('[data-writing-item]')).toHaveCount(6);
+  for (const item of cases) await expect(page.locator(link(item.slug)), item.slug).toBeVisible();
+  await expect(page.locator('[data-writing-item]')).toHaveCount(cases.length);
   await expect(page.locator('[data-writing-filters]')).toBeHidden();
   await expect(page.getByRole('button', { name: 'Note' })).toHaveCount(0);
   await context.close();
 });
 
-test('renders original-first bilingual articles at one stable URL', async ({ page, browser }) => {
-  await page.goto('/writing/memorying-start/');
-  await expect(page.getByRole('heading', { level: 1, name: 'Memorying을 시작하며' })).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
-  await expect(page.getByRole('button', { name: /한국어.*Original/ })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByRole('button', { name: 'English' })).toHaveAttribute('aria-pressed', 'false');
-  await expect(page.locator('[data-language-panel="ko"]')).toBeVisible();
-  await expect(page.locator('[data-language-panel="en"]')).toBeHidden();
-  await expect(page.locator('[data-writing-cover] img')).toHaveCount(1);
-  await expect(page.locator('[data-writing-cover] img')).toHaveAttribute('alt', '저녁빛 아래 겹쳐진 기억의 풍경');
-  await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'article');
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
-    'href',
-    'http://localhost:4321/writing/memorying-start/',
-  );
-  await expect(page.getByRole('link', { name: 'Back to Writing' })).toBeVisible();
-  await expect(page.locator('.article-header__description')).toHaveCount(0);
-  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /\S/);
-  const publishedDate = page.locator('.meta time').first();
-  await expect(publishedDate).toHaveText('2026-07-24');
-  await expect(publishedDate).toHaveAttribute('datetime', '2026-07-24T00:00:00.000Z');
+for (const item of cases) {
+  const original = item.originalLanguage;
+  const other = otherLanguage(item);
 
-  const initialUrl = page.url();
-  await page.getByRole('button', { name: 'English' }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'Beginning Memorying' })).toBeVisible();
-  await expect(page.locator('[data-language-panel="en"]')).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  await expect(page.locator('[data-writing-cover] img')).toHaveAttribute('alt', 'Layered memory landscapes in evening light');
-  await expect(publishedDate).toHaveText('2026-07-24');
-  expect(page.url()).toBe(initialUrl);
+  test(`${item.slug}: shows the original language first at one stable URL and switches languages`, async ({ page }) => {
+    await page.goto(articlePath(item));
+    const title = (language: Language) => page.getByRole('heading', { level: 1, name: item.translations[language].title, exact: true });
 
-  await page.reload();
-  await expect(page.getByRole('heading', { level: 1, name: 'Memorying을 시작하며' })).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
+    await expect(title(original)).toBeVisible();
+    await expect(page.locator('html')).toHaveAttribute('lang', original);
+    await expect(page.getByRole('button', { name: buttonName(original, true) })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: buttonName(other, false) })).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator(`[data-language-panel="${original}"]`)).toBeVisible();
+    await expect(page.locator(`[data-language-panel="${other}"]`)).toBeHidden();
+    const sentence = firstPlainLine(item.translations[original].body);
+    if (sentence) await expect(page.locator(`[data-language-panel="${original}"]`)).toContainText(sentence);
 
-  await page.goto('/writing/small-beginning/');
-  await expect(page.getByRole('heading', { level: 1, name: 'A small beginning' })).toBeVisible();
-  await expect(page.getByRole('button', { name: /English.*Original/ })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('[data-writing-cover]')).toHaveCount(0);
+    await expect(page.locator('.meta time').first()).toHaveText(item.publishedAt);
+    await expect(page.locator('.meta time').first()).toHaveAttribute('datetime', isoDatetime(item));
+    await expect(page.locator('.article-header .meta')).toContainText(typeLabel(item.type));
+    await expect(page.locator('.article-header .meta')).toHaveAttribute('lang', original);
+    await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'article');
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `${SITE}${articlePath(item)}`);
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', originalDescription(item));
+    await expect(page.locator('.article-header__description')).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Back to Writing' })).toBeVisible();
+    await expect(page.locator('[data-writing-cover]')).toHaveCount(item.cover ? 1 : 0);
 
-  const noJavaScriptContext = await browser.newContext({ javaScriptEnabled: false });
-  const noJavaScriptPage = await noJavaScriptContext.newPage();
-  await noJavaScriptPage.goto('/writing/memorying-start/');
-  await expect(noJavaScriptPage.getByRole('heading', { level: 1, name: 'Memorying을 시작하며' })).toBeVisible();
-  await expect(noJavaScriptPage.locator('[data-language-panel="ko"]')).toBeVisible();
-  await expect(noJavaScriptPage.locator('[data-language-panel="ko"]')).toContainText('시간이 지나도 잊고 싶지 않은 것들을 기록합니다.');
-  await expect(noJavaScriptPage.locator('[data-language-panel="en"]')).toBeHidden();
-  await expect(noJavaScriptPage.locator('[data-language-toggle]')).toBeHidden();
-  await expect(noJavaScriptPage.getByRole('button', { name: /한국어.*Original/ })).toHaveCount(0);
-  await expect(noJavaScriptPage.getByRole('button', { name: 'English' })).toHaveCount(0);
-  await noJavaScriptContext.close();
-});
+    const initialUrl = page.url();
+    await page.getByRole('button', { name: buttonName(other, false) }).click();
+    await expect(title(other)).toBeVisible();
+    await expect(page.locator('html')).toHaveAttribute('lang', other);
+    await expect(page.locator(`[data-language-panel="${other}"]`)).toBeVisible();
+    await expect(page.locator(`[data-language-panel="${original}"]`)).toBeHidden();
+    await expect(page.locator('.meta time').first()).toHaveText(item.publishedAt);
+    if (item.cover) await expect(page.locator('[data-writing-cover] img')).toHaveAttribute('alt', item.cover.alt[other]);
+    expect(page.url()).toBe(initialUrl);
 
-test('renders the imported Korean-original Alone essay at one stable URL', async ({ page }) => {
-  await page.goto('/writing/alone/');
-  await expect(page.getByRole('heading', { level: 1, name: '홀로-' })).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
-  await expect(page.getByRole('button', { name: /한국어.*Original/ })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('[data-language-panel="ko"]')).toContainText('변하지 않는 것은 없다.');
-  await expect(page.locator('.meta time').first()).toHaveText('2025-11-21');
-  await expect(page.locator('[data-writing-cover]')).toHaveCount(1);
+    await page.reload();
+    await expect(title(original)).toBeVisible();
+    await expect(page.locator('html')).toHaveAttribute('lang', original);
+  });
 
-  const initialUrl = page.url();
-  await page.getByRole('button', { name: 'English' }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'Alone—' })).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  await expect(page.locator('[data-language-panel="en"]')).toContainText('I do not regret buying the headphones impulsively early this month at all.');
-  expect(page.url()).toBe(initialUrl);
-});
+  test(`${item.slug}: keeps the original text readable without JavaScript`, async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+    await page.goto(articlePath(item));
+    await expect(page.getByRole('heading', { level: 1, name: originalTitle(item), exact: true })).toBeVisible();
+    await expect(page.locator(`[data-language-panel="${original}"]`)).toBeVisible();
+    await expect(page.locator(`[data-language-panel="${other}"]`)).toBeHidden();
+    await expect(page.locator('[data-language-toggle]')).toBeHidden();
+    await context.close();
+  });
+
+  test(`${item.slug}: offers the subscription form after an Essay but not after a Note`, async ({ page }) => {
+    await page.goto(articlePath(item));
+    await expect(page.getByRole('form', { name: 'Newsletter subscription' })).toHaveCount(item.type === 'essay' ? 1 : 0);
+  });
+}
 
 test('wraps Korean and English detail titles only at word boundaries', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 900 });
-  await page.goto('/writing/memorying-start/');
+  await page.goto(articlePath(cases[0]));
 
-  const koreanTitle = page.locator('h1[data-language-fragment="ko"]');
-  await expect(koreanTitle).toBeVisible();
-  await expect(koreanTitle).toHaveCSS('font-size', '32px');
-  await expect(koreanTitle).toHaveCSS('word-break', 'keep-all');
-  await expect(koreanTitle).toHaveCSS('overflow-wrap', 'normal');
-  await expect(koreanTitle).toHaveCSS('hyphens', 'none');
+  const original = cases[0].originalLanguage;
+  const other = otherLanguage(cases[0]);
+  const titleOf = (language: Language) => page.locator(`h1[data-language-fragment="${language}"]`);
 
-  await page.getByRole('button', { name: 'English' }).click();
-  const englishTitle = page.locator('h1[data-language-fragment="en"]');
-  await expect(englishTitle).toBeVisible();
-  await expect(englishTitle).toHaveCSS('font-size', '32px');
-  await expect(englishTitle).toHaveCSS('word-break', 'keep-all');
-  await expect(englishTitle).toHaveCSS('overflow-wrap', 'normal');
-  await expect(englishTitle).toHaveCSS('hyphens', 'none');
+  await expect(titleOf(original)).toBeVisible();
+  await page.getByRole('button', { name: buttonName(other, false) }).click();
+  await expect(titleOf(other)).toBeVisible();
+
+  for (const language of [original, other]) {
+    await expect(titleOf(language)).toHaveCSS('font-size', '32px');
+    await expect(titleOf(language)).toHaveCSS('word-break', 'keep-all');
+    await expect(titleOf(language)).toHaveCSS('overflow-wrap', 'normal');
+    await expect(titleOf(language)).toHaveCSS('hyphens', 'none');
+  }
 
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(1);
 
   await page.setViewportSize({ width: 1280, height: 900 });
-  await expect(englishTitle).toHaveCSS('font-size', '38px');
+  await expect(titleOf(other)).toHaveCSS('font-size', '38px');
 });
 
 test('sets writing in the self-hosted serif typefaces', async ({ page }) => {
+  const koreanOriginal = cases.find((item) => item.originalLanguage === 'ko');
+  expect(koreanOriginal, 'a Korean-original article (a fixture guarantees one)').toBeDefined();
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto('/writing/alone/');
+  await page.goto(articlePath(koreanOriginal!));
 
   const brand = page.getByRole('link', { name: 'Sunwoo Choi' });
   await expect(brand).toHaveCSS('font-family', /^"?Instrument Serif"?,/);
@@ -252,29 +281,33 @@ test('sets writing in the self-hosted serif typefaces', async ({ page }) => {
   expect(loadedFamilies).toContain('Noto Serif KR Variable');
 });
 
-const realCoverSlugs = ['alone', 'keep-it-up', 'time-for-change', 'teammates'];
+const covered = cases.filter((item) => item.cover);
+
+test('at least one article has a cover to check', () => {
+  expect(covered.length).toBeGreaterThan(0);
+});
 
 for (const [width, side] of [[1280, 624], [390, 342]] as const) {
-  test(`frames every real cover in the same white square at ${width}px`, async ({ page }) => {
+  test(`frames every cover in the same white square at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     const frames: { width: number; height: number }[] = [];
 
-    for (const slug of realCoverSlugs) {
-      await page.goto(`/writing/${slug}/`);
+    for (const item of covered) {
+      await page.goto(articlePath(item));
       const frame = page.locator('[data-writing-cover]');
-      await expect(frame, slug).toHaveCount(1);
+      await expect(frame, item.slug).toHaveCount(1);
       const image = frame.locator('img');
 
       await expect(frame).toHaveCSS('background-color', 'rgb(255, 255, 255)');
       await expect(frame).toHaveCSS('border-top-width', '1px');
       await expect(image).toHaveCSS('object-fit', 'contain');
-      await expect(image).toHaveAttribute('alt', '');
-      await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0), { message: slug }).toBe(true);
+      await expect(image, item.slug).toHaveAttribute('alt', item.cover!.alt[item.originalLanguage]);
+      await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0), { message: item.slug }).toBe(true);
 
       const box = await frame.boundingBox();
-      expect(box, slug).not.toBeNull();
-      expect(Math.abs(box!.width - side), `${slug} frame width`).toBeLessThanOrEqual(1);
-      expect(Math.abs(box!.height - box!.width), `${slug} frame is square`).toBeLessThanOrEqual(1);
+      expect(box, item.slug).not.toBeNull();
+      expect(Math.abs(box!.width - side), `${item.slug} frame width`).toBeLessThanOrEqual(1);
+      expect(Math.abs(box!.height - box!.width), `${item.slug} frame is square`).toBeLessThanOrEqual(1);
       frames.push({ width: box!.width, height: box!.height });
 
       const imageBox = await image.boundingBox();
@@ -290,7 +323,7 @@ for (const [width, side] of [[1280, 624], [390, 342]] as const) {
 }
 
 test('places the cover between the article header and the text', async ({ page }) => {
-  await page.goto('/writing/teammates/');
+  await page.goto(articlePath(covered[0]));
   const header = await page.locator('.article-header').boundingBox();
   const cover = await page.locator('[data-writing-cover]').boundingBox();
   const prose = await page.locator('.prose').boundingBox();

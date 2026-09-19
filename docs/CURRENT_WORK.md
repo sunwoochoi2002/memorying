@@ -56,6 +56,11 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 5. The user accepted publishing the photos as they are, including a Slack screenshot naming a work channel and colleague, a photo of two other people, and a lyrics screenshot. The raised concerns (workplace information, consent of people shown, lyrics copyright) were recorded, not resolved; revisit if any of them changes.
 6. Known trade-off: wide screenshots shrink inside the square frame, so small text is hard to read on phones. A tap-to-enlarge viewer could be added later.
 
+## Maintenance guide record
+
+1. `MAINTENANCE.md` (root, Korean) is the user's routine-operations guide: new writing, edits, Essay and Note switching, hiding and deleting, photos, dates, non-writing copy, newsletter sending, the deploy flow with Cloudflare preview URLs, rollback, and what needs a conversation first. `tests/unit/maintenance-guide.test.ts` keeps it from rotting (commands, metadata fields, headings, README link).
+2. Known trap documented there: several tests hard-code the four real essays (`tests/unit/production-writing.test.ts` lists the writing folders, `tests/e2e/writing.spec.ts` counts six items including two fixtures, `tests/e2e/home-and-work.spec.ts` checks titles), so publishing a new essay or renaming one fails `verify` until the tests are updated. A worthwhile follow-up is to derive those expectations from the content instead.
+
 ## Writing test fixtures record
 
 1. The user intentionally deleted the two sample drafts (`memorying-start`, a Korean-original Essay with a cover, and `small-beginning`, an English-original Note) from `src/content/writing/` so the archive holds only real writing.

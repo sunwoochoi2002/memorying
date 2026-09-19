@@ -20,6 +20,10 @@ npm run verify
 
 GitHub Actions runs `npm run verify` for `main` pushes and pull requests.
 
+## Everyday maintenance
+
+- Korean step-by-step guide for adding or editing writing, switching Essay and Note, photos, deploying, and rolling back: [`MAINTENANCE.md`](MAINTENANCE.md)
+
 ## Resume in Codespaces
 
 - Current implementation checkpoint: [`docs/CURRENT_WORK.md`](docs/CURRENT_WORK.md)

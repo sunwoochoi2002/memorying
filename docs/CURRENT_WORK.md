@@ -69,6 +69,12 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 4. Proof: the refactored tests passed on the old content (97 unit, 92 browser), passed unchanged after the four essays became Notes, and passed after a temporary published English-original Essay with a cover was added and removed. A deliberately broken article (a `[Draft]` marker on published writing) failed with that article named.
 5. On 2026-09-20 the user converted `alone`, `keep-it-up`, `teammates`, and `time-for-change` from Essay to Note and removed the trailing "댓글은 카톡으로…" lines from `time-for-change`. Consequences: no article page shows the subscribe block any more (it appears on Essays only) and the Writing Essay filter is empty until an Essay exists.
 
+## Newsletter template record
+
+1. On 2026-09-20 the user asked for one minimal, consistent email format and a sturdier way to send it. The user chose: original-language body only, no cover photo in the email, and Notes allowed like Essays.
+2. `scripts/newsletter.mjs` (`npm run newsletter -- <slug> [--lang ko|en]`) builds the email from the article files: subject is the chosen-language title; body is the article Markdown unchanged; a fixed footer follows (`---`, `웹에서 읽기 · Read on the web`, the canonical `https://sunwoochoi.com/writing/<slug>/` URL from `SITE_URL`, `Sunwoo Choi`). It prints the subject and writes the body to the git-ignored `.newsletter/<slug>.<lang>.md`. It refuses drafts, unknown or unsafe slugs, unsupported languages, and MDX-only syntax.
+3. `tests/unit/newsletter.test.ts` covers the template and also builds a mail for every published real article, so it needs no change when writing is added. Sending stays manual in the Buttondown dashboard; nothing calls the Buttondown API and no Buttondown setting was changed. The welcome email (sent right after subscribing) is a separate Buttondown setting and was not touched.
+
 ## Writing test fixtures record
 
 1. The user intentionally deleted the two sample drafts (`memorying-start`, a Korean-original Essay with a cover, and `small-beginning`, an English-original Note) from `src/content/writing/` so the archive holds only real writing.

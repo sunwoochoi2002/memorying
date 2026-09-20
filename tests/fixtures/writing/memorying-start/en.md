@@ -1,6 +1,5 @@
 ---
 title: Beginning Memorying
-description: The first essay in an archive for the things I do not want to forget.
 ---
 
 I write down the things I do not want to forget over time.

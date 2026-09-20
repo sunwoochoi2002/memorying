@@ -18,7 +18,7 @@ const writingDirectories = resolveWritingSourceDirectories(process.env);
 
 const writing = defineCollection({
   loader: glob({
-    pattern: createWritingGlobPattern(writingDirectories, '**/*.(md|mdx)'),
+    pattern: createWritingGlobPattern(writingDirectories, '**/*.md'),
     base: '.',
     generateId: ({ entry }) =>
       getWritingSourceId(stripWritingSourceDirectory(entry, writingDirectories)),

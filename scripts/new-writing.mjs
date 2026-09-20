@@ -28,11 +28,11 @@ function metadata({ originalLanguage, publishedAt }) {
 }
 
 function koreanDraft() {
-  return `---\ntitle: \"[Draft] 한국어 제목\"\ndescription: \"[Draft] 한국어 설명\"\n---\n\n한국어 본문을 작성하세요.\n`;
+  return `---\ntitle: \"[Draft] 한국어 제목\"\n---\n\n한국어 본문을 작성하세요.\n`;
 }
 
 function englishDraft() {
-  return `---\ntitle: \"[Draft] English title\"\ndescription: \"[Draft] English description\"\n---\n\nWrite the English body here.\n`;
+  return `---\ntitle: \"[Draft] English title\"\n---\n\nWrite the English body here.\n`;
 }
 
 export async function createWritingDraft({ root, slug, originalLanguage, publishedAt }) {
@@ -47,8 +47,8 @@ export async function createWritingDraft({ root, slug, originalLanguage, publish
   try {
     await Promise.all([
       writeFile(join(temporaryDirectory, 'meta.yaml'), metadata({ originalLanguage, publishedAt }), 'utf8'),
-      writeFile(join(temporaryDirectory, 'ko.mdx'), koreanDraft(), 'utf8'),
-      writeFile(join(temporaryDirectory, 'en.mdx'), englishDraft(), 'utf8'),
+      writeFile(join(temporaryDirectory, 'ko.md'), koreanDraft(), 'utf8'),
+      writeFile(join(temporaryDirectory, 'en.md'), englishDraft(), 'utf8'),
     ]);
     await rename(temporaryDirectory, target);
   } catch (error) {

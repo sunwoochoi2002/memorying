@@ -104,9 +104,8 @@ export function prepareWritingData<
       if (!entry.body?.trim()) {
         throw new Error(`Writing "${slug}" translation "${language}" has an empty body.`);
       }
-      if (!metaEntry.data.draft && (entry.data.title.startsWith('[Draft]')
-        || entry.data.description.startsWith('[Draft]'))) {
-        throw new Error(`Published writing "${slug}" cannot use [Draft] title or description markers.`);
+      if (!metaEntry.data.draft && entry.data.title.startsWith('[Draft]')) {
+        throw new Error(`Published writing "${slug}" cannot use [Draft] title markers.`);
       }
       if (!metaEntry.data.draft && entry.body.trim() === generatedDraftBodies[language]) {
         throw new Error(`Published writing "${slug}" cannot use the generated ${language} body placeholder.`);

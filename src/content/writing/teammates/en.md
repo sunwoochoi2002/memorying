@@ -1,0 +1,21 @@
+---
+title: Teammates
+---
+
+# Welcome to Korea!
+
+Some familiar faces came to Korea.
+
+I never imagined that I would meet face to face the people whose faces I had only known from Slack profile pictures. They were exactly as I had imagined them: bright and cheerful.
+
+Perhaps because I have been taking a break from work lately, with the semester starting and our retreat happening at the same time, talking again felt a little awkward. My English did not come easily, so I may have rambled a little. Even so, looking at the photos now, I think my sincerity came across.
+
+I had bought gifts for the two of them, as well as Akash, Yasemin, and Jiwon K. Shashank and Jiwon were celebrating their birthdays, and the other three were people I had worked with often. I wondered what kind of gift would feel most meaningful and memorable to them while they were in Korea. In the end, two days before the party, I bought an Osulloc Thank You Tea Set. Thankfully, they were truly happy to receive it. I could see it in their faces.
+
+It made me so happy.
+
+Being able to give someone I care about such heartfelt joy made me so happy. In that moment, neither the money nor the time I had spent mattered. I do not mean that I weigh money and time so carefully, but the joy of that moment outweighed every bit of effort that went into preparing for it.
+
+I am surrounded by so many good people. As much as I hold them dear, I hope they hold me dear too. Even if they do not, I hope they know what is in my heart.
+
+The more I work as an intern and earn money, the more freely I spend on people I care about. It worries me a little. I should earn a lot, if only so I can keep sharing. 😅

@@ -16,7 +16,7 @@ export type WritingType = 'essay' | 'note';
 
 export interface Translation {
   title: string;
-  description: string;
+  extraKeys: string[];
   body: string;
 }
 
@@ -50,15 +50,15 @@ function dateText(value: unknown, where: string): string {
 }
 
 function readTranslation(directory: string, slug: string, language: Language): Translation {
-  const path = join(directory, `${language}.mdx`);
-  if (!existsSync(path)) throw new Error(`Writing "${slug}" is missing ${language}.mdx.`);
+  const path = join(directory, `${language}.md`);
+  if (!existsSync(path)) throw new Error(`Writing "${slug}" is missing ${language}.md.`);
   const raw = readFileSync(path, 'utf8').replace(/^﻿/, '');
   const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/.exec(raw);
-  if (!match) throw new Error(`Writing "${slug}" ${language}.mdx needs front matter (--- title and description ---) at the top.`);
+  if (!match) throw new Error(`Writing "${slug}" ${language}.md needs front matter (--- title ---) at the top.`);
   const data = (parse(match[1]) ?? {}) as Record<string, unknown>;
   return {
     title: String(data.title ?? '').trim(),
-    description: String(data.description ?? '').trim(),
+    extraKeys: Object.keys(data).filter((key) => key !== 'title'),
     body: match[2].trim(),
   };
 }
@@ -138,7 +138,6 @@ export function visibleCases(cases: WritingCase[], options: { includeDrafts: boo
 }
 
 export const originalTitle = (item: WritingCase): string => item.translations[item.originalLanguage].title;
-export const originalDescription = (item: WritingCase): string => item.translations[item.originalLanguage].description;
 export const otherLanguage = (item: WritingCase): Language => (item.originalLanguage === 'ko' ? 'en' : 'ko');
 export const typeLabel = (type: WritingType): 'Essay' | 'Note' => (type === 'essay' ? 'Essay' : 'Note');
 export const isoDatetime = (item: WritingCase): string => `${item.publishedAt}T00:00:00.000Z`;

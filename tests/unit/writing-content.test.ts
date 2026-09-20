@@ -25,8 +25,8 @@ function project(
       const directory = join(root, base, slug);
       mkdirSync(directory, { recursive: true });
       writeFileSync(join(directory, 'meta.yaml'), article.meta ?? 'publishedAt: 2025-01-01\ntype: essay\noriginalLanguage: ko\ndraft: false\nfeatured: false\n');
-      if (article.ko !== null) writeFileSync(join(directory, 'ko.mdx'), article.ko ?? `---\ntitle: 제목 ${slug}\ndescription: 설명 ${slug}\n---\n\n본문입니다.\n`);
-      if (article.en !== null) writeFileSync(join(directory, 'en.mdx'), article.en ?? `---\ntitle: Title ${slug}\ndescription: Description ${slug}\n---\n\nBody text.\n`);
+      if (article.ko !== null) writeFileSync(join(directory, 'ko.md'), article.ko ?? `---\ntitle: 제목 ${slug}\n---\n\n본문입니다.\n`);
+      if (article.en !== null) writeFileSync(join(directory, 'en.md'), article.en ?? `---\ntitle: Title ${slug}\n---\n\nBody text.\n`);
       for (const [name, text] of Object.entries(article.files ?? {})) writeFileSync(join(directory, name), text);
     }
   }
@@ -50,7 +50,7 @@ describe('writing content reader', () => {
     expect(cases.map((item) => item.slug)).toEqual(['a-same-day', 'b-same-day', 'older']);
     expect(cases[0]).toMatchObject({ type: 'essay', originalLanguage: 'ko', draft: false, publishedAt: '2025-03-03', updatedAt: '2025-04-01', source: 'content' });
     expect(cases[2]).toMatchObject({ type: 'note', originalLanguage: 'en', draft: true });
-    expect(cases[0].translations.ko).toMatchObject({ title: '제목 a-same-day', description: '설명 a-same-day' });
+    expect(cases[0].translations.ko).toMatchObject({ title: '제목 a-same-day' });
     expect(cases[0].translations.en.body).toBe('Body text.');
     expect(originalTitle(cases[2])).toBe('Title older');
     expect(isoDatetime(cases[0])).toBe('2025-03-03T00:00:00.000Z');
@@ -94,9 +94,9 @@ describe('writing content reader', () => {
   });
 
   it('explains what is missing instead of crashing', () => {
-    expect(() => loadWritingCases({ root: project({ broken: { en: null } }) })).toThrow(/"broken".*en\.mdx/);
+    expect(() => loadWritingCases({ root: project({ broken: { en: null } }) })).toThrow(/"broken".*en\.md/);
     expect(() => loadWritingCases({ root: project({ broken: { meta: 'type: essay\n' } }) })).toThrow(/"broken".*publishedAt/);
-    expect(() => loadWritingCases({ root: project({ broken: { ko: 'no frontmatter here' } }) })).toThrow(/"broken".*ko\.mdx.*front/i);
+    expect(() => loadWritingCases({ root: project({ broken: { ko: 'no frontmatter here' } }) })).toThrow(/"broken".*ko\.md.*front/i);
   });
 
   it('picks a plain sentence to look for on the page', () => {

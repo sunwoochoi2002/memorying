@@ -25,7 +25,7 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 
 ## Product invariants
 
-- Each article keeps `meta.yaml`, `ko.mdx`, and `en.mdx` together under `src/content/writing/<slug>/`.
+- Each article keeps `meta.yaml`, `ko.md`, and `en.md` together under `src/content/writing/<slug>/`.
 - Archive and home views show the declared original language first.
 - Article detail pages switch language at one stable URL and identify the original.
 - Published dates use `YYYY-MM-DD`, and bilingual titles preserve word boundaries.
@@ -34,7 +34,7 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 ## Notion archive and cover delivery record
 
 1. Four reviewed Korean-original essays from the September 5, 2026 Notion export are published at stable `/writing/<slug>/` URLs: `alone`, `keep-it-up`, `time-for-change`, and `teammates`.
-2. Their English counterparts are stored as complete `en.mdx` files; original-language Korean remains first on the home, archive, and detail pages.
+2. Their English counterparts are stored as complete `en.md` files; original-language Korean remains first on the home, archive, and detail pages.
 3. A writing folder may include one optional `cover.{avif,jpeg,jpg,png,svg,webp}`. It appears only on the detail page when both `cover.alt.ko.txt` and `cover.alt.en.txt` are present. Missing files leave the article text-only.
 4. [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md) (in `docs/`) explains direct-edit locations, generated folders, and the content/translation workflow.
 5. Migration and cover behavior were independently reviewed. The final `main` verification passed with 68 unit tests, type checks, asset checks, build, internal-link checks, and browser tests.
@@ -45,7 +45,7 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 2. Content changes that came with it: article and list summaries are no longer shown (descriptions stay in meta tags), the Writing page intro sentence and every small uppercase eyebrow label are gone, the home page shows only the heading `Sunwoo’s Archive` (the Buttondown newsletter name; the header brand stays `Sunwoo Choi`) and the tagline, with `전체 글 보기` on the `Writing` heading line, and the subscribe block reads `새 에세이를 이메일로 받아 보세요.` with `새 에세이가 올라오면 남겨 주신 이메일 주소로 보내 드립니다. 구독은 언제든 취소할 수 있습니다.` The greeting paragraph removed from the home page still lives on the About page, which no longer carries the sentence "Memorying은 작업과 생각을 천천히 쌓아가는 개인적인 공간입니다."
 3. Fonts are self-hosted from the OFL-1.1 Fontsource npm packages. `public/_headers` allows only same-origin resources (`default-src 'self'`), so `astro.config.mjs` sets `assetsInlineLimit: 0` and `tests/unit/production-writing.test.ts` fails if any font is inlined as a `data:` URI. Korean text uses 124 unicode-range slices (about 6 MB in `dist/_astro/`); browsers fetch only the slices a page needs.
 4. Dates remain `YYYY-MM-DD` (product invariant); the demo's dotted dates were not adopted. English article text is set in Instrument Serif at 24px with extra word spacing; if it reads too dense, Newsreader was the compared alternative.
-5. Known content nit, not changed: `src/content/writing/alone/ko.mdx` contains `신경쓰지는`, which standard spelling writes as `신경 쓰지는`. Content edits need the author's approval.
+5. Known content nit, not changed: `src/content/writing/alone/ko.md` contains `신경쓰지는`, which standard spelling writes as `신경 쓰지는`. Content edits need the author's approval.
 
 ## Compact layout and photo covers record
 
@@ -72,8 +72,15 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 ## Newsletter template record
 
 1. On 2026-09-20 the user asked for one minimal, consistent email format and a sturdier way to send it. The user chose: original-language body only, no cover photo in the email, and Notes allowed like Essays.
-2. `scripts/newsletter.mjs` (`npm run newsletter -- <slug> [--lang ko|en]`) builds the email from the article files: subject is the chosen-language title; body is the article Markdown unchanged; a fixed footer follows (`---`, `웹에서 읽기 · Read on the web`, the canonical `https://sunwoochoi.com/writing/<slug>/` URL from `SITE_URL`, `Sunwoo Choi`). It prints the subject and writes the body to the git-ignored `.newsletter/<slug>.<lang>.md`. It refuses drafts, unknown or unsafe slugs, unsupported languages, and MDX-only syntax.
+2. `scripts/newsletter.mjs` (`npm run newsletter -- <slug> [--lang ko|en]`) builds the email from the article files: subject is the chosen-language title; body is the article Markdown unchanged; a fixed footer follows (`---`, `웹에서 읽기 · Read on the web`, the canonical `https://sunwoochoi.com/writing/<slug>/` URL from `SITE_URL`, `Sunwoo Choi`). It prints the subject and writes the body to the git-ignored `.newsletter/<slug>.<lang>.md`. It refuses drafts, unknown or unsafe slugs, and unsupported languages.
 3. `tests/unit/newsletter.test.ts` covers the template and also builds a mail for every published real article, so it needs no change when writing is added. Sending stays manual in the Buttondown dashboard; nothing calls the Buttondown API and no Buttondown setting was changed. The welcome email (sent right after subscribing) is a separate Buttondown setting and was not touched.
+
+## Plain Markdown and no description record
+
+1. On 2026-09-20 the user asked to remove the `description` element from Essays and Notes for good and to make every article file plain Markdown (the `.mdx` choice had no recorded rationale and no article used a component).
+2. Writing is now `meta.yaml`, `ko.md`, and `en.md` per folder. Frontmatter holds only `title`. The translation schema is strict, so a leftover `description` fails the build, and `tests/support/writing-rules.ts` reports it by article. `scripts/new-writing.mjs` no longer generates one. Article pages no longer emit `<meta name="description">`, `og:description`, or `twitter:description`; `BaseLayout` takes an optional `description`, which About, Work, Privacy, Writing, Home, and 404 still pass. The Work entry's own `description` field is unrelated and unchanged.
+3. `@astrojs/mdx` was uninstalled and removed from `astro.config.mjs`; the writing loader reads only `**/*.md`. Earlier records and specs below and under `docs/superpowers/` still say `.mdx` and `description`; they are history.
+4. The Work entry title is `Sunwoo’s Archive` with the curly apostrophe, matching the home heading and the Buttondown newsletter name.
 
 ## Writing test fixtures record
 
@@ -125,7 +132,7 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 Proceed one project at a time:
 
 1. With the user's own test email, run one live subscribe, confirm, and unsubscribe test from `https://sunwoochoi.com` (the user performs it), then finish the remaining launch checklist in `docs/publishing.md`.
-2. Review or replace writing copy directly in `src/content/writing/<slug>/` (now only the four real essays); after the original-language edits are ready, request one batch translation for all affected `ko.mdx`, `en.mdx`, and any `cover.alt.*.txt` files.
+2. Review or replace writing copy directly in `src/content/writing/<slug>/` (now only the four real essays); after the original-language edits are ready, request one batch translation for all affected `ko.md`, `en.md`, and any `cover.alt.*.txt` files.
 3. Optionally submit `https://sunwoochoi.com/sitemap-index.xml` to Google Search Console and Naver Search Advisor (the user owns those accounts).
 
 Buttondown delivery and Notion automation remain separate projects. The Cloudflare Pages project, the `sunwoochoi.com` DNS zone, and `SITE_URL` are live production settings; changing any of them needs explicit authorization.

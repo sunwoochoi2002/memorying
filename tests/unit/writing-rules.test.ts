@@ -6,7 +6,7 @@ import { checkWriting } from '../support/writing-rules';
 
 const roots: string[] = [];
 const GOOD_META = 'publishedAt: 2025-01-01\ntype: essay\noriginalLanguage: ko\ndraft: false\nfeatured: false\n';
-const mdx = (title: string, description: string, body: string) => `---\ntitle: ${title}\ndescription: ${description}\n---\n\n${body}\n`;
+const articleFile = (title: string, body: string, extraFront = '') => `---\ntitle: ${title}\n${extraFront}---\n\n${body}\n`;
 
 function project(articles: Record<string, { meta?: string; ko?: string; en?: string; files?: Record<string, string> }>) {
   const root = mkdtempSync(join(tmpdir(), 'writing-rules-'));
@@ -15,8 +15,8 @@ function project(articles: Record<string, { meta?: string; ko?: string; en?: str
     const directory = join(root, 'src/content/writing', slug);
     mkdirSync(directory, { recursive: true });
     writeFileSync(join(directory, 'meta.yaml'), article.meta ?? GOOD_META);
-    writeFileSync(join(directory, 'ko.mdx'), article.ko ?? mdx('제목', '설명', '한국어 본문입니다.'));
-    writeFileSync(join(directory, 'en.mdx'), article.en ?? mdx('Title', 'Description', 'English body text.'));
+    writeFileSync(join(directory, 'ko.md'), article.ko ?? articleFile('제목', '한국어 본문입니다.'));
+    writeFileSync(join(directory, 'en.md'), article.en ?? articleFile('Title', 'English body text.'));
     for (const [name, text] of Object.entries(article.files ?? {})) writeFileSync(join(directory, name), text);
   }
   return root;
@@ -52,19 +52,27 @@ describe('writing rules', () => {
     expect(problems.join('\n')).toMatch(/typo.*meta\.yaml/);
   });
 
-  it('rejects an empty title, description, or body in either language', () => {
+  it('rejects an empty title or body in either language', () => {
     const problems = problemsFor({
-      hollow: { ko: mdx('""', '설명', '한국어 본문'), en: mdx('Title', 'Description', '') },
+      hollow: { ko: articleFile('""', '한국어 본문'), en: articleFile('Title', '') },
     });
 
     expect(problems.join('\n')).toMatch(/hollow.*ko.*제목/);
     expect(problems.join('\n')).toMatch(/hollow.*en.*본문/);
   });
 
+  it('rejects a leftover description, which writing no longer has', () => {
+    const problems = problemsFor({
+      described: { ko: articleFile('제목', '한국어 본문입니다.', 'description: 설명\n') },
+    });
+
+    expect(problems.join('\n')).toMatch(/described.*ko\.md.*description/);
+  });
+
   it('rejects a published article that still has draft markers, placeholder text, or a future date', () => {
     const problems = problemsFor({
-      marker: { ko: mdx('"[Draft] 제목"', '설명', '본문') },
-      placeholder: { en: mdx('Title', 'Description', 'Write the English body here.') },
+      marker: { ko: articleFile('"[Draft] 제목"', '본문') },
+      placeholder: { en: articleFile('Title', 'Write the English body here.') },
       future: { meta: 'publishedAt: 2999-01-01\ntype: essay\noriginalLanguage: ko\ndraft: false\nfeatured: false\n' },
     });
 
@@ -77,26 +85,26 @@ describe('writing rules', () => {
     expect(problemsFor({
       wip: {
         meta: 'publishedAt: 2999-01-01\ntype: essay\noriginalLanguage: ko\ndraft: true\nfeatured: false\n',
-        ko: mdx('"[Draft] 제목"', '"[Draft] 설명"', '한국어 본문을 작성하세요.'),
-        en: mdx('"[Draft] Title"', '"[Draft] Description"', 'Write the English body here.'),
+        ko: articleFile('"[Draft] 제목"', '한국어 본문을 작성하세요.'),
+        en: articleFile('"[Draft] Title"', 'Write the English body here.'),
       },
     })).toEqual([]);
   });
 
   it('rejects a translation written in the wrong script', () => {
     const problems = problemsFor({
-      mixed: { ko: mdx('Title', 'Description', 'This is English.'), en: mdx('제목', '설명', '한국어입니다.') },
+      mixed: { ko: articleFile('Title', 'This is English.'), en: articleFile('제목', '한국어입니다.') },
     });
 
-    expect(problems.join('\n')).toMatch(/mixed.*ko\.mdx.*한글/);
-    expect(problems.join('\n')).toMatch(/mixed.*en\.mdx.*영문/);
+    expect(problems.join('\n')).toMatch(/mixed.*ko\.md.*한글/);
+    expect(problems.join('\n')).toMatch(/mixed.*en\.md.*영문/);
   });
 
   it('rejects more than one cover photo and stray photos that the site would silently ignore', () => {
     const problems = problemsFor({
       twice: { files: { 'cover.png': 'x', 'cover.jpg': 'x' } },
       stray: { files: { 'IMG_1234.png': 'x' } },
-      referenced: { ko: mdx('제목', '설명', '![그림](./inline.png)'), files: { 'inline.png': 'x' } },
+      referenced: { ko: articleFile('제목', '![그림](./inline.png)'), files: { 'inline.png': 'x' } },
     });
 
     expect(problems.join('\n')).toMatch(/twice.*한 장/);
@@ -119,8 +127,8 @@ describe('writing rules', () => {
 
   it('reports a missing translation file as a problem instead of crashing', () => {
     const root = project({ half: {} });
-    rmSync(join(root, 'src/content/writing/half/en.mdx'));
+    rmSync(join(root, 'src/content/writing/half/en.md'));
 
-    expect(checkWriting({ root }).join('\n')).toMatch(/half.*en\.mdx/);
+    expect(checkWriting({ root }).join('\n')).toMatch(/half.*en\.md/);
   });
 });

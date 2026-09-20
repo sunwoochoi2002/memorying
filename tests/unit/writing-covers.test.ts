@@ -15,8 +15,8 @@ const article = (overrides: Partial<WritingArticle> = {}): WritingArticle => ({
   draft: false,
   featured: false,
   translations: {
-    ko: { language: 'ko', title: '홀로-', description: '홀로 있는 시간에 대한 기록입니다.' },
-    en: { language: 'en', title: 'Alone—', description: 'A reflection on time spent alone.' },
+    ko: { language: 'ko', title: '홀로-' },
+    en: { language: 'en', title: 'Alone—' },
   },
   ...overrides,
 });

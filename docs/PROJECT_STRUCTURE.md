@@ -6,7 +6,7 @@ Memorying은 글을 중심으로 운영하는 이중 언어 아카이브입니�
 
 | 경로 | 용도 |
 | --- | --- |
-| `src/content/writing/<slug>/` | 글 한 편의 언어별 제목·설명·본문, 메타데이터, 선택 사진을 함께 보관합니다. |
+| `src/content/writing/<slug>/` | 글 한 편의 언어별 제목·본문, 메타데이터, 선택 사진을 함께 보관합니다. |
 | `src/components/`, `src/pages/`, `src/layouts/` | 페이지의 모양과 구성입니다. 글 내용 수정과는 보통 관계가 없습니다. |
 | `src/styles/global.css` | 색, 글꼴, 간격, 화면 배치의 기준입니다. 글꼴 파일은 npm 패키지(`@fontsource/instrument-serif`, `@fontsource-variable/noto-serif-kr`)에서 오며 직접 수정하지 않습니다. |
 | `src/lib/` | 글 목록, 언어 전환처럼 여러 화면이 함께 쓰는 규칙입니다. |
@@ -22,8 +22,8 @@ Memorying은 글을 중심으로 운영하는 이중 언어 아카이브입니�
 ```text
 src/content/writing/<slug>/
 ├── meta.yaml           # 게시일, 글 종류, 원문 언어, 공개 상태 등
-├── ko.mdx              # 한국어 제목·설명·본문
-├── en.mdx              # 영어 제목·설명·본문
+├── ko.md              # 한국어 제목·본문
+├── en.md              # 영어 제목·본문
 ├── cover.jpg           # 선택 사항: 상세 페이지에만 보일 사진
 ├── cover.alt.ko.txt    # 선택 사항: 사진의 한국어 대체 텍스트
 └── cover.alt.en.txt    # 선택 사항: 사진의 영어 대체 텍스트

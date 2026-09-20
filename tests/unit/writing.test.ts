@@ -24,8 +24,8 @@ const article = (overrides: Partial<WritingArticle> = {}): WritingArticle => ({
   draft: false,
   featured: false,
   translations: {
-    ko: { language: 'ko', title: '기본 제목', description: '기본 설명' },
-    en: { language: 'en', title: 'Base title', description: 'Base description' },
+    ko: { language: 'ko', title: '기본 제목' },
+    en: { language: 'en', title: 'Base title' },
   },
   ...overrides,
 });
@@ -38,7 +38,7 @@ describe('writing article domain', () => {
 
   it('keeps flat and folder-index source IDs distinct until route normalization', () => {
     const sourceIds = [
-      getWritingSourceId('same.mdx'),
+      getWritingSourceId('same.md'),
       getWritingSourceId('same/index.md'),
     ];
 

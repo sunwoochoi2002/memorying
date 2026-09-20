@@ -25,7 +25,6 @@ const metadata = {
 };
 const translation = {
   title: '기억은 어떻게 장소가 되는가',
-  description: '개인 아카이브와 기억에 관한 글',
 };
 
 describe('work schema', () => {
@@ -85,10 +84,14 @@ describe('bilingual writing schemas', () => {
     expect(translationSchema.safeParse(translation).success).toBe(true);
   });
 
+  it('has no description: a translation is only a title, and a leftover description is rejected', () => {
+    expect(translationSchema.safeParse({ title: '기억은 어떻게 장소가 되는가' }).success).toBe(true);
+    expect(translationSchema.safeParse({ title: '기억은 어떻게 장소가 되는가', description: '설명' }).success).toBe(false);
+  });
+
   it('trims localized text', () => {
     const result = translationSchema.safeParse({
       title: '  기억은 어떻게 장소가 되는가  ',
-      description: '  개인 아카이브와 기억에 관한 글  ',
     });
 
     expect(result.success).toBe(true);

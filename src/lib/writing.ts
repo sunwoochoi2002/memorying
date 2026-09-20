@@ -11,7 +11,6 @@ export interface WritingFilters {
 export interface WritingTranslation {
   language: WritingLanguage;
   title: string;
-  description: string;
 }
 
 export interface WritingArticle {
@@ -29,7 +28,7 @@ export interface WritingArticle {
 }
 
 export function getWritingSourceId(entry: string): string {
-  return entry.replace(/\.(md|mdx)$/, '');
+  return entry.replace(/\.md$/, '');
 }
 
 export function parseWritingTranslationId(id: string): { slug: string; language: WritingLanguage } {

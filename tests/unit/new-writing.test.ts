@@ -36,12 +36,14 @@ describe('new writing scaffold', () => {
     });
 
     expect(basename(created)).toBe('remembering-summer');
-    expect(await readdir(created)).toEqual(['en.mdx', 'ko.mdx', 'meta.yaml']);
+    expect(await readdir(created)).toEqual(['en.md', 'ko.md', 'meta.yaml']);
     expect(await readFile(join(created, 'meta.yaml'), 'utf8')).toContain('publishedAt: 2026-07-25');
     expect(await readFile(join(created, 'meta.yaml'), 'utf8')).toContain('originalLanguage: ko');
     expect(await readFile(join(created, 'meta.yaml'), 'utf8')).toContain('draft: true');
-    expect(await readFile(join(created, 'ko.mdx'), 'utf8')).toContain('[Draft] 한국어 제목');
-    expect(await readFile(join(created, 'en.mdx'), 'utf8')).toContain('[Draft] English title');
+    expect(await readFile(join(created, 'ko.md'), 'utf8')).toContain('[Draft] 한국어 제목');
+    expect(await readFile(join(created, 'en.md'), 'utf8')).toContain('[Draft] English title');
+    expect(await readFile(join(created, 'ko.md'), 'utf8')).not.toContain('description');
+    expect(await readFile(join(created, 'en.md'), 'utf8')).not.toContain('description');
   });
 
   it.each([

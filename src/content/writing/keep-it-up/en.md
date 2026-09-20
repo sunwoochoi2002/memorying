@@ -1,6 +1,5 @@
 ---
 title: Keep It Up!
-description: A note about setting comparison aside, trusting my own path, and steadying myself again.
 ---
 
 Do not compare yourself. Walk your own path.

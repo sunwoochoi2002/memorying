@@ -22,7 +22,7 @@ GitHub Actions runs `npm run verify` for `main` pushes and pull requests.
 
 ## Everyday maintenance
 
-- Korean step-by-step guide for adding or editing writing, switching Essay and Note, photos, deploying, and rolling back: [`MAINTENANCE.md`](MAINTENANCE.md)
+- Korean step-by-step guide for adding or editing writing, switching Essay and Note, photos, deploying, and rolling back: [`docs/MAINTENANCE.md`](docs/MAINTENANCE.md)
 
 ## Resume in Codespaces
 
@@ -33,7 +33,7 @@ GitHub Actions runs `npm run verify` for `main` pushes and pull requests.
 ## Content
 
 - Writing: `src/content/writing/`
-- Folder guide and writing/photo conventions: [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md)
+- Folder guide and writing/photo conventions: [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md)
 - Selected Work: `src/content/work/`
 - Product design: `docs/superpowers/specs/2026-07-24-memorying-design.md`
 - Implementation plan: `docs/superpowers/plans/2026-07-24-memorying-mvp.md`

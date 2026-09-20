@@ -1,6 +1,6 @@
 # Publishing Memorying
 
-> 일상적인 수정 작업(새 글, 오타, Essay와 Note 전환, 사진, 배포, 되돌리기)은 [`MAINTENANCE.md`](../MAINTENANCE.md)에 순서대로 정리되어 있습니다. 이 문서는 글쓰기 규칙과 배포 전 점검표를 다룹니다.
+> 일상적인 수정 작업(새 글, 오타, Essay와 Note 전환, 사진, 배포, 되돌리기)은 [`MAINTENANCE.md`](MAINTENANCE.md)에 순서대로 정리되어 있습니다. 이 문서는 글쓰기 규칙과 배포 전 점검표를 다룹니다.
 
 Memorying의 글은 이 저장소가 유일한 원본입니다. 처음 한 번의 Notion 이전 이후에는 새 글을 Notion에서 시작하지 않고, 이 저장소에서 바로 작성합니다.
 
@@ -58,7 +58,7 @@ description: 한국어 설명
 
 ## 표지 이미지와 대체 텍스트
 
-> 권장 방식은 글 폴더에 `cover.png` 같은 사진 파일만 넣는 것입니다(대체 텍스트 파일은 선택). 자세한 규칙은 [`PROJECT_STRUCTURE.md`](../PROJECT_STRUCTURE.md)를 보세요. 아래의 `meta.yaml` 방식은 예전 방식이며 두 언어 대체 텍스트가 반드시 필요합니다.
+> 권장 방식은 글 폴더에 `cover.png` 같은 사진 파일만 넣는 것입니다(대체 텍스트 파일은 선택). 자세한 규칙은 [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md)를 보세요. 아래의 `meta.yaml` 방식은 예전 방식이며 두 언어 대체 텍스트가 반드시 필요합니다.
 
 표지 이미지는 선택 사항이며 글 폴더 안에 함께 보관합니다. JPEG, PNG, WebP를 모두 사용할 수 있습니다. 예를 들면 `cover.jpg`, `cover.png`, `cover.webp`가 가능합니다. WebP는 파일 크기 측면에서 권장할 뿐, JPEG나 PNG를 변환해야 하는 것은 아닙니다.
 

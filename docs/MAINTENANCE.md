@@ -5,7 +5,7 @@
 - 사이트 주소: https://sunwoochoi.com
 - 저장소: https://github.com/sunwoochoi2002/memorying
 - 폴더가 무엇인지 궁금하면 [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md)를 보세요.
-- 지금까지 무엇을 했는지 궁금하면 [`docs/CURRENT_WORK.md`](docs/CURRENT_WORK.md)를 보세요.
+- 지금까지 무엇을 했는지 궁금하면 [`docs/CURRENT_WORK.md`](CURRENT_WORK.md)를 보세요.
 
 ## 1. 두 가지 방법
 
@@ -258,6 +258,6 @@ PR의 `verify` 검사는 사이트가 깨지지 않았는지 자동으로 확인
 ## 10. 관련 문서
 
 - [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md): 폴더 안내와 글, 사진 규칙
-- [`docs/publishing.md`](docs/publishing.md): 글쓰기와 배포 전 점검표
-- [`docs/codespaces-guide.md`](docs/codespaces-guide.md): 공유 컴퓨터에서 Codespaces로 작업하는 방법
-- [`docs/CURRENT_WORK.md`](docs/CURRENT_WORK.md): 진행 기록과 현재 상태
+- [`docs/publishing.md`](publishing.md): 글쓰기와 배포 전 점검표
+- [`docs/codespaces-guide.md`](codespaces-guide.md): 공유 컴퓨터에서 Codespaces로 작업하는 방법
+- [`docs/CURRENT_WORK.md`](CURRENT_WORK.md): 진행 기록과 현재 상태

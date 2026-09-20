@@ -36,7 +36,7 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 1. Four reviewed Korean-original essays from the September 5, 2026 Notion export are published at stable `/writing/<slug>/` URLs: `alone`, `keep-it-up`, `time-for-change`, and `teammates`.
 2. Their English counterparts are stored as complete `en.mdx` files; original-language Korean remains first on the home, archive, and detail pages.
 3. A writing folder may include one optional `cover.{avif,jpeg,jpg,png,svg,webp}`. It appears only on the detail page when both `cover.alt.ko.txt` and `cover.alt.en.txt` are present. Missing files leave the article text-only.
-4. [`PROJECT_STRUCTURE.md`](../PROJECT_STRUCTURE.md) is at the repository root and explains direct-edit locations, generated folders, and the content/translation workflow.
+4. [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md) (in `docs/`) explains direct-edit locations, generated folders, and the content/translation workflow.
 5. Migration and cover behavior were independently reviewed. The final `main` verification passed with 68 unit tests, type checks, asset checks, build, internal-link checks, and browser tests.
 
 ## Serif redesign record
@@ -58,7 +58,7 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 
 ## Maintenance guide record
 
-1. `MAINTENANCE.md` (root, Korean) is the user's routine-operations guide: new writing, edits, Essay and Note switching, hiding and deleting, photos, dates, non-writing copy, newsletter sending, the deploy flow with Cloudflare preview URLs, rollback, and what needs a conversation first. `tests/unit/maintenance-guide.test.ts` keeps it from rotting (commands, metadata fields, headings, README link).
+1. `docs/MAINTENANCE.md` (Korean) is the user's routine-operations guide: new writing, edits, Essay and Note switching, hiding and deleting, photos, dates, non-writing copy, newsletter sending, the deploy flow with Cloudflare preview URLs, rollback, and what needs a conversation first. `tests/unit/maintenance-guide.test.ts` keeps it from rotting (commands, metadata fields, headings, README link).
 2. The trap first documented there (tests hard-coded the four essays, so publishing a new one failed `verify`) was removed by the content-driven checks below.
 
 ## Content-driven checks record

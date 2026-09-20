@@ -6,7 +6,7 @@ const read = (path: string) => readFile(resolve(process.cwd(), path), 'utf8');
 
 describe('Korean maintenance guide', () => {
   it('explains every routine task with the real commands and fields', async () => {
-    const guide = await read('MAINTENANCE.md');
+    const guide = await read('docs/MAINTENANCE.md');
 
     for (const command of ['npm run new:writing', 'npm run dev', 'npm run verify']) {
       expect(guide).toContain(command);
@@ -27,9 +27,19 @@ describe('Korean maintenance guide', () => {
   });
 
   it('never asks the reader to store secrets and stays linked from the README', async () => {
-    const [guide, readme] = await Promise.all([read('MAINTENANCE.md'), read('README.md')]);
+    const [guide, readme] = await Promise.all([read('docs/MAINTENANCE.md'), read('README.md')]);
 
     expect(guide).not.toMatch(/\b(?:API_KEY|TOKEN|PASSWORD)\s*=\s*\S+/i);
-    expect(readme).toContain('MAINTENANCE.md');
+    expect(readme).toContain('docs/MAINTENANCE.md');
+  });
+});
+
+describe('repository root', () => {
+  it('keeps only tool-required files and entry points at the top level', async () => {
+    const { readdir } = await import('node:fs/promises');
+    const entries = await readdir(process.cwd(), { withFileTypes: true });
+    const rootMarkdown = entries.filter((entry) => entry.isFile() && entry.name.endsWith('.md')).map((entry) => entry.name).sort();
+
+    expect(rootMarkdown).toEqual(['AGENTS.md', 'README.md']);
   });
 });

@@ -52,19 +52,18 @@ function checkArticle(item: WritingCase, now: Date): string[] {
 
   for (const language of ['ko', 'en'] as const) {
     const translation = item.translations[language];
-    const file = `${language}.mdx`;
+    const file = `${language}.md`;
 
-    const parsed = translationSchema.safeParse({ title: translation.title, description: translation.description });
-    if (!parsed.success) {
-      for (const issue of parsed.error.issues) {
-        problems.push(`${label}: ${file} ${issue.path[0] === 'title' ? '제목(title)' : '설명(description)'}이 비어 있습니다.`);
-      }
+    const parsed = translationSchema.safeParse({ title: translation.title });
+    if (!parsed.success) problems.push(`${label}: ${file} 제목(title)이 비어 있습니다.`);
+    for (const key of translation.extraKeys) {
+      problems.push(`${label}: ${file}에 지원하지 않는 항목(${key})이 있습니다. 글에는 제목(title)만 씁니다. 지우세요.`);
     }
     if (!translation.body) problems.push(`${label}: ${file} 본문이 비어 있습니다.`);
 
     if (!item.draft) {
-      if (translation.title.startsWith('[Draft]') || translation.description.startsWith('[Draft]')) {
-        problems.push(`${label}: ${file} 제목·설명에 [Draft] 표시가 남아 있습니다. 공개하기 전에 지우세요.`);
+      if (translation.title.startsWith('[Draft]')) {
+        problems.push(`${label}: ${file} 제목에 [Draft] 표시가 남아 있습니다. 공개하기 전에 지우세요.`);
       }
       if (translation.body === GENERATED_BODIES[language]) {
         problems.push(`${label}: ${file} 본문이 생성된 기본 문구 그대로입니다.`);
@@ -75,10 +74,10 @@ function checkArticle(item: WritingCase, now: Date): string[] {
   const hangul = /[가-힣]/;
   const latin = /[A-Za-z]/;
   if (!hangul.test(item.translations.ko.title + item.translations.ko.body)) {
-    problems.push(`${label}: ko.mdx에 한글이 없습니다. 영어 글이 한국어 파일에 들어갔는지 확인하세요.`);
+    problems.push(`${label}: ko.md에 한글이 없습니다. 영어 글이 한국어 파일에 들어갔는지 확인하세요.`);
   }
   if (!latin.test(item.translations.en.title + item.translations.en.body)) {
-    problems.push(`${label}: en.mdx에 영문이 없습니다. 한국어 글이 영어 파일에 들어갔는지 확인하세요.`);
+    problems.push(`${label}: en.md에 영문이 없습니다. 한국어 글이 영어 파일에 들어갔는지 확인하세요.`);
   }
 
   if (item.coverFiles.length > 1) {

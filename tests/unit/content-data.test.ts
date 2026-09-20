@@ -28,22 +28,21 @@ const metadataEntry = (
 const translationEntry = (
   id: string,
   title = `Title for ${id}`,
-  description = `Description for ${id}`,
   body = 'Writing body',
   overrides: Partial<WritingTranslationEntryData> = {},
 ) => ({
   id,
   collection: 'writing' as const,
   body,
-  filePath: `src/content/writing/${id}.mdx`,
-  data: { title, description, ...overrides },
+  filePath: `src/content/writing/${id}.md`,
+  data: { title, ...overrides },
 });
 
 const pair = (slug: string, overrides: Partial<WritingMetadataEntryData> = {}) => ({
   meta: metadataEntry(slug, overrides),
   translations: [
-    translationEntry(`${slug}/ko`, `Korean ${slug}`, `Korean description for ${slug}`),
-    translationEntry(`${slug}/en`, `English ${slug}`, `English description for ${slug}`),
+    translationEntry(`${slug}/ko`, `Korean ${slug}`),
+    translationEntry(`${slug}/en`, `English ${slug}`),
   ],
 });
 
@@ -66,8 +65,8 @@ describe('content data preparation', () => {
     const result = prepareWritingData(
       [metadataEntry('memorying-start', { originalLanguage: 'ko' })],
       [
-        translationEntry('memorying-start/ko', '한국어 제목', '한국어 설명', '한국어 본문'),
-        translationEntry('memorying-start/en', 'English title', 'English description', 'English body'),
+        translationEntry('memorying-start/ko', '한국어 제목', '한국어 본문'),
+        translationEntry('memorying-start/en', 'English title', 'English body'),
       ],
       true,
     );
@@ -93,8 +92,8 @@ describe('content data preparation', () => {
         coverImageAlt: { ko: '한국어 대체 텍스트', en: 'English alternative text' },
       })],
       [
-        translationEntry('english-original/ko', '한국어 제목', '한국어 설명'),
-        translationEntry('english-original/en', 'English title', 'English description'),
+        translationEntry('english-original/ko', '한국어 제목'),
+        translationEntry('english-original/en', 'English title'),
       ],
       true,
     );
@@ -103,7 +102,7 @@ describe('content data preparation', () => {
     const original = originalTranslation(item);
 
     expect(result.pairs[0].entries[result.items[0].originalLanguage].id).toBe('english-original/en');
-    expect(original).toMatchObject({ language: 'en', title: 'English title', description: 'English description' });
+    expect(original).toMatchObject({ language: 'en', title: 'English title' });
     expect(item.coverImage).toBe(coverImage);
     expect(item.coverImageAlt?.en).toBe('English alternative text');
   });
@@ -148,7 +147,7 @@ describe('content data preparation', () => {
     expect(() => prepareWritingData(
       [metadataEntry('memorying-start')],
       [
-        translationEntry('memorying-start/ko', undefined, undefined, '   \n\t '),
+        translationEntry('memorying-start/ko', undefined, '   \n\t '),
         translationEntry('memorying-start/en'),
       ],
       true,
@@ -181,7 +180,7 @@ describe('content data preparation', () => {
         translationEntry('published/en'),
       ],
       true,
-    )).toThrow('Published writing "published" cannot use [Draft] title or description markers.');
+    )).toThrow('Published writing "published" cannot use [Draft] title markers.');
 
     expect(() => prepareWritingData(
       [metadataEntry('draft', { draft: true })],
@@ -206,8 +205,8 @@ describe('content data preparation', () => {
     expect(() => prepareWritingData(
       [metadataEntry('published')],
       [
-        translationEntry('published/ko', 'Korean title', 'Korean description', bodies.ko),
-        translationEntry('published/en', 'English title', 'English description', bodies.en),
+        translationEntry('published/ko', 'Korean title', bodies.ko),
+        translationEntry('published/en', 'English title', bodies.en),
       ],
       true,
     )).toThrow(`Published writing "published" cannot use the generated ${language} body placeholder.`);

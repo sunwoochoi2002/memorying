@@ -13,8 +13,8 @@ const item: WritingArticle = {
   draft: false,
   featured: false,
   translations: {
-    ko: { language: 'ko', title: '합성 제목', description: '합성 설명' },
-    en: { language: 'en', title: 'Synthetic title', description: 'Synthetic description' },
+    ko: { language: 'ko', title: '합성 제목' },
+    en: { language: 'en', title: 'Synthetic title' },
   },
 };
 

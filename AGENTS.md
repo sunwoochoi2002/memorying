@@ -6,7 +6,7 @@ Memorying is Sunwoo Choi's person-first bilingual writing archive. Preserve the 
 
 ## Writing invariants
 
-Each writing article has `meta.yaml`, `ko.mdx`, and `en.mdx`. Keep both translations complete, preserve the declared original language, and display original-language title and description first in archive and home views. Do not regress draft exclusion, stable slugs, or original-first detail behavior.
+Each writing article has `meta.yaml`, `ko.md`, and `en.md`. Keep both translations complete, preserve the declared original language, and display the original-language title first in archive and home views. Writing has no `description` field; do not add one. Do not regress draft exclusion, stable slugs, or original-first detail behavior.
 
 ## Approved work and continuity
 

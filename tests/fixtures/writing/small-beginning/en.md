@@ -1,6 +1,5 @@
 ---
 title: A small beginning
-description: A short note marking the beginning of this personal archive.
 ---
 
 This is a small beginning for an archive of things worth remembering.

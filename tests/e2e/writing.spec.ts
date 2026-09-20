@@ -4,7 +4,6 @@ import {
   firstPlainLine,
   isoDatetime,
   loadWritingCases,
-  originalDescription,
   originalTitle,
   otherLanguage,
   typeLabel,
@@ -191,7 +190,8 @@ for (const item of cases) {
     await expect(page.locator('.article-header .meta')).toHaveAttribute('lang', original);
     await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'article');
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `${SITE}${articlePath(item)}`);
-    await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', originalDescription(item));
+    await expect(page.locator('meta[name="description"]')).toHaveCount(0);
+    await expect(page.locator('meta[property="og:description"]')).toHaveCount(0);
     await expect(page.locator('.article-header__description')).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Back to Writing' })).toBeVisible();
     await expect(page.locator('[data-writing-cover]')).toHaveCount(item.cover ? 1 : 0);

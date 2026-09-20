@@ -27,7 +27,7 @@
 | 하고 싶은 일 | 고치는 곳 | 자세히 |
 | --- | --- | --- |
 | 새 글 쓰기 | `src/content/writing/<슬러그>/` 폴더 | 3-1 |
-| 글의 오타·문장 고치기 | 그 글의 `ko.mdx`, `en.mdx` | 3-2 |
+| 글의 오타·문장 고치기 | 그 글의 `ko.md`, `en.md` | 3-2 |
 | Essay를 Note로, 또는 반대로 | 그 글의 `meta.yaml` | 3-3 |
 | 글 잠시 숨기기, 지우기 | 그 글의 `meta.yaml`, 폴더 | 3-4 |
 | 글에 사진 넣기·바꾸기·빼기 | 그 글 폴더의 `cover.*` 파일 | 3-5 |
@@ -48,8 +48,8 @@ npm run new:writing -- remembering-summer --original ko
 원문이 영어면 `--original en`으로 씁니다. 그러면 `src/content/writing/remembering-summer/` 아래에 파일 3개가 만들어집니다.
 
 - `meta.yaml`: 글의 정보
-- `ko.mdx`: 한국어 제목, 설명, 본문
-- `en.mdx`: 영어 제목, 설명, 본문
+- `ko.md`: 한국어 제목, 본문
+- `en.md`: 영어 제목, 본문
 
 `meta.yaml`에는 아래 항목이 들어 있습니다.
 
@@ -62,7 +62,7 @@ npm run new:writing -- remembering-summer --original ko
 | `updatedAt` | 수정 날짜 (선택) | `2026-10-01` 형식 |
 | `featured` | 대표 글 표시. 지금은 화면에 쓰이지 않으니 그대로 두세요. | `false` |
 
-2. `ko.mdx`와 `en.mdx`의 맨 위 `title`, `description`을 채우고 본문을 씁니다. **두 언어를 모두 채워야** 합니다. 설명(`description`)은 화면에는 보이지 않지만 검색 결과와 공유 미리보기에 쓰이므로 비워 둘 수 없습니다. 번역이 필요하면 Claude에게 "영어 번역해 줘"라고 요청하세요.
+2. `ko.md`와 `en.md`의 맨 위 `title`을 채우고 본문을 씁니다. **두 언어를 모두 채워야** 합니다. 글에는 제목과 본문만 있고, 설명(`description`)은 없습니다. 파일에 `description`을 적으면 검사가 실패합니다. 번역이 필요하면 Claude에게 "영어 번역해 줘"라고 요청하세요.
 3. 글 종류가 Note라면 `meta.yaml`에서 `type: essay`를 `type: note`로 바꿉니다.
 4. 날짜를 확인합니다. 명령을 실행한 날짜가 `publishedAt`에 들어가 있습니다. 미래 날짜는 공개할 수 없습니다.
 5. 미리보기로 확인합니다. 새 글은 `draft: true` 상태라 미리보기에서는 보이지만 공개 사이트에는 나오지 않습니다.
@@ -71,12 +71,12 @@ npm run new:writing -- remembering-summer --original ko
 npm run dev -- --host 0.0.0.0
 ```
 
-6. 공개할 준비가 되면 `meta.yaml`의 `draft: true`를 `draft: false`로 바꿉니다. `[Draft]`가 붙은 제목과 설명이 남아 있으면 빌드가 실패합니다.
+6. 공개할 준비가 되면 `meta.yaml`의 `draft: true`를 `draft: false`로 바꿉니다. `[Draft]`가 붙은 제목이 남아 있으면 빌드가 실패합니다.
 7. 4번 「배포하는 순서」로 올립니다.
 
 ### 3-2. 글 내용 고치기
 
-1. `src/content/writing/<슬러그>/ko.mdx` 또는 `en.mdx`를 열어 고칩니다. 원문과 번역이 어긋나지 않게, 뜻이 바뀌는 수정은 두 파일 모두에서 합니다.
+1. `src/content/writing/<슬러그>/ko.md` 또는 `en.md`를 열어 고칩니다. 원문과 번역이 어긋나지 않게, 뜻이 바뀌는 수정은 두 파일 모두에서 합니다.
 2. 크게 고쳤다면 `meta.yaml`에 수정한 날짜를 추가할 수 있습니다. 글 위쪽에 「Updated 날짜」가 표시됩니다.
 
 ```yaml
@@ -172,7 +172,7 @@ npm run newsletter -- remembering-summer
 4. 본인에게 테스트 메일을 보내 휴대폰과 컴퓨터에서 확인합니다.
 5. 확인한 뒤 직접 발송을 누릅니다.
 
-명령은 초안 글, 없는 글, MDX 전용 문법(`import`, 컴포넌트)이 있는 글에는 메일을 만들지 않고 이유를 알려 줍니다. 구독자 이메일 주소와 Buttondown 비밀번호는 저장소나 채팅에 절대 붙여 넣지 마세요. 환영 메일(구독 직후 한 번 가는 인사)은 Buttondown 설정에서 따로 정하는 것이라 이 양식과 별개입니다.
+명령은 초안 글이나 없는 글에는 메일을 만들지 않고 이유를 알려 줍니다. 구독자 이메일 주소와 Buttondown 비밀번호는 저장소나 채팅에 절대 붙여 넣지 마세요. 환영 메일(구독 직후 한 번 가는 인사)은 Buttondown 설정에서 따로 정하는 것이라 이 양식과 별개입니다.
 
 ## 4. 배포하는 순서
 
@@ -209,7 +209,7 @@ PR의 `verify` 검사는 사이트가 깨지지 않았는지 자동으로 확인
 기준은 이렇습니다. 어기면 어느 글의 무엇이 문제인지 알려 주며 실패합니다.
 
 - 글 폴더 이름(슬러그)은 소문자 영문, 숫자, 하이픈만 씁니다.
-- `ko.mdx`와 `en.mdx`가 모두 있고, 제목, 설명, 본문이 비어 있지 않습니다.
+- `ko.md`와 `en.md`가 모두 있고, 제목과 본문이 비어 있지 않습니다.
 - 한국어 파일에는 한글이, 영어 파일에는 영문이 있습니다. 언어가 뒤바뀐 실수를 잡습니다.
 - 공개된 글에는 `[Draft]` 표시, 생성된 기본 문구, 미래 날짜가 없습니다. 숨긴 글(`draft: true`)은 이 기준을 적용하지 않습니다.
 - `type`은 `essay` 또는 `note`, `originalLanguage`는 `ko` 또는 `en`입니다.

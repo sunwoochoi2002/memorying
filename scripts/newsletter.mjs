@@ -16,12 +16,6 @@ function splitFrontmatter(source) {
   return { data: parse(match[1]) ?? {}, content: match[2] };
 }
 
-function assertPlainMarkdown(content, slug) {
-  if (/^\s*(import|export)\s/m.test(content) || /<[A-Z][A-Za-z0-9]*[\s/>]/.test(content)) {
-    throw new Error(`${slug} uses MDX-only syntax (import, export, or a component) that an email cannot render.`);
-  }
-}
-
 async function readOptional(path) {
   try {
     return await readFile(path, 'utf8');
@@ -54,13 +48,11 @@ export async function buildNewsletter({ root, slug, siteUrl = defaultSiteUrl, la
     throw new Error(`Unsupported language: ${chosenLanguage}. Use ko or en.`);
   }
 
-  const { data, content } = splitFrontmatter(await readFile(join(root, slug, `${chosenLanguage}.mdx`), 'utf8'));
+  const { data, content } = splitFrontmatter(await readFile(join(root, slug, `${chosenLanguage}.md`), 'utf8'));
   const subject = String(data.title ?? '').trim();
   if (subject === '') {
     throw new Error(`${slug} has no ${chosenLanguage} title.`);
   }
-
-  assertPlainMarkdown(content, slug);
 
   const articleUrl = `${siteUrl.replace(/\/+$/, '')}/writing/${slug}/`;
   const body = `${content.trim()}\n\n---\n\n${footerLabel}\n${articleUrl}\n\n${authorName}\n`;

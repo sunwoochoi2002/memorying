@@ -16,7 +16,7 @@ const writingMetadataCoreSchema = z.object({
 });
 
 export function createWritingTranslationSchema() {
-  return z.object({ title: nonemptyTextSchema, description: nonemptyTextSchema });
+  return z.strictObject({ title: nonemptyTextSchema });
 }
 
 export function createWritingMetadataSchema<T extends z.ZodType>(imageSchema: T) {

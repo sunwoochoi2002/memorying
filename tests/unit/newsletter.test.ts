@@ -13,7 +13,7 @@ afterEach(async () => {
 
 async function createArticle(
   slug: string,
-  options: { originalLanguage?: 'ko' | 'en'; draft?: boolean; type?: string; koBody?: string } = {},
+  options: { originalLanguage?: 'ko' | 'en'; draft?: boolean; type?: string } = {},
 ) {
   const root = await mkdtemp(join(tmpdir(), 'memorying-newsletter-'));
   temporaryRoots.push(root);
@@ -24,12 +24,12 @@ async function createArticle(
     `publishedAt: 2026-09-01\ntype: ${options.type ?? 'essay'}\noriginalLanguage: ${options.originalLanguage ?? 'ko'}\ndraft: ${options.draft ?? false}\nfeatured: false\n`,
   );
   await writeFile(
-    join(directory, 'ko.mdx'),
-    `---\ntitle: 여름을 기억하며\ndescription: 한국어 설명\n---\n\n${options.koBody ?? '첫 문단입니다.\n\n둘째 문단입니다.'}\n`,
+    join(directory, 'ko.md'),
+    `---\ntitle: 여름을 기억하며\n---\n\n첫 문단입니다.\n\n둘째 문단입니다.\n`,
   );
   await writeFile(
-    join(directory, 'en.mdx'),
-    `---\ntitle: Remembering summer\ndescription: English description\n---\n\nFirst paragraph.\n`,
+    join(directory, 'en.md'),
+    `---\ntitle: Remembering summer\n---\n\nFirst paragraph.\n`,
   );
   return root;
 }
@@ -43,7 +43,6 @@ describe('newsletter template', () => {
     expect(mail.language).toBe('ko');
     expect(mail.subject).toBe('여름을 기억하며');
     expect(mail.body.startsWith('첫 문단입니다.\n\n둘째 문단입니다.\n')).toBe(true);
-    expect(mail.body).not.toContain('한국어 설명');
     expect(mail.body).not.toContain('title:');
   });
 
@@ -93,14 +92,6 @@ describe('newsletter template', () => {
     await expect(buildNewsletter({ root, slug: '../escape', siteUrl })).rejects.toThrow(/Invalid writing slug/);
   });
 
-  it('refuses MDX-only syntax that an email cannot render', async () => {
-    const importRoot = await createArticle('with-import', { koBody: "import Box from './Box.astro';\n\n본문" });
-    const componentRoot = await createArticle('with-component', { koBody: '<Callout>본문</Callout>' });
-
-    await expect(buildNewsletter({ root: importRoot, slug: 'with-import', siteUrl })).rejects.toThrow(/MDX/);
-    await expect(buildNewsletter({ root: componentRoot, slug: 'with-component', siteUrl })).rejects.toThrow(/MDX/);
-  });
-
   it('rejects an unsupported language', async () => {
     const root = await createArticle('remembering-summer');
 
@@ -118,7 +109,7 @@ describe('newsletter template', () => {
 
     expect(written).toBe(join(outputDirectory, 'remembering-summer.ko.md'));
     expect(await readFile(written, 'utf8')).toBe(mail.body);
-    expect((await readdir(join(root, 'remembering-summer'))).sort()).toEqual(['en.mdx', 'ko.mdx', 'meta.yaml']);
+    expect((await readdir(join(root, 'remembering-summer'))).sort()).toEqual(['en.md', 'ko.md', 'meta.yaml']);
   });
 });
 

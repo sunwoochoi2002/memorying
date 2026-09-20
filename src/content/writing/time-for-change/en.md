@@ -1,19 +1,12 @@
 ---
 title: A Time for Change.
-description: A record from the day I felt I needed a change to find my rhythm again.
 ---
 
 I have not been able to focus very well lately.
 
-Even when I study or work, I keep feeling that I am rushing just to get things over with.
+Even when I study or work, I keep feeling that I am rushing just to get things over with. I slept plenty during the holiday, but I still do not feel properly rested.
 
-I slept plenty during the holiday, but I still do not feel properly rested.
-
-Is it the burnout people always talk about?
-
-Or a vague heaviness before enlisting?
-
-Or maybe it is simply because the weather has been awful every day lately.
+Is it the burnout people always talk about? Or a vague heaviness before enlisting? Or maybe it is simply because the weather has been awful every day lately.
 
 What autumn? It is just summer with lower temperatures.
 

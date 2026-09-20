@@ -26,19 +26,19 @@ describe('writing source directories', () => {
     expect(createWritingGlobPattern(['src/content/writing'], '**/meta.(yaml|yml)')).toBe(
       'src/content/writing/**/meta.(yaml|yml)',
     );
-    expect(createWritingGlobPattern(['src/content/writing', 'tests/fixtures/writing'], '**/*.(md|mdx)')).toBe(
-      '{src/content/writing,tests/fixtures/writing}/**/*.(md|mdx)',
+    expect(createWritingGlobPattern(['src/content/writing', 'tests/fixtures/writing'], '**/*.md')).toBe(
+      '{src/content/writing,tests/fixtures/writing}/**/*.md',
     );
   });
 
   it('strips the matching source directory so IDs stay unchanged', () => {
     const directories = ['src/content/writing', 'tests/fixtures/writing'];
-    expect(stripWritingSourceDirectory('src/content/writing/alone/ko.mdx', directories)).toBe('alone/ko.mdx');
+    expect(stripWritingSourceDirectory('src/content/writing/alone/ko.md', directories)).toBe('alone/ko.md');
     expect(stripWritingSourceDirectory('tests/fixtures/writing/memorying-start/meta.yaml', directories)).toBe(
       'memorying-start/meta.yaml',
     );
-    expect(() => stripWritingSourceDirectory('public/alone/ko.mdx', directories)).toThrow(
-      'Writing entry "public/alone/ko.mdx" is outside the configured source directories.',
+    expect(() => stripWritingSourceDirectory('public/alone/ko.md', directories)).toThrow(
+      'Writing entry "public/alone/ko.md" is outside the configured source directories.',
     );
   });
 });

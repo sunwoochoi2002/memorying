@@ -1,11 +1,12 @@
 ---
 import PersonalIntroduction from '../components/PersonalIntroduction.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
 import WritingListItem from '../components/WritingListItem.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { loadWritingArticles } from '../lib/content';
 
 const writing = await loadWritingArticles();
-const recent = writing.slice(0, 6);
+const recent = writing.slice(0, 3);
 ---
 
 <BaseLayout title="Home" description="Sunwoo Choi's personal writing and archive.">
@@ -23,6 +24,7 @@ const recent = writing.slice(0, 6);
         </ul>
       ) : <p class="empty-state">첫 번째 글을 준비하고 있습니다.</p>}
     </section>
+    <NewsletterSignup id="home" />
     </div>
   </div>
 </BaseLayout>

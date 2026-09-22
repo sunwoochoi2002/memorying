@@ -1,15 +1,123 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import LanguageToggle from '../components/LanguageToggle.astro';
+
+// Sample entries: replace these with the author's real experience before publishing.
+const experiences = [
+  {
+    role: { ko: '개인 프로젝트', en: 'Personal project' },
+    organization: { ko: '예시 프로젝트', en: 'Example project' },
+    start: '2026-03',
+    end: null,
+    description: {
+      ko: '일상에서 발견한 문제를 작은 서비스로 만들고, 사용자의 의견을 반영해 개선합니다.',
+      en: 'I build small services to address problems I encounter in everyday life and improve them through user feedback.',
+    },
+  },
+  {
+    role: { ko: '서비스 기획 인턴', en: 'Product planning intern' },
+    organization: { ko: '예시 회사', en: 'Example company' },
+    start: '2025-07',
+    end: '2025-12',
+    description: {
+      ko: '사용자 인터뷰와 자료 조사를 바탕으로 팀과 함께 서비스의 개선 방향을 고민했습니다.',
+      en: 'I worked with the team to explore ways to improve the service, drawing on user interviews and research.',
+    },
+  },
+  {
+    role: { ko: '학부 재학', en: 'Undergraduate studies' },
+    organization: { ko: '예시 대학교 · 예시 전공', en: 'Example university · Example major' },
+    start: '2021-03',
+    end: '2025-02',
+    description: {
+      ko: '관심 있는 분야를 공부하고, 동료들과 프로젝트를 진행하며 배움을 넓혔습니다.',
+      en: 'I explored subjects that interested me and broadened my learning through projects with fellow students.',
+    },
+  },
+];
+const languages = ['ko', 'en'] as const;
+const labels = {
+  ko: { note: '아래는 예시 이력입니다. 실제 이력으로 교체할 예정입니다.', experience: '이력', present: '현재' },
+  en: { note: 'These are sample entries and will be replaced with my actual experience.', experience: 'Experience', present: 'Present' },
+};
 ---
 
-<BaseLayout title="About" description="About Sunwoo Choi and the ideas behind Memorying.">
+<BaseLayout title="About" description="About Sunwoo Choi and his experience.">
   <section class="container section">
     <div class="column">
-    <h1 class="section-title">About</h1>
-    <div class="prose">
-      <p>안녕하세요, 최선우입니다.</p>
-      <p>시간이 지나도 잊고 싶지 않은 것들을 기록하고, 일상에서 발견하는 행복과 가치, 그리고 꿈에 관해 씁니다.</p>
-    </div>
+      <h1 class="section-title" lang="en">About</h1>
+      <LanguageToggle initialLanguage="ko" />
+      {languages.map((language) => (
+        <div lang={language} data-language-panel={language} hidden={language !== 'ko'}>
+          <p class="experience-note">{labels[language].note}</p>
+          <ol class="experience-timeline" aria-label={labels[language].experience} role="list">
+            {experiences.map((experience) => (
+              <li class:list={['experience-item', { 'is-current': !experience.end }]}>
+                <h2>{experience.role[language]} <span>@ {experience.organization[language]}</span></h2>
+                <p class="experience-period">
+                  <time datetime={experience.start}>{experience.start}</time>
+                  {' – '}
+                  {experience.end ? <time datetime={experience.end}>{experience.end}</time> : <span>{labels[language].present}</span>}
+                </p>
+                <p class="experience-description">{experience.description[language]}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ))}
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .experience-note {
+    margin: 1.25rem 0 0;
+    color: var(--muted);
+    font-family: var(--serif-ko);
+    font-size: 0.875rem;
+    word-break: keep-all;
+  }
+  .experience-timeline {
+    position: relative;
+    display: grid;
+    gap: 2rem;
+    margin: 1.5rem 0 0;
+    padding: 1.5rem 0 0 1.5rem;
+    border-top: 1px solid var(--line);
+    list-style: none;
+    font-family: var(--serif-ko);
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  .experience-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.25rem;
+    top: 2rem;
+    bottom: 0.5rem;
+    width: 1px;
+    background: var(--line);
+  }
+  .experience-item { position: relative; }
+  .experience-item::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 0.5rem;
+    width: 0.5625rem;
+    height: 0.5625rem;
+    border: 1px solid var(--muted);
+    border-radius: 50%;
+    background: var(--paper);
+  }
+  .experience-item.is-current::before { background: var(--muted); }
+  .experience-item h2 { margin: 0; font-size: 1.0625rem; font-weight: 400; line-height: 1.7; }
+  .experience-item h2 span { color: var(--muted); }
+  .experience-period { margin: 0.375rem 0 0; color: var(--muted); font-size: 0.8125rem; }
+  .experience-period time { font-family: var(--mono); }
+  .experience-description { margin: 0.625rem 0 0; font-size: 0.9375rem; line-height: 1.85; }
+  .experience-note:lang(en), .experience-timeline:lang(en) { font-family: var(--serif-display); word-break: normal; }
+  .experience-note:lang(en) { font-size: 1.125rem; }
+  .experience-item:lang(en) h2 { font-size: 1.375rem; }
+  .experience-description:lang(en) { font-size: 1.25rem; line-height: 1.7; }
+</style>

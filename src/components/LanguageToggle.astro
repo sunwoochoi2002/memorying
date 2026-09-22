@@ -1,0 +1,44 @@
+---
+interface Props {
+  initialLanguage: 'ko' | 'en';
+  originalLanguage?: 'ko' | 'en';
+}
+const { initialLanguage, originalLanguage } = Astro.props;
+---
+
+<div class="language-toggle" role="group" aria-label="Language" data-language-toggle hidden>
+  <button type="button" data-language-button="ko" aria-pressed={initialLanguage === 'ko'}>
+    <span lang="ko">한국어</span> {originalLanguage === 'ko' && <small lang="en">Original</small>}
+  </button>
+  <span aria-hidden="true">/</span>
+  <button type="button" data-language-button="en" aria-pressed={initialLanguage === 'en'}>
+    <span lang="en">English</span> {originalLanguage === 'en' && <small lang="en">Original</small>}
+  </button>
+</div>
+
+<script>
+  for (const toggle of document.querySelectorAll<HTMLElement>('[data-language-toggle]')) {
+    toggle.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>('[data-language-button]');
+      const language = button?.dataset.languageButton;
+      if (language !== 'ko' && language !== 'en') return;
+
+      for (const fragment of document.querySelectorAll<HTMLElement>('[data-language-fragment]')) {
+        fragment.hidden = fragment.dataset.languageFragment !== language;
+      }
+      for (const panel of document.querySelectorAll<HTMLElement>('[data-language-panel]')) {
+        panel.hidden = panel.dataset.languagePanel !== language;
+      }
+      for (const languageButton of toggle.querySelectorAll<HTMLButtonElement>('[data-language-button]')) {
+        languageButton.setAttribute('aria-pressed', String(languageButton === button));
+      }
+
+      document.documentElement.lang = language;
+      for (const cover of document.querySelectorAll<HTMLElement>('[data-writing-cover]')) {
+        const image = cover.querySelector('img');
+        if (image) image.alt = language === 'ko' ? cover.dataset.altKo ?? '' : cover.dataset.altEn ?? '';
+      }
+    });
+    toggle.hidden = false;
+  }
+</script>

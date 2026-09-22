@@ -31,8 +31,9 @@ test('invites subscription in plain words without boxes or old copy', async ({ p
   await expect(page.getByRole('heading', { level: 2, name: '새 에세이를 이메일로 받아 보세요.' })).toBeVisible();
 });
 
-test('uses browser validation and posts valid email directly to Buttondown', async ({ page }) => {
-  await page.goto('/writing/');
+for (const path of ['/', '/writing/']) {
+test(`${path} uses browser validation and posts valid email directly to Buttondown`, async ({ page }) => {
+  await page.goto(path);
   const email = page.getByRole('form', { name: 'Newsletter subscription' }).getByLabel('Email');
   await email.fill('invalid');
   await page.getByRole('button', { name: 'Subscribe' }).click();
@@ -55,6 +56,7 @@ test('uses browser validation and posts valid email directly to Buttondown', asy
   expect(posted).toContain('email=reader%40example.com');
   expect(posted).toContain('embed=1');
 });
+}
 
 test('shows the secondary subscription form after an Essay but not a Note', async ({ page }) => {
   expect(essay, 'an Essay (a fixture guarantees one)').toBeDefined();

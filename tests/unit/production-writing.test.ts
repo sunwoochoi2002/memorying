@@ -13,7 +13,7 @@ import {
  * exists in the repository. Nothing here names a particular article.
  */
 
-const HOME_LIST_LENGTH = 6;
+const HOME_LIST_LENGTH = 3;
 const SITE = 'https://example.com';
 
 const escapeHtml = (text: string) => text

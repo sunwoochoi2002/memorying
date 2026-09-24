@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'astro/zod';
 import {
+  createAboutSchema,
   createWorkSchema,
   createWritingMetadataSchema,
   createWritingTranslationSchema,
@@ -9,6 +10,20 @@ import {
 const metadataSchema = createWritingMetadataSchema(z.string());
 const translationSchema = createWritingTranslationSchema();
 const workSchema = createWorkSchema(z.string());
+const aboutSchema = createAboutSchema();
+const aboutBase = {
+  intro: { ko: ['안녕하세요, 최선우입니다.'], en: ['Hello, I’m Sunwoo Choi.'] },
+  sections: [{
+    id: 'affiliations',
+    heading: 'Selected Affiliations',
+    featured: true,
+    entries: [{
+      title: 'Mathematics @ POSTECH',
+      period: '2021.02–Present',
+      description: { ko: 'POSTECH에서 수학을 전공합니다.', en: 'I study Mathematics at POSTECH.' },
+    }],
+  }],
+};
 const workBase = {
   title: 'Memorying',
   period: '2026',
@@ -75,6 +90,28 @@ describe('work schema', () => {
 
   it('rejects invalid project URLs', () => {
     expect(workSchema.safeParse({ ...workBase, url: 'not a URL' }).success).toBe(false);
+  });
+});
+
+describe('about content schema', () => {
+  it('accepts a bilingual editable timeline', () => {
+    expect(aboutSchema.safeParse(aboutBase).success).toBe(true);
+  });
+
+  it('rejects missing translations, empty titles, and malformed dates', () => {
+    expect(aboutSchema.safeParse({ ...aboutBase, intro: { ko: ['안녕하세요'] } }).success).toBe(false);
+    expect(aboutSchema.safeParse({
+      ...aboutBase,
+      sections: [{ ...aboutBase.sections[0], entries: [{ ...aboutBase.sections[0].entries[0], title: '  ' }] }],
+    }).success).toBe(false);
+    expect(aboutSchema.safeParse({
+      ...aboutBase,
+      sections: [{ ...aboutBase.sections[0], entries: [{ ...aboutBase.sections[0].entries[0], period: 'sometime' }] }],
+    }).success).toBe(false);
+    expect(aboutSchema.safeParse({
+      ...aboutBase,
+      sections: [{ ...aboutBase.sections[0], entries: [{ ...aboutBase.sections[0].entries[0], description: { ko: '설명' } }] }],
+    }).success).toBe(false);
   });
 });
 

@@ -79,21 +79,66 @@ test('home places the same subscription form below its recent writing', async ({
   }
 });
 
-test('about presents clearly labeled sample experience on desktop and mobile', async ({ page }) => {
+test('about leads with selected affiliations and retains the full resume by category', async ({ page }) => {
   for (const width of [320, 1280]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/about/');
     await expect(page.getByRole('heading', { level: 1, name: 'About' })).toBeVisible();
-    await expect(page.getByText('아래는 예시 이력입니다. 실제 이력으로 교체할 예정입니다.')).toBeVisible();
-    const timeline = page.getByRole('list', { name: '이력' });
-    const entries = timeline.getByRole('listitem');
-    await expect(entries).toHaveCount(3);
-    for (const entry of await entries.all()) {
-      await expect(entry.getByRole('heading', { level: 2 })).toBeVisible();
-      await expect(entry.locator('time').first()).toHaveAttribute('datetime', /^\d{4}-\d{2}$/);
-      await expect(entry.locator('p').last()).not.toBeEmpty();
+    await expect(page.getByText(/추천 시스템, 강화학습, Interactive ML/)).toBeVisible();
+    const affiliations = page.getByRole('list', { name: 'Selected Affiliations' });
+    await expect(affiliations.getByRole('listitem')).toHaveCount(4);
+    await expect(affiliations.locator('.entry-title')).toHaveText([
+      'Military Service @ Republic of Korea Army (ROKA)',
+      'Data Analytics Intern @ Chartmetric',
+      'Exchange Student @ TU Delft',
+      'Mathematics @ POSTECH',
+    ]);
+    await expect(affiliations.getByText(/2026년 2월부터 대한민국 육군에서 복무/)).toBeVisible();
+    await expect(affiliations.getByText(/수학을 전공/)).toBeVisible();
+    await expect(page.getByRole('list', { name: 'Work & Research' }).getByRole('listitem')).toHaveCount(6);
+    await expect(page.getByRole('list', { name: 'Activities' }).getByRole('listitem')).toHaveCount(11);
+    await expect(page.getByRole('list', { name: 'Projects & Achievements' }).getByRole('listitem')).toHaveCount(8);
+    await expect(page.getByRole('list', { name: 'Additional Education' }).getByRole('listitem')).toHaveCount(1);
+    await expect(page.getByRole('list', { name: 'Work & Research' }).getByText('Data Analytics Intern @ Chartmetric')).toBeVisible();
+    await expect(page.getByRole('list', { name: 'Activities' }).getByText('Exchange Student @ TU Delft')).toBeVisible();
+    for (const title of await page.locator('.entry-title').allTextContents()) {
+      expect(title).not.toMatch(/[가-힣]/);
+    }
+    await expect(page.getByText('아래는 예시 이력입니다. 실제 이력으로 교체할 예정입니다.')).toHaveCount(0);
+    await expect(page.locator('main img')).toHaveCount(0);
+    for (const privateText of ['GPA', 'TOEFL', 'Year of birth', 'Academic Excellence Recognition', 'sunwoochoi@postech.ac.kr']) {
+      await expect(page.locator('main').getByText(privateText, { exact: false })).toHaveCount(0);
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+  }
+});
+
+test('about timeline uses a continuous line and a node for each dated item', async ({ page }) => {
+  await page.goto('/about/');
+  for (const list of await page.locator('.about-entry-list').all()) {
+    const line = await list.evaluate((element) => {
+      const style = getComputedStyle(element, '::before');
+      return { content: style.content, backgroundColor: style.backgroundColor };
+    });
+    const node = await list.locator('li').first().evaluate((element) => {
+      const style = getComputedStyle(element, '::before');
+      return { content: style.content, backgroundColor: style.backgroundColor };
+    });
+    expect(line.content).toBe('""');
+    expect(node.content).toBe('""');
+    expect(line.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+    expect(node.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+  }
+});
+
+test('about timelines run from newer to older start dates', async ({ page }) => {
+  await page.goto('/about/');
+  for (const list of await page.locator('.about-entry-list').all()) {
+    const dates = (await list.locator('.entry-period').allTextContents()).map((period) => period.slice(0, 7));
+    expect(dates.length).toBeGreaterThan(0);
+    for (let index = 1; index < dates.length; index += 1) {
+      expect(dates[index - 1] >= dates[index]).toBe(true);
+    }
   }
 });
 
@@ -104,7 +149,7 @@ test('work introduces the personal archive', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Sunwoo’s Archive' })).toBeVisible();
 });
 
-test('about switches its complete experience between Korean and English and resets on reload', async ({ page }) => {
+test('about keeps English titles, expands details on demand, and translates open content', async ({ page }) => {
   for (const width of [320, 1280]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/about/');
@@ -113,8 +158,22 @@ test('about switches its complete experience between Korean and English and rese
     await expect(korean).toHaveAttribute('aria-pressed', 'true');
     await expect(english).toHaveAttribute('aria-pressed', 'false');
     await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
-    await expect(page.getByRole('list', { name: '이력', exact: true })).toBeVisible();
-    await expect(page.getByRole('list', { name: 'Experience', exact: true })).toBeHidden();
+    const projects = page.locator('[data-about-list="projects"]');
+    const affiliations = page.locator('[data-about-list="affiliations"]');
+    const army = affiliations.getByRole('listitem').filter({ hasText: 'Military Service @ Republic of Korea Army (ROKA)' });
+    const chartmetric = affiliations.getByRole('listitem').filter({ hasText: 'Data Analytics Intern @ Chartmetric' });
+    await expect(army.getByText(/대한민국 육군에서 복무/)).toBeVisible();
+    await expect(army.getByText(/serving in the Republic of Korea Army/)).toBeHidden();
+    await expect(chartmetric.getByText(/신뢰할 수 있는 데이터, 시각화, 심층 인사이트/)).toBeVisible();
+    const jarvis = projects.getByRole('listitem').filter({ hasText: 'JARVIS' });
+    await expect(jarvis.locator('.entry-title')).toHaveText('JARVIS');
+    await expect(army.locator('.entry-title')).toHaveText('Military Service @ Republic of Korea Army (ROKA)');
+    await expect(jarvis.locator('details')).not.toHaveAttribute('open', '');
+    await expect(jarvis.getByText(/로컬 파일/)).toBeHidden();
+    await jarvis.getByText('자세히 보기').click();
+    await expect(jarvis.locator('details')).toHaveAttribute('open', '');
+    await expect(jarvis.getByText(/로컬 파일/)).toBeVisible();
+    await expect(jarvis.getByText(/local files/)).toBeHidden();
 
     await english.focus();
     await page.keyboard.press('Enter');
@@ -122,43 +181,39 @@ test('about switches its complete experience between Korean and English and rese
     await expect(english).toHaveAttribute('aria-pressed', 'true');
     await expect(korean).toHaveAttribute('aria-pressed', 'false');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-    await expect(page.getByText('These are sample entries and will be replaced with my actual experience.')).toBeVisible();
-    const timeline = page.getByRole('list', { name: 'Experience', exact: true });
-    await expect(timeline.getByRole('heading')).toHaveText([
-      'Personal project @ Example project',
-      'Product planning intern @ Example company',
-      'Undergraduate studies @ Example university · Example major',
-    ]);
-    await expect(timeline.getByText('Present', { exact: true })).toBeVisible();
-    const englishText = await timeline.innerText();
-    expect(englishText).not.toMatch(/[가-힣]/);
-    for (const entry of await timeline.getByRole('listitem').all()) {
-      await expect(entry.locator('p').last()).not.toBeEmpty();
-    }
-    await expect(page.getByRole('list', { name: '이력', exact: true })).toBeHidden();
+    await expect(army.getByText(/serving in the Republic of Korea Army/)).toBeVisible();
+    await expect(army.getByText(/대한민국 육군에서 복무/)).toBeHidden();
+    await expect(chartmetric.getByText(/reliable data, beautiful visuals, in-depth insights/)).toBeVisible();
+    await expect(jarvis.locator('details')).toHaveAttribute('open', '');
+    await expect(jarvis.getByText(/local files/)).toBeVisible();
+    await expect(jarvis.getByText(/로컬 파일/)).toBeHidden();
+    await expect(jarvis.locator('.entry-title')).toHaveText('JARVIS');
+    await expect(page.getByText(/I study recommender systems, reinforcement learning, and Interactive ML/)).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
 
     await korean.click();
     await expect(korean).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
-    await expect(page.getByRole('list', { name: '이력', exact: true })).toBeVisible();
-    await expect(timeline).toBeHidden();
+    await expect(jarvis.getByText(/로컬 파일/)).toBeVisible();
     await english.click();
     await page.reload();
     await expect(korean).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
-    await expect(page.getByRole('list', { name: '이력', exact: true })).toBeVisible();
+    await expect(projects.getByRole('listitem')).toHaveCount(8);
+    await expect(projects.getByRole('listitem').filter({ hasText: 'JARVIS' }).locator('details')).not.toHaveAttribute('open', '');
   }
 });
 
-test('about keeps Korean experience readable without JavaScript', async ({ browser }) => {
+test('about keeps Korean content and native details available without JavaScript', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   try {
     await page.goto('/about/');
-    await expect(page.getByRole('list', { name: '이력', exact: true })).toBeVisible();
+    await expect(page.getByText(/추천 시스템, 강화학습, Interactive ML/)).toBeVisible();
     await expect(page.locator('[data-language-toggle]')).toBeHidden();
-    await expect(page.getByRole('list', { name: 'Experience', exact: true })).toBeHidden();
+    const jarvis = page.getByRole('list', { name: 'Projects & Achievements' }).getByRole('listitem').filter({ hasText: 'JARVIS' });
+    await jarvis.getByText('자세히 보기').click();
+    await expect(jarvis.getByText(/로컬 파일/)).toBeVisible();
   } finally {
     await context.close();
   }

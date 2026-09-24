@@ -68,6 +68,11 @@ export type AboutEntry = z.infer<typeof aboutEntrySchema>;
 
 export function createAboutSchema() {
   return z.strictObject({
+    labels: z.strictObject({
+      pageTitle: nonemptyTextSchema,
+      more: bilingualTextSchema,
+      less: bilingualTextSchema,
+    }),
     intro: z.strictObject({
       ko: z.array(nonemptyTextSchema).min(1),
       en: z.array(nonemptyTextSchema).min(1),

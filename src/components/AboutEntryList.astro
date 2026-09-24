@@ -6,9 +6,10 @@ interface Props {
   id: string;
   labelledBy: string;
   featured?: boolean;
+  labels: { pageTitle: string; more: { ko: string; en: string }; less: { ko: string; en: string } };
 }
 
-const { entries, id, labelledBy, featured = false } = Astro.props;
+const { entries, id, labelledBy, featured = false, labels } = Astro.props;
 const chronologicalEntries = [...entries].sort((left, right) =>
   right.period.slice(0, 7).localeCompare(left.period.slice(0, 7)),
 );
@@ -33,12 +34,12 @@ const chronologicalEntries = [...entries].sort((left, right) =>
             <span class="entry-period">{entry.period}</span>
             <span class="entry-action">
               <span class="entry-more">
-                <span lang="ko" data-language-fragment="ko">자세히 보기</span>
-                <span lang="en" data-language-fragment="en" hidden>Details</span>
+                <span lang="ko" data-language-fragment="ko">{labels.more.ko}</span>
+                <span lang="en" data-language-fragment="en" hidden>{labels.more.en}</span>
               </span>
               <span class="entry-less">
-                <span lang="ko" data-language-fragment="ko">접기</span>
-                <span lang="en" data-language-fragment="en" hidden>Close</span>
+                <span lang="ko" data-language-fragment="ko">{labels.less.ko}</span>
+                <span lang="en" data-language-fragment="en" hidden>{labels.less.en}</span>
               </span>
             </span>
           </summary>

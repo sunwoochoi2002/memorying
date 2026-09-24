@@ -84,7 +84,7 @@ test('about leads with selected affiliations and retains the full resume by cate
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/about/');
     await expect(page.getByRole('heading', { level: 1, name: 'About' })).toBeVisible();
-    await expect(page.getByText(/추천 시스템, 강화학습, Interactive ML/)).toBeVisible();
+    await expect(page.getByText(/Recommender Systems, Reinforcement Learning, Interactive Machine Learning/)).toBeVisible();
     const affiliations = page.getByRole('list', { name: 'Selected Affiliations' });
     await expect(affiliations.getByRole('listitem')).toHaveCount(4);
     await expect(affiliations.locator('.entry-title')).toHaveText([
@@ -96,7 +96,7 @@ test('about leads with selected affiliations and retains the full resume by cate
     await expect(affiliations.getByText(/2026년 2월부터 대한민국 육군에서 복무/)).toBeVisible();
     await expect(affiliations.getByText(/수학을 전공/)).toBeVisible();
     await expect(page.getByRole('list', { name: 'Work & Research' }).getByRole('listitem')).toHaveCount(6);
-    await expect(page.getByRole('list', { name: 'Activities' }).getByRole('listitem')).toHaveCount(11);
+    await expect(page.getByRole('list', { name: 'Activities' }).getByRole('listitem')).toHaveCount(12);
     await expect(page.getByRole('list', { name: 'Projects & Achievements' }).getByRole('listitem')).toHaveCount(8);
     await expect(page.getByRole('list', { name: 'Additional Education' }).getByRole('listitem')).toHaveCount(1);
     await expect(page.getByRole('list', { name: 'Work & Research' }).getByText('Data Analytics Intern @ Chartmetric')).toBeVisible();
@@ -166,7 +166,7 @@ test('about keeps English titles, expands details on demand, and translates open
     await expect(army.getByText(/serving in the Republic of Korea Army/)).toBeHidden();
     await expect(chartmetric.getByText(/신뢰할 수 있는 데이터, 시각화, 심층 인사이트/)).toBeVisible();
     const jarvis = projects.getByRole('listitem').filter({ hasText: 'JARVIS' });
-    await expect(jarvis.locator('.entry-title')).toHaveText('JARVIS');
+    await expect(jarvis.locator('.entry-title')).toHaveText('2025 UGRP (Undergraduate Group Research Program) — Technology Entrepreneurship Track / Encouragement Prize');
     await expect(army.locator('.entry-title')).toHaveText('Military Service @ Republic of Korea Army (ROKA)');
     await expect(jarvis.locator('details')).not.toHaveAttribute('open', '');
     await expect(jarvis.getByText(/로컬 파일/)).toBeHidden();
@@ -187,8 +187,8 @@ test('about keeps English titles, expands details on demand, and translates open
     await expect(jarvis.locator('details')).toHaveAttribute('open', '');
     await expect(jarvis.getByText(/local files/)).toBeVisible();
     await expect(jarvis.getByText(/로컬 파일/)).toBeHidden();
-    await expect(jarvis.locator('.entry-title')).toHaveText('JARVIS');
-    await expect(page.getByText(/I study recommender systems, reinforcement learning, and Interactive ML/)).toBeVisible();
+    await expect(jarvis.locator('.entry-title')).toHaveText('2025 UGRP (Undergraduate Group Research Program) — Technology Entrepreneurship Track / Encouragement Prize');
+    await expect(page.getByText(/I am studying areas such as recommender systems, reinforcement learning, and interactive machine learning/)).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
 
     await korean.click();
@@ -209,7 +209,7 @@ test('about keeps Korean content and native details available without JavaScript
   const page = await context.newPage();
   try {
     await page.goto('/about/');
-    await expect(page.getByText(/추천 시스템, 강화학습, Interactive ML/)).toBeVisible();
+    await expect(page.getByText(/Recommender Systems, Reinforcement Learning, Interactive Machine Learning/)).toBeVisible();
     await expect(page.locator('[data-language-toggle]')).toBeHidden();
     const jarvis = page.getByRole('list', { name: 'Projects & Achievements' }).getByRole('listitem').filter({ hasText: 'JARVIS' });
     await jarvis.getByText('자세히 보기').click();

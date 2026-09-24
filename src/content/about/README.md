@@ -7,6 +7,7 @@ timeline changes.
 
 - `intro.ko` and `intro.en` are the paragraphs above the timelines. Keep both
   languages complete.
+- `labels` controls the page title and disclosure labels.
 - `sections` controls the section order. `heading` and every entry `title` are
   displayed in English in both language modes.
 - `entries[].description.ko` and `.en` are the corresponding expandable text.

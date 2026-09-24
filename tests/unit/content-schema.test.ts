@@ -12,6 +12,7 @@ const translationSchema = createWritingTranslationSchema();
 const workSchema = createWorkSchema(z.string());
 const aboutSchema = createAboutSchema();
 const aboutBase = {
+  labels: { pageTitle: 'About', more: { ko: '자세히 보기', en: 'Details' }, less: { ko: '접기', en: 'Close' } },
   intro: { ko: ['안녕하세요, 최선우입니다.'], en: ['Hello, I’m Sunwoo Choi.'] },
   sections: [{
     id: 'affiliations',

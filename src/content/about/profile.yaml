@@ -1,16 +1,25 @@
 # Edit this file to update the public About page. Keep both ko and en text complete.
 # The page sorts entries in each section by the first YYYY.MM in period.
 # Keep private information, grades, and source documents in docs/resume.md only.
+labels:
+  pageTitle: About
+  more:
+    ko: 자세히 보기
+    en: Details
+  less:
+    ko: 접기
+    en: Close
 intro:
   ko:
     - 안녕하세요, 최선우입니다.
-    - 저의 목표는 사람들, 특히 학생들이 진로와 커리어를 선택할 때 진정으로 행복하게 살 수 있는 길을 찾도록 돕는 것입니다. 이를 기술로 구현하기 위해 추천 시스템, 강화학습,
-      Interactive ML (IML)을 수학적 배경을 바탕으로 공부하고 있습니다.
+    - 제 궁극적인 목표는 사람들, 특히 학생들이 본격적으로 진로와 커리어를 고민하고 선택하는 과정에서, 진정으로 행복하게 살 수 있는 선택지를 찾고 그 길로 나아갈 수 있도록 돕는 것입니다.
+    - 이를 기술적으로 구현하기 위해 Recommender Systems, Reinforcement Learning, Interactive Machine Learning (IML) 등에 관심을 갖고, 수학적인 배경을 바탕으로 공부하고 있습니다.
+    - 그리고 2026.02.02.부로 대한민국 육군으로 입대하여 현재 군복무 중이며, 자율시간을 활용해 공부 및 개인 프로젝트를 진행하고 있습니다.
   en:
     - Hello, I’m Sunwoo Choi.
-    - My goal is to help people, especially students, find career paths that allow them to live genuinely
-      happy lives. To work toward this through technology, I study recommender systems, reinforcement
-      learning, and Interactive ML (IML), drawing on my mathematical background.
+    - My ultimate goal is to help people, especially students, explore and pursue paths that can lead to genuinely happy lives as they begin making meaningful decisions about their futures and careers.
+    - To put this goal into practice through technology, I am studying areas such as recommender systems, reinforcement learning, and interactive machine learning (IML), leveraging my background in mathematics.
+    - I’ve been serving in the Republic of Korea Army since February 2, 2026. In my free time, I continue studying and working on personal projects.
 sections:
   - id: affiliations
     heading: Selected Affiliations
@@ -23,7 +32,7 @@ sections:
           en: I have been serving in the Republic of Korea Army since February 2026. During off-duty hours, I continue
             to study and work on personal projects.
       - title: Data Analytics Intern @ Chartmetric
-        period: "2025.06"
+        period: 2025.06–2025.12
         description:
           ko: Chartmetric은 신뢰할 수 있는 데이터, 시각화, 심층 인사이트, 혁신적인 기능과 고객 지원을 통해 음악 산업에서 더 빠르고 현명한 의사결정을 돕습니다.
           en: Chartmetric helps the music industry make smarter and faster music business decisions by providing
@@ -45,7 +54,7 @@ sections:
     heading: Work & Research
     entries:
       - title: Data Analytics Intern @ Chartmetric
-        period: "2025.06"
+        period: 2025.06–2025.12
         description:
           ko: Chartmetric은 신뢰할 수 있는 데이터, 시각화, 심층 인사이트, 혁신적인 기능과 고객 지원을 통해 음악 산업에서 더 빠르고 현명한 의사결정을 돕습니다.
           en: Chartmetric helps the music industry make smarter and faster music business decisions by providing
@@ -80,7 +89,7 @@ sections:
   - id: projects
     heading: Projects & Achievements
     entries:
-      - title: JARVIS
+      - title: 2025 UGRP (Undergraduate Group Research Program) — Technology Entrepreneurship Track / Encouragement Prize
         period: "2026.02"
         description:
           ko: 2025 UGRP Technology Entrepreneurship Track 장려상. 3인 팀의 팀장으로 로컬 파일을 인덱싱하고 RAG와 특화 Agent로 질의응답, 데이터 분석, 보고서
@@ -88,7 +97,7 @@ sections:
           en: Encouragement Prize, 2025 UGRP Technology Entrepreneurship Track. Led a three-person team to build JARVIS,
             a desktop AI assistant prototype that indexes local files and uses RAG and specialized agents to
             answer questions, analyze data, generate reports, and provide personalized recommendations.
-      - title: BERA (Biotech Equity Risk Analytics)
+      - title: 1st SL BIOFUTURE START-UP CHALLENGE 2025 / Grand Prize
         period: "2026.02"
         description:
           ko: 제1회 SL BIOFUTURE START-UP CHALLENGE 2025 대상. 팀과 함께 임상시험 결과를 예측하고 바이오 기업 데이터를 투자 위험 리포트로 만드는 AI 연구 플랫폼
@@ -97,7 +106,7 @@ sections:
             that predicts clinical trial outcomes and turns biotech company data into investment-risk reports.
             The award supported my visit to San Francisco during JPM Healthcare Week, where I explored the
             global biotech investment ecosystem.
-      - title: START-UP 48
+      - title: 2025 START-UP 48 Inter-University Entrepreneurship Ideathon / 1st Prize
         period: "2025.07"
         description:
           ko: START-UP 48 대학 연합 창업 아이디어톤 1위. POSTECH, Seoul National University, KAIST, Yonsei University, Korea
@@ -108,7 +117,7 @@ sections:
             KAIST, Yonsei University, and Korea University. Participants form teams and go through the full
             startup journey, from idea generation and business model development to prototyping and final
             pitching, supported by industry mentors.
-      - title: Global Student Startup Competition (GSSC)
+      - title: Global Student Startup Competition (GSSC) / Asian Leadership Conference 2025
         period: "2025.05"
         description:
           ko: POSTECH 대표로 Human-Centered AI에 초점을 맞춘 글로벌 창업 프로그램에 참여했습니다. 한국의 주요 리더십 콘퍼런스에서 창업 역량을 키우고 국제 학생들과 인사이트를
@@ -117,26 +126,26 @@ sections:
             Participated in a global entrepreneurship program focused on Human-Centered AI. Built
             entrepreneurial competencies and exchanged insights with international students at Korea's premier
             leadership conference.
-      - title: Techathon
+      - title: 2025 Techathon / 3rd Prize
         period: "2025.01"
         description:
           ko: Techathon 3위. Technology와 Ideathon을 합친 이름으로, 기술을 바탕으로 창업 아이디어를 만들고 비즈니스 모델로 구체화하는 행사입니다.
           en: 3rd Prize, “Techathon”. Techathon is a combination of “Technology” and “Ideathon,” a startup event where
             participants develop startup ideas based on technology and refine them into business models.
-      - title: Crackathon
+      - title: 2024 Crackathon / 3rd Prize
         period: "2024.11"
         description:
           ko: Crackathon 3위. cracking과 ideathon을 합친 이름으로, 대기업의 관습적인 틀에서 벗어나는 혁신적인 아이디어를 제안하는 행사입니다.
           en: 3rd Prize, “Crackathon”. Crackathon is a combination of “cracking” and “ideathon,” where participants
             present innovative ideas to break away from the conventional frameworks of large corporations.
-      - title: POSTECH Mathematics Research Paper Award
+      - title: 2024 POSTECH Mathematics Research Paper Award / Grand Prize
         period: "2024.11"
         description:
           ko: "2024 POSTECH Mathematics Research Paper Award 대상. 논문: “Statistical Estimation of Prime Divisor CDF for
             Finite N in Erdős-Kac Theorem.”"
           en: "Grand Prize, 2024 POSTECH Mathematics Research Paper Award. Paper: “Statistical Estimation of Prime
             Divisor CDF for Finite N in Erdős-Kac Theorem.”"
-      - title: Introducing My Research in 2023
+      - title: Introducing My Research in 2023 / Finalist (Encouragement Prize)
         period: "2023.11"
         description:
           ko: "Introducing My Research in 2023 최종 후보(장려상). 발표 주제: “Markov chain and its applications.”"
@@ -150,6 +159,11 @@ sections:
   - id: activities
     heading: Activities
     entries:
+      - title: CES 2026
+        period: "2026.01"
+        description:
+          ko: 미국 Las Vegas에서 열린 CES 2026에 참석했습니다.
+          en: I attended CES 2026 in Las Vegas, USA.
       - title: Korean Business Networking Conference (KBNC) 2025
         period: "2025.06"
         description:

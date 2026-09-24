@@ -11,7 +11,7 @@ if (!profile) throw new Error('Missing src/content/about/profile.yaml');
 <BaseLayout title="About" description="About Sunwoo Choi, his interests, experience, and projects.">
   <section class="container section">
     <div class="column">
-      <h1 class="section-title" lang="en">About</h1>
+      <h1 class="section-title" lang="en">{profile.data.labels.pageTitle}</h1>
       <LanguageToggle initialLanguage="ko" />
 
       <div class="about-intro">
@@ -22,7 +22,7 @@ if (!profile) throw new Error('Missing src/content/about/profile.yaml');
       {profile.data.sections.map((section) => (
         <section class="about-section" aria-labelledby={`${section.id}-heading`}>
           <h2 id={`${section.id}-heading`} lang="en">{section.heading}</h2>
-          <AboutEntryList id={section.id} entries={section.entries} labelledBy={`${section.id}-heading`} featured={section.featured} />
+          <AboutEntryList id={section.id} entries={section.entries} labelledBy={`${section.id}-heading`} featured={section.featured} labels={profile.data.labels} />
         </section>
       ))}
     </div>

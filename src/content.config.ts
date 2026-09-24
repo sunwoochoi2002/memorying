@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import {
+  createAboutSchema,
   createWorkSchema,
   createWritingMetadataSchema,
   createWritingTranslationSchema,
@@ -41,4 +42,9 @@ const work = defineCollection({
   schema: ({ image }) => createWorkSchema(image()),
 });
 
-export const collections = { writing, writingMeta, work };
+const about = defineCollection({
+  loader: glob({ pattern: '*.yaml', base: './src/content/about' }),
+  schema: createAboutSchema(),
+});
+
+export const collections = { writing, writingMeta, work, about };

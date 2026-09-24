@@ -55,6 +55,37 @@ const workCoreSchema = z.object({
   order: z.number().int().nonnegative(),
 });
 
+const bilingualTextSchema = z.strictObject({ ko: nonemptyTextSchema, en: nonemptyTextSchema });
+
+const aboutEntrySchema = z.strictObject({
+  title: nonemptyTextSchema,
+  period: nonemptyTextSchema.regex(/^\d{4}\.\d{2}(?:–(?:\d{4}\.\d{2}|Present))?$/),
+  description: bilingualTextSchema,
+  link: z.strictObject({ href: z.url(), label: bilingualTextSchema }).optional(),
+});
+
+export type AboutEntry = z.infer<typeof aboutEntrySchema>;
+
+export function createAboutSchema() {
+  return z.strictObject({
+    labels: z.strictObject({
+      pageTitle: nonemptyTextSchema,
+      more: bilingualTextSchema,
+      less: bilingualTextSchema,
+    }),
+    intro: z.strictObject({
+      ko: z.array(nonemptyTextSchema).min(1),
+      en: z.array(nonemptyTextSchema).min(1),
+    }),
+    sections: z.array(z.strictObject({
+      id: nonemptyTextSchema.regex(/^[a-z][a-z-]*$/),
+      heading: nonemptyTextSchema,
+      featured: z.boolean().default(false),
+      entries: z.array(aboutEntrySchema).min(1),
+    })).min(1),
+  });
+}
+
 export function createWorkSchema<T extends z.ZodType>(imageSchema: T) {
   return workCoreSchema.extend({ image: imageSchema.optional() });
 }

@@ -1,0 +1,27 @@
+---
+import { getEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LanguageToggle from '../components/LanguageToggle.astro';
+import ProfileEntryList from '../components/ProfileEntryList.astro';
+import { loadExperience } from '../lib/content';
+
+const sections = await loadExperience();
+const profile = await getEntry('about', 'profile');
+if (!profile) throw new Error('Missing src/content/about/profile.yaml');
+---
+
+<BaseLayout title="Experience" description="Education, experience, activities, and awards of Sunwoo Choi.">
+  <section class="container section">
+    <h1 class="section-title" lang="en">Experience</h1>
+    <LanguageToggle initialLanguage="ko" />
+    <nav class="experience-nav" aria-label="Experience sections">
+      {sections.map((section) => <a href={`#${section.data.id}`}>{section.data.heading}</a>)}
+    </nav>
+    {sections.map((section) => (
+      <section id={section.data.id} class="profile-section" aria-labelledby={`${section.data.id}-heading`}>
+        <h2 id={`${section.data.id}-heading`} lang="en">{section.data.heading}</h2>
+        <ProfileEntryList entries={section.data.entries} labels={profile.data.labels} />
+      </section>
+    ))}
+  </section>
+</BaseLayout>

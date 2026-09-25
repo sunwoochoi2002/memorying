@@ -1,0 +1,30 @@
+---
+import type { ProfileEntry } from '../lib/content-schema';
+
+interface Props {
+  entries: ProfileEntry[];
+  labels: { more: { ko: string; en: string }; less: { ko: string; en: string } };
+}
+const { entries, labels } = Astro.props;
+---
+
+<ol class="profile-list">
+  {entries.map((entry) => (
+    <li class="profile-list-item">
+      <details>
+        <summary>
+          <span class="profile-list-heading"><span lang="en">{entry.title}</span><span class="profile-period">{entry.period}</span></span>
+          <span class="profile-action">
+            <span class="profile-more"><span lang="ko" data-language-fragment="ko">{labels.more.ko}</span><span lang="en" data-language-fragment="en" hidden>{labels.more.en}</span></span>
+            <span class="profile-less"><span lang="ko" data-language-fragment="ko">{labels.less.ko}</span><span lang="en" data-language-fragment="en" hidden>{labels.less.en}</span></span>
+          </span>
+        </summary>
+        <div class="profile-description">
+          <p lang="ko" data-language-fragment="ko">{entry.description.ko}</p>
+          <p lang="en" data-language-fragment="en" hidden>{entry.description.en}</p>
+          {entry.link && <p class="profile-link"><a href={entry.link.href} rel="noreferrer"><span lang="ko" data-language-fragment="ko">{entry.link.label.ko}</span><span lang="en" data-language-fragment="en" hidden>{entry.link.label.en}</span></a></p>}
+        </div>
+      </details>
+    </li>
+  ))}
+</ol>

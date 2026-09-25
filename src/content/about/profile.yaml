@@ -1,6 +1,3 @@
-# Edit this file to update the public About page. Keep both ko and en text complete.
-# The page sorts entries in each section by the first YYYY.MM in period.
-# Keep private information, grades, and source documents in docs/resume.md only.
 labels:
   pageTitle: About
   more:
@@ -12,226 +9,26 @@ labels:
 intro:
   ko:
     - 안녕하세요, 최선우입니다.
-    - 제 궁극적인 목표는 사람들, 특히 학생들이 본격적으로 진로와 커리어를 고민하고 선택하는 과정에서, 진정으로 행복하게 살 수 있는 선택지를 찾고 그 길로 나아갈 수 있도록 돕는 것입니다.
-    - 이를 기술적으로 구현하기 위해 Recommender Systems, Reinforcement Learning, Interactive Machine Learning (IML) 등에 관심을 갖고, 수학적인 배경을 바탕으로 공부하고 있습니다.
-    - 그리고 2026.02.02.부로 대한민국 육군으로 입대하여 현재 군복무 중이며, 자율시간을 활용해 공부 및 개인 프로젝트를 진행하고 있습니다.
+    - 제 궁극적인 목표는 사람들, 특히 학생들이 본격적으로 진로와 커리어를 고민하고 선택하는 과정에서, 진정으로 행복하게 살 수 있는 선택지를 찾고 그 길로 나아갈 수 있도록 돕는
+      것입니다.
+    - 이를 기술적으로 구현하기 위해 Recommender Systems, Reinforcement Learning, Interactive Machine Learning (IML) 등에
+      관심을 갖고, 수학적인 배경을 바탕으로 공부하고 있습니다.
+    - 그리고 2026년 2월 2일에 대한민국 육군에 입대하여 현재 군 복무 중이며, 자율 시간을 활용해 공부 및 개인 프로젝트를 진행하고 있습니다.
   en:
     - Hello, I’m Sunwoo Choi.
-    - My ultimate goal is to help people, especially students, explore and pursue paths that can lead to genuinely happy lives as they begin making meaningful decisions about their futures and careers.
-    - To put this goal into practice through technology, I am studying areas such as recommender systems, reinforcement learning, and interactive machine learning (IML), leveraging my background in mathematics.
-    - I’ve been serving in the Republic of Korea Army since February 2, 2026. In my free time, I continue studying and working on personal projects.
-sections:
-  - id: affiliations
-    heading: Selected Affiliations
-    featured: true
-    entries:
-      - title: Military Service @ Republic of Korea Army (ROKA)
-        period: 2026.02–Present
-        description:
-          ko: 2026년 2월부터 대한민국 육군에서 복무하고 있습니다. 개인정비시간에는 공부와 개인 프로젝트를 이어가고 있습니다.
-          en: I have been serving in the Republic of Korea Army since February 2026. During off-duty hours, I continue
-            to study and work on personal projects.
-      - title: Data Analytics Intern @ Chartmetric
-        period: 2025.06–2025.12
-        description:
-          ko: Chartmetric은 신뢰할 수 있는 데이터, 시각화, 심층 인사이트, 혁신적인 기능과 고객 지원을 통해 음악 산업에서 더 빠르고 현명한 의사결정을 돕습니다.
-          en: Chartmetric helps the music industry make smarter and faster music business decisions by providing
-            reliable data, beautiful visuals, in-depth insights, innovative features, and rockstar customer
-            support.
-      - title: Exchange Student @ TU Delft
-        period: 2024.02–2024.07
-        description:
-          ko: 네덜란드 TU Delft에서 교환학생으로 공부하며 Markov Processes, Modelling 2A, Responsible Data Analytics 등을 수강했습니다.
-          en: I studied at TU Delft in the Netherlands as an exchange student, taking courses including Markov
-            Processes, Modelling 2A, and Responsible Data Analytics.
-      - title: Mathematics @ POSTECH
-        period: 2021.02–Present
-        description:
-          ko: POSTECH에서 수학을 전공하고 Industrial & Management Engineering과 Entrepreneurship를 부전공하며 재학 중입니다.
-          en: I am a Mathematics student at POSTECH, minoring in Industrial & Management Engineering and
-            Entrepreneurship.
-  - id: work
-    heading: Work & Research
-    entries:
-      - title: Data Analytics Intern @ Chartmetric
-        period: 2025.06–2025.12
-        description:
-          ko: Chartmetric은 신뢰할 수 있는 데이터, 시각화, 심층 인사이트, 혁신적인 기능과 고객 지원을 통해 음악 산업에서 더 빠르고 현명한 의사결정을 돕습니다.
-          en: Chartmetric helps the music industry make smarter and faster music business decisions by providing
-            reliable data, beautiful visuals, in-depth insights, innovative features, and rockstar customer
-            support.
-      - title: Statistics & Data Science Lab @ POSTECH
-        period: "2025.02"
-        description:
-          ko: POSTECH 산업경영공학과 Statistics & Data Science Lab에서 Minwoo Chae 교수와 함께했습니다.
-          en: "Professor: Minwoo Chae."
-      - title: Stochastic Systems Lab @ POSTECH
-        period: 2024.09–2025.01
-        description:
-          ko: "지도교수: Young-Myoung Ko. 연구 주제: On-Device data generation을 위한 시뮬레이션."
-          en: "Professor: Young-Myoung Ko. Topic: Simulation for on-device data generation."
-      - title: Undergraduate Research Program (UGRP) @ POSTECH
-        period: 2022.03–2023.01
-        description:
-          ko: "연구 주제: 수면 데이터를 분석해 개인의 최적 수면 패턴을 도출하는 알고리즘 개발."
-          en: "Topic: Development of a sleep data analysis algorithm that derives an individual's optimal sleep
-            pattern."
-      - title: Statistical Data Analysis and Application Contest @ National Statistical Office
-        period: 2022.06–2022.08
-        description:
-          ko: "연구 주제: 농산물 가격 변동 분석과 변동성 예측 모형 설계."
-          en: "Topic: Analysis of agricultural price fluctuations and design of volatility prediction models."
-      - title: Financial Investment & Risk Management Lab @ POSTECH
-        period: 2022.01–2022.02
-        description:
-          ko: "지도교수: Bong-Gyu Jang. 연구 주제: 원·달러 환율 예측."
-          en: "Professor: Bong-Gyu Jang. Topic: Won-Dollar Exchange Rate Forecast."
-  - id: projects
-    heading: Projects & Achievements
-    entries:
-      - title: 2025 UGRP (Undergraduate Group Research Program) — Technology Entrepreneurship Track / Encouragement Prize
-        period: "2026.02"
-        description:
-          ko: 2025 UGRP Technology Entrepreneurship Track 장려상. 3인 팀의 팀장으로 로컬 파일을 인덱싱하고 RAG와 특화 Agent로 질의응답, 데이터 분석, 보고서
-            생성, 맞춤 추천을 제공하는 데스크톱 AI 비서 시제품 JARVIS를 만들었습니다.
-          en: Encouragement Prize, 2025 UGRP Technology Entrepreneurship Track. Led a three-person team to build JARVIS,
-            a desktop AI assistant prototype that indexes local files and uses RAG and specialized agents to
-            answer questions, analyze data, generate reports, and provide personalized recommendations.
-      - title: 1st SL BIOFUTURE START-UP CHALLENGE 2025 / Grand Prize
-        period: "2026.02"
-        description:
-          ko: 제1회 SL BIOFUTURE START-UP CHALLENGE 2025 대상. 팀과 함께 임상시험 결과를 예측하고 바이오 기업 데이터를 투자 위험 리포트로 만드는 AI 연구 플랫폼
-            BERA를 개발했습니다. 수상을 계기로 샌프란시스코의 JPM Healthcare Week를 방문해 글로벌 바이오 투자 생태계를 살펴봤습니다.
-          en: Grand Prize, 1st SL BIOFUTURE START-UP CHALLENGE 2025. Our team developed BERA, an AI research platform
-            that predicts clinical trial outcomes and turns biotech company data into investment-risk reports.
-            The award supported my visit to San Francisco during JPM Healthcare Week, where I explored the
-            global biotech investment ecosystem.
-      - title: 2025 START-UP 48 Inter-University Entrepreneurship Ideathon / 1st Prize
-        period: "2025.07"
-        description:
-          ko: START-UP 48 대학 연합 창업 아이디어톤 1위. POSTECH, Seoul National University, KAIST, Yonsei University, Korea
-            University 학생 48명이 참여하는 3일간의 행사입니다. 참가자는 팀을 이뤄 산업계 멘토의 지원을 받으며 아이디어 구상, 비즈니스 모델 개발, 시제품 제작, 최종
-            발표까지 창업 과정을 경험합니다.
-          en: 1st Prize, “START-UP 48” Inter-University Entrepreneurship Ideathon. START-UP 48 is a three-day
-            inter-university ideathon bringing together 48 students from POSTECH, Seoul National University,
-            KAIST, Yonsei University, and Korea University. Participants form teams and go through the full
-            startup journey, from idea generation and business model development to prototyping and final
-            pitching, supported by industry mentors.
-      - title: Global Student Startup Competition (GSSC) / Asian Leadership Conference 2025
-        period: "2025.05"
-        description:
-          ko: POSTECH 대표로 Human-Centered AI에 초점을 맞춘 글로벌 창업 프로그램에 참여했습니다. 한국의 주요 리더십 콘퍼런스에서 창업 역량을 키우고 국제 학생들과 인사이트를
-            교류했습니다.
-          en: POSTECH Representative, Global Student Startup Competition (GSSC), Asian Leadership Conference 2025.
-            Participated in a global entrepreneurship program focused on Human-Centered AI. Built
-            entrepreneurial competencies and exchanged insights with international students at Korea's premier
-            leadership conference.
-      - title: 2025 Techathon / 3rd Prize
-        period: "2025.01"
-        description:
-          ko: Techathon 3위. Technology와 Ideathon을 합친 이름으로, 기술을 바탕으로 창업 아이디어를 만들고 비즈니스 모델로 구체화하는 행사입니다.
-          en: 3rd Prize, “Techathon”. Techathon is a combination of “Technology” and “Ideathon,” a startup event where
-            participants develop startup ideas based on technology and refine them into business models.
-      - title: 2024 Crackathon / 3rd Prize
-        period: "2024.11"
-        description:
-          ko: Crackathon 3위. cracking과 ideathon을 합친 이름으로, 대기업의 관습적인 틀에서 벗어나는 혁신적인 아이디어를 제안하는 행사입니다.
-          en: 3rd Prize, “Crackathon”. Crackathon is a combination of “cracking” and “ideathon,” where participants
-            present innovative ideas to break away from the conventional frameworks of large corporations.
-      - title: 2024 POSTECH Mathematics Research Paper Award / Grand Prize
-        period: "2024.11"
-        description:
-          ko: "2024 POSTECH Mathematics Research Paper Award 대상. 논문: “Statistical Estimation of Prime Divisor CDF for
-            Finite N in Erdős-Kac Theorem.”"
-          en: "Grand Prize, 2024 POSTECH Mathematics Research Paper Award. Paper: “Statistical Estimation of Prime
-            Divisor CDF for Finite N in Erdős-Kac Theorem.”"
-      - title: Introducing My Research in 2023 / Finalist (Encouragement Prize)
-        period: "2023.11"
-        description:
-          ko: "Introducing My Research in 2023 최종 후보(장려상). 발표 주제: “Markov chain and its applications.”"
-          en: "Finalist (Encouragement Prize), “Introducing My Research in 2023”. Topic: “Markov chain and its
-            applications.”"
-        link:
-          href: https://youtu.be/XWeJFHQxELo?si=SbdSaJu-OA5N6v8l
-          label:
-            ko: 발표 영상
-            en: Presentation video
-  - id: activities
-    heading: Activities
-    entries:
-      - title: CES 2026
-        period: "2026.01"
-        description:
-          ko: 미국 Las Vegas에서 열린 CES 2026에 참석했습니다.
-          en: I attended CES 2026 in Las Vegas, USA.
-      - title: Korean Business Networking Conference (KBNC) 2025
-        period: "2025.06"
-        description:
-          ko: Korean Business Networking Conference (KBNC)는 비즈니스와 혁신에 열정을 가진 학생들을 연결하고 네트워크를 확장하는 행사입니다. KBO가 주최하며 글로벌
-            대학 학생들이 전문가 워크숍과 패널, 심층 커리어 토론, 의미 있는 네트워킹에 참여합니다.
-          en: The Korean Business Networking Conference (KBNC) aims to connect students passionate about business and
-            innovation while expanding this network further. Hosted by KBO, KBNC brings together global
-            universities for workshops and panels led by industry experts, in-depth career development
-            discussions, and meaningful networking opportunities.
-      - title: Tech-Review @ POSTECH
-        period: "2025.01"
-        description:
-          ko: Tech-Review는 POSTECH 창업 부서의 지원을 받는 조직입니다. 최신 기술 동향을 대학 구성원과 공유하고, 창업 문화를 조성하며, 기술의 가치를 알리는 것을 목표로 합니다.
-          en: Tech-Review is an organization supported by POSTECH's Startup Department. It aims to share the latest
-            technological trends with university members, foster an entrepreneurial culture, and highlight the
-            value of technology.
-      - title: Exchange Student @ TU Delft
-        period: 2024.02–2024.07
-        description:
-          ko: 네덜란드 TU Delft에서 교환학생으로 공부하며 Markov Processes, Modelling 2A, Responsible Data Analytics 등을 수강했습니다.
-          en: I studied at TU Delft in the Netherlands as an exchange student, taking courses including Markov
-            Processes, Modelling 2A, and Responsible Data Analytics.
-      - title: CES 2024
-        period: "2024.01"
-        description:
-          ko: 미국 Las Vegas에서 열린 CES 2024에 참석했습니다.
-          en: I attended CES 2024 in Las Vegas, USA.
-      - title: Department of Mathematics Representative @ POSTECH
-        period: 2023.01–2023.12
-        description:
-          ko: 2023년 POSTECH 수학과 학생대표로 활동했습니다.
-          en: I served as the student representative of POSTECH’s Department of Mathematics in 2023.
-      - title: Resident Director, Dormitory Building No. 8 @ POSTECH
-        period: 2023.02–2023.12
-        description:
-          ko: 2023년 POSTECH 기숙사 8동의 Resident Director로 활동했습니다.
-          en: I served as Resident Director of POSTECH Dormitory Building No. 8 in 2023.
-      - title: PAMSTER @ POSTECH
-        period: "2022.09"
-        description:
-          ko: POSTECH 비교과 활동 서포터 PAMSTER로 활동했습니다.
-          en: I participated in PAMSTER, POSTECH’s extracurricular activity supporter program.
-      - title: Vice-captain, CHEERO @ POSTECH
-        period: 2022.11–2023.10
-        description:
-          ko: POSTECH 응원 동아리 CHEERO의 부주장으로 활동했습니다.
-          en: I served as vice-captain of CHEERO, POSTECH’s cheerleading club.
-      - title: Exchange Student Buddy Program (PBUD) @ POSTECH
-        period: 2023.02–2023.06
-        description:
-          ko: POSTECH의 교환학생 버디 프로그램 PBUD에 참여했습니다.
-          en: I participated in PBUD, POSTECH’s exchange student buddy program.
-      - title: Student Cultural Planning Director, 36th Student Council @ POSTECH
-        period: 2022.01–2022.12
-        description:
-          ko: POSTECH 제36대 총학생회에서 문화기획부장을 맡았습니다.
-          en: I served as Director of Student Cultural Planning in POSTECH’s 36th Student Council.
-      - title: Head, Table-tennis Club @ POSTECH
-        period: 2022.09–2022.12
-        description:
-          ko: POSTECH 탁구 동아리 회장으로 활동했습니다.
-          en: I served as head of POSTECH’s table-tennis club.
-  - id: education
-    heading: Additional Education
-    entries:
-      - title: LG Aimers @ LG AI Research
-        period: 2022.07–2022.08
-        description:
-          ko: LG Aimers에서 Data Intelligence, 지도·비지도 학습, Explainable Artificial Intelligence (XAI)를 공부했습니다.
-          en: Through LG Aimers, I studied Data Intelligence, supervised and unsupervised learning, and Explainable
-            Artificial Intelligence (XAI).
+    - My ultimate goal is to help people, especially students, explore and pursue paths that can lead to
+      genuinely happy lives as they begin making meaningful decisions about their futures and careers.
+    - To put this goal into practice through technology, I am studying areas such as recommender systems,
+      reinforcement learning, and interactive machine learning (IML), leveraging my background in
+      mathematics.
+    - I’ve been serving in the Republic of Korea Army since February 2, 2026. In my free time, I continue
+      studying and working on personal projects.
+affiliations:
+  - title: Military Service @ Republic of Korea Army (ROKA)
+    period: 2026.02–Present
+  - title: Data Analytics Intern @ Chartmetric
+    period: 2025.06–2025.12
+  - title: Exchange Student @ TU Delft
+    period: 2024.02–2024.07
+  - title: Mathematics @ POSTECH
+    period: 2021.02–Present

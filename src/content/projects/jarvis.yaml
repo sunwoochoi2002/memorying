@@ -1,0 +1,10 @@
+name: JARVIS
+period: "2026.02"
+order: 2
+award: Encouragement Prize, 2025 UGRP Technology Entrepreneurship Track
+description:
+  ko: 3인 팀의 팀장으로 로컬 파일을 인덱싱하고 RAG와 특화 에이전트를 사용해 질의응답, 데이터 분석, 보고서 생성, 맞춤 추천을 제공하는 데스크톱
+    AI 비서 시제품 JARVIS를 만들었습니다.
+  en: Led a three-person team to build JARVIS, a desktop AI assistant prototype that indexes local files
+    and uses RAG and specialized agents to answer questions, analyze data, generate reports, and provide
+    personalized recommendations.

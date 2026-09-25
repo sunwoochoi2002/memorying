@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LanguageToggle from '../components/LanguageToggle.astro';
+import { loadProjects } from '../lib/content';
+
+const projects = await loadProjects();
+---
+
+<BaseLayout title="Projects" description="Projects by Sunwoo Choi.">
+  <section class="container section">
+    <h1 class="section-title" lang="en">Projects</h1>
+    <LanguageToggle initialLanguage="ko" />
+    <ol class="profile-list project-list">
+      {projects.map((project) => (
+        <li class="profile-list-item">
+          <h2 lang="en">{project.data.name}</h2>
+          <p class="profile-period">{project.data.period}</p>
+          {project.data.award && <p class="project-award" lang="en">{project.data.award}</p>}
+          <div class="profile-description">
+            <p lang="ko" data-language-fragment="ko">{project.data.description.ko}</p>
+            <p lang="en" data-language-fragment="en" hidden>{project.data.description.en}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+</BaseLayout>

@@ -1,0 +1,44 @@
+id: education
+heading: Education
+order: 1
+entries:
+  - title: Mathematics @ POSTECH
+    period: 2021.02–Present
+    description:
+      ko: "POSTECH에서 수학을 전공하고 Industrial & Management Engineering과 Entrepreneurship를 부전공하며 재학 중입니다. 수학 전공 수업:
+        Calculus I/II; Freshman Research Participation; Differential Equations; Applied Linear Algebra;
+        Probability and Statistics; Modern Algebra I/II; Analysis I/II; Introduction to Numerical
+        Analysis; Introduction to Probability Theory; Introduction to Mathematical Data Science;
+        Independent Study A; Mathematics for AI. Industrial & Management Engineering 부전공 수업: R
+        programming for data analysis; Investment Theory; Introduction to Financial Engineering;
+        Introduction to Experimental Design; Mathematical Programming. Entrepreneurship 부전공 수업:
+        Entrepreneurship; Principles of Business Administration; Entrepreneurship Seminar; Action
+        Learning in Business Planning. Computer Science & Engineering 수업: Programming and Problem
+        Solving; Introduction to Date Analysis; Object Oriented Programming; Data Structure."
+      en: "Mathematics student at POSTECH, minoring in Industrial & Management Engineering and
+        Entrepreneurship. Mathematics coursework: Calculus I/II; Freshman Research Participation;
+        Differential Equations; Applied Linear Algebra; Probability and Statistics; Modern Algebra I/II;
+        Analysis I/II; Introduction to Numerical Analysis; Introduction to Probability Theory;
+        Introduction to Mathematical Data Science; Independent Study A; Mathematics for AI. Industrial &
+        Management Engineering coursework: R programming for data analysis; Investment Theory;
+        Introduction to Financial Engineering; Introduction to Experimental Design; Mathematical
+        Programming. Entrepreneurship coursework: Entrepreneurship; Principles of Business
+        Administration; Entrepreneurship Seminar; Action Learning in Business Planning. Department of
+        Computer Science & Engineering coursework: Programming and Problem Solving; Introduction to Date
+        Analysis; Object Oriented Programming; Data Structure."
+  - title: Exchange Student @ TU Delft
+    period: 2024.02–2024.07
+    description:
+      ko: TU Delft의 Faculty of Electrical Engineering, Mathematics and Computer Science에서 Markov Processes와
+        Modelling 2A를, Faculty of Technology, Policy and Management에서 Responsible Data Analytics와 Writing
+        a Bachelor’s Thesis in English를 수강했습니다.
+      en: "Faculty of Electrical Engineering, Mathematics and Computer Science: Markov Processes; Modelling 2A.
+        Faculty of Technology, Policy and Management: Responsible Data Analytics; Writing a Bachelor’s
+        Thesis in English."
+  - title: LG Aimers @ LG AI Research
+    period: 2022.07–2022.08
+    description:
+      ko: LG Aimers에서 Data Intelligence, Supervised Learning and Unsupervised Learning, Explainable Artificial
+        Intelligence (XAI) and its Importance를 공부했습니다.
+      en: Data Intelligence; Supervised Learning and Unsupervised Learning; Explainable Artificial Intelligence
+        (XAI) and its Importance.

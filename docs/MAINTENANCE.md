@@ -32,7 +32,7 @@
 | 글 잠시 숨기기, 지우기 | 그 글의 `meta.yaml`, 폴더 | 3-4 |
 | 글에 사진 넣기·바꾸기·빼기 | 그 글 폴더의 `cover.*` 파일 | 3-5 |
 | 글 날짜 바꾸기 | 그 글의 `meta.yaml` | 3-6 |
-| About, 홈 소개, Work, 하단 링크, 구독 문구 | `src/pages/`, `src/components/`, `src/content/work/` | 3-7 |
+| About, Projects, Experience, 홈 소개, 하단 링크, 구독 문구 | `src/content/about/`, `src/content/projects/`, `src/content/experience/`, `src/components/` | 3-7 |
 | 뉴스레터 보내기 | `npm run newsletter`와 Buttondown 사이트 | 3-8 |
 
 ## 3. 자주 하는 작업
@@ -129,15 +129,16 @@ type: note    # Note
 | 바꾸고 싶은 것 | 파일 |
 | --- | --- |
 | 홈의 큰 제목과 한 줄 소개 | `src/components/PersonalIntroduction.astro` |
-| About 문장 | `src/pages/about.astro` |
+| About 소개와 소속 요약 | `src/content/about/profile.yaml`. [프로필 편집 안내](../src/content/about/README.md)를 참고합니다. |
 | Privacy 문장 | `src/pages/privacy.astro` |
-| Work 항목 | `src/content/work/` 안의 `.yaml` 파일. 새 항목은 파일을 하나 더 만들고 `order` 숫자로 순서를 정합니다. |
+| Projects 항목 | `src/content/projects/` 안의 `.yaml` 파일. `order` 숫자로 순서를 정하고 `description.ko`·`.en`을 함께 고칩니다. |
+| Experience 항목 | `src/content/experience/`의 해당 섹션 `.yaml` 파일. 항목은 파일 순서대로 표시됩니다. |
 | 위쪽 메뉴 | `src/components/SiteHeader.astro` |
 | 아래쪽 이름, GitHub, 이메일 링크 | `src/components/SiteFooter.astro` |
 | 구독 안내 문구 | `src/components/NewsletterSignup.astro` |
 | 색, 글꼴, 글자 크기, 간격 | `src/styles/global.css` |
 
-이 파일들의 문구는 자동 검사가 그대로 확인하고 있습니다. 문구만 바꿔도 검사가 실패할 수 있으니 **Claude에게 요청하는 것을 추천**합니다. 그러면 검사도 함께 고칩니다.
+프로필 YAML의 영문 설명은 `docs/resume.md`를 기준으로 고치고 한국어도 함께 확인합니다. 소개·군 복무·CES 2026의 기존 공개 문구는 예외입니다. 성적, 연락처, 사진, 원본 자료는 공개 YAML에 넣지 마세요. 변경 뒤에는 `npm run verify`로 검사합니다.
 
 ### 3-8. 뉴스레터 보내기
 

@@ -4,7 +4,7 @@ import { articlePath, loadWritingCases, representativeCases } from '../support/w
 const cases = loadWritingCases({ fixtures: true });
 const widths = [320, 390, 768, 1024, 1440];
 // One article with a cover and one without stand in for every article.
-const paths = ['/', '/writing/', ...representativeCases(cases).map(articlePath), '/work/', '/privacy/', '/404/'];
+const paths = ['/', '/about/', '/writing/', ...representativeCases(cases).map(articlePath), '/projects/', '/experience/', '/privacy/', '/404/'];
 
 for (const width of widths) {
   for (const path of paths) {
@@ -54,6 +54,7 @@ test('site writing actions provide 44px touch targets at 320px', async ({ page }
   expect(Number.parseFloat(navFocus.outlineWidth)).toBeGreaterThanOrEqual(3);
   expect(navFocus.boxShadow).not.toBe('none');
 
+  await page.keyboard.press('Tab');
   await page.keyboard.press('Tab');
   await page.keyboard.press('Tab');
   await page.keyboard.press('Tab');

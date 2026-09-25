@@ -27,15 +27,6 @@ export interface WritingTranslationDataEntry {
   data: WritingTranslationEntryData;
 }
 
-export interface WorkEntryData {
-  order: number;
-}
-
-export interface WorkDataEntry {
-  id: string;
-  data: WorkEntryData;
-}
-
 export interface PreparedWritingPair<
   TMeta extends WritingMetadataDataEntry,
   TTranslation extends WritingTranslationDataEntry,
@@ -136,11 +127,4 @@ export function prepareWritingData<
     items: visibleItems,
     pairs: visibleItems.map((item) => pairsByItem.get(item)!),
   };
-}
-
-export function sortWorkData<TEntry extends WorkDataEntry>(entries: readonly TEntry[]): TEntry[] {
-  return [...entries].sort((left, right) => {
-    const byOrder = left.data.order - right.data.order;
-    return byOrder || compareCodePointStrings(left.id, right.id);
-  });
 }

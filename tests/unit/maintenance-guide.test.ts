@@ -17,7 +17,7 @@ describe('Korean maintenance guide', () => {
     for (const heading of ['새 글 추가', '글 내용 고치기', 'Essay와 Note 바꾸기', '글 숨기기와 삭제', '사진 넣기', '뉴스레터', '되돌리기', '문제가 생겼을 때']) {
       expect(guide).toContain(heading);
     }
-    for (const path of ['src/content/writing/', 'src/content/work/', 'src/pages/about.astro', 'src/components/PersonalIntroduction.astro']) {
+    for (const path of ['src/content/writing/', 'src/content/about/profile.yaml', 'src/content/projects/', 'src/content/experience/', 'src/components/PersonalIntroduction.astro']) {
       expect(guide).toContain(path);
     }
     expect(guide).toContain('https://sunwoochoi.com');

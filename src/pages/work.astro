@@ -1,16 +1,3 @@
 ---
-import WorkList from '../components/WorkList.astro';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { loadWork } from '../lib/content';
-
-const work = await loadWork();
+return Astro.redirect('/projects/', 301);
 ---
-
-<BaseLayout title="Work" description="Selected work by Sunwoo Choi." lang="en">
-  <section class="container section">
-    <h1 class="section-title">Selected work</h1>
-    <div class="work-body">
-      {work.length ? <WorkList entries={work} /> : <p class="empty-state">Selected work will appear here.</p>}
-    </div>
-  </section>
-</BaseLayout>

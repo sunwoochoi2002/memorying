@@ -20,7 +20,7 @@ I deleted Instagram, YouTube, and my stock-trading app from my phone.
 
 Other than occasionally opening YouTube for something long-form, let us keep living clean for as long as possible.
 
-1. **A promise**
+2. **A promise**
 
 No matter how small it is, if I made a plan, I will keep it.
 

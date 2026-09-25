@@ -7,6 +7,9 @@ Memorying은 글을 중심으로 운영하는 이중 언어 아카이브입니�
 | 경로 | 용도 |
 | --- | --- |
 | `src/content/writing/<slug>/` | 글 한 편의 언어별 제목·본문, 메타데이터, 선택 사진을 함께 보관합니다. |
+| `src/content/about/profile.yaml` | About 소개와 네 개의 소속 요약입니다. |
+| `src/content/projects/*.yaml` | Projects에 표시할 프로젝트별 한국어·영어 설명입니다. |
+| `src/content/experience/*.yaml` | Experience의 교육·일과 연구·활동·수상 기록입니다. 자세한 편집법은 `src/content/about/README.md`를 봅니다. |
 | `src/components/`, `src/pages/`, `src/layouts/` | 페이지의 모양과 구성입니다. 글 내용 수정과는 보통 관계가 없습니다. |
 | `src/styles/global.css` | 색, 글꼴, 간격, 화면 배치의 기준입니다. 글꼴 파일은 npm 패키지(`@fontsource/instrument-serif`, `@fontsource-variable/noto-serif-kr`)에서 오며 직접 수정하지 않습니다. |
 | `src/lib/` | 글 목록, 언어 전환처럼 여러 화면이 함께 쓰는 규칙입니다. |

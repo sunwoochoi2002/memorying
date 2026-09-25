@@ -3,7 +3,7 @@ import { articlePath, loadWritingCases } from '../support/writing-content';
 
 const cases = loadWritingCases({ fixtures: true });
 const koreanOriginal = cases.find((item) => item.originalLanguage === 'ko')!;
-const pages = ['/', '/writing/', articlePath(cases[0]), '/about/', '/work/', '/privacy/'];
+const pages = ['/', '/writing/', articlePath(cases[0]), '/about/', '/projects/', '/experience/', '/privacy/'];
 
 for (const width of [390, 1280, 1440]) {
   test(`keeps every page in one centered 39rem column at ${width}px`, async ({ page }) => {

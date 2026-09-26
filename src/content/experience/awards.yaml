@@ -59,17 +59,17 @@ entries:
     originalLanguage: ko
     description:
       ko: |-
-        "2024 POSTECH Mathematics Research Paper Award 대상.
-        논문: “Statistical Estimation of Prime Divisor CDF for Finite N in Erdős-Kac Theorem.”"
-      en: "Paper: “Statistical Estimation of Prime Divisor CDF for Finite N in Erdős-Kac Theorem.”"
+        2024 POSTECH Mathematics Research Paper Award 대상.
+        논문: Statistical Estimation of Prime Divisor CDF for Finite N in Erdős-Kac Theorem.
+      en: "Paper: Statistical Estimation of Prime Divisor CDF for Finite N in Erdős-Kac Theorem."
   - title: Introducing My Research in 2023 / Finalist (Encouragement Prize)
     period: "2023.11"
     originalLanguage: ko
     description:
       ko: |-
-        "Introducing My Research in 2023 최종 후보(장려상).
-        발표 주제: “Markov chain and its applications.”"
-      en: "Topic: “Markov chain and its applications.”"
+        Introducing My Research in 2023 최종 후보(장려상).
+        발표 주제: Markov chain and its applications.
+      en: "Topic: Markov chain and its applications."
     ##link:
     ##  href: https://youtu.be/XWeJFHQxELo?si=SbdSaJu-OA5N6v8l
     ##  label:

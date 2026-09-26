@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   prepareWritingData,
   resolveIncludeDrafts,
-  sortWorkData,
   type WritingMetadataEntryData,
   type WritingTranslationEntryData,
 } from '../../src/lib/content-data';
@@ -44,20 +43,6 @@ const pair = (slug: string, overrides: Partial<WritingMetadataEntryData> = {}) =
     translationEntry(`${slug}/ko`, `Korean ${slug}`),
     translationEntry(`${slug}/en`, `English ${slug}`),
   ],
-});
-
-const workEntry = (id: string, order: number) => ({
-  id,
-  collection: 'work' as const,
-  filePath: `src/content/work/${id}.yaml`,
-  data: {
-    title: `Work ${id}`,
-    period: '2026',
-    role: 'Designer and Developer',
-    description: `Description for ${id}`,
-    status: 'Active',
-    order,
-  },
 });
 
 describe('content data preparation', () => {
@@ -269,16 +254,4 @@ describe('content data preparation', () => {
     expect(resolveIncludeDrafts(true, false)).toBe(true);
   });
 
-  it('sorts work by numeric order and uses ID as a deterministic tie-breaker', () => {
-    const laterB = workEntry('b', 2);
-    const first = workEntry('first', 1);
-    const laterA = workEntry('a', 2);
-    const input = [laterB, first, laterA];
-
-    const result = sortWorkData(input);
-
-    expect(result.map(({ id }) => id)).toEqual(['first', 'a', 'b']);
-    expect(result[0]).toBe(first);
-    expect(input).toEqual([laterB, first, laterA]);
-  });
 });

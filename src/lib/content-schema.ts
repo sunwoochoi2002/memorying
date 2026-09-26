@@ -45,26 +45,19 @@ export function createWritingMetadataSchema<T extends z.ZodType>(imageSchema: T)
     });
 }
 
-const workCoreSchema = z.object({
+const bilingualTextSchema = z.strictObject({ ko: nonemptyTextSchema, en: nonemptyTextSchema });
+// An absolute URL, or a path on this site such as /projects/#jarvis.
+const profileLinkHrefSchema = z.union([z.url(), z.string().regex(/^\/(?!\/)\S*$/)]);
+const profilePeriodSchema = nonemptyTextSchema.regex(/^\d{4}\.\d{2}(?:–(?:\d{4}\.\d{2}|Present))?$/);
+const profileEntrySchema = z.strictObject({
   title: nonemptyTextSchema,
   period: nonemptyTextSchema,
-  role: nonemptyTextSchema,
-  description: nonemptyTextSchema,
-  status: nonemptyTextSchema.optional(),
-  url: z.url().optional(),
-  order: z.number().int().nonnegative(),
-});
-
-const bilingualTextSchema = z.strictObject({ ko: nonemptyTextSchema, en: nonemptyTextSchema });
-
-const aboutEntrySchema = z.strictObject({
-  title: nonemptyTextSchema,
-  period: nonemptyTextSchema.regex(/^\d{4}\.\d{2}(?:–(?:\d{4}\.\d{2}|Present))?$/),
+  originalLanguage: z.enum(['ko', 'en']),
   description: bilingualTextSchema,
-  link: z.strictObject({ href: z.url(), label: bilingualTextSchema }).optional(),
+  link: z.strictObject({ href: profileLinkHrefSchema, label: bilingualTextSchema }).optional(),
 });
 
-export type AboutEntry = z.infer<typeof aboutEntrySchema>;
+export type ProfileEntry = z.infer<typeof profileEntrySchema>;
 
 export function createAboutSchema() {
   return z.strictObject({
@@ -77,15 +70,29 @@ export function createAboutSchema() {
       ko: z.array(nonemptyTextSchema).min(1),
       en: z.array(nonemptyTextSchema).min(1),
     }),
-    sections: z.array(z.strictObject({
-      id: nonemptyTextSchema.regex(/^[a-z][a-z-]*$/),
-      heading: nonemptyTextSchema,
-      featured: z.boolean().default(false),
-      entries: z.array(aboutEntrySchema).min(1),
-    })).min(1),
+    affiliations: z.array(z.strictObject({
+      title: nonemptyTextSchema,
+      period: profilePeriodSchema,
+    })).length(4),
   });
 }
 
-export function createWorkSchema<T extends z.ZodType>(imageSchema: T) {
-  return workCoreSchema.extend({ image: imageSchema.optional() });
+export function createProjectSchema() {
+  return z.strictObject({
+    name: nonemptyTextSchema,
+    period: nonemptyTextSchema,
+    order: z.number().int().nonnegative(),
+    description: bilingualTextSchema,
+    award: nonemptyTextSchema.optional(),
+    url: z.url().optional(),
+  });
+}
+
+export function createExperienceSchema() {
+  return z.strictObject({
+    id: z.enum(['education', 'work-research', 'activities', 'awards']),
+    heading: nonemptyTextSchema,
+    order: z.number().int().nonnegative(),
+    entries: z.array(profileEntrySchema).min(1),
+  });
 }

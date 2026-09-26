@@ -3,7 +3,6 @@ import type { ImageMetadata } from 'astro';
 import {
   prepareWritingData,
   resolveIncludeDrafts,
-  sortWorkData,
   type PreparedWritingPair,
 } from './content-data';
 import type { WritingArticle } from './writing';
@@ -14,7 +13,8 @@ import {
 
 export type WritingEntry = CollectionEntry<'writing'>;
 export type WritingMetaEntry = CollectionEntry<'writingMeta'>;
-export type WorkEntry = CollectionEntry<'work'>;
+export type ProjectEntry = CollectionEntry<'projects'>;
+export type ExperienceEntry = CollectionEntry<'experience'>;
 export type LoadedWritingArticle = PreparedWritingPair<WritingMetaEntry, WritingEntry>;
 
 // Covers attach by slug, so fixture covers are inert unless WRITING_FIXTURES=1 loaded
@@ -66,6 +66,10 @@ export async function loadWritingArticleEntries(
   return (await loadPreparedWriting(includeDrafts)).pairs;
 }
 
-export async function loadWork(): Promise<WorkEntry[]> {
-  return sortWorkData(await getCollection('work'));
+export async function loadProjects(): Promise<ProjectEntry[]> {
+  return (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+}
+
+export async function loadExperience(): Promise<ExperienceEntry[]> {
+  return (await getCollection('experience')).sort((a, b) => a.data.order - b.data.order);
 }

@@ -1,0 +1,76 @@
+id: awards
+heading: Awards
+order: 4
+entries:
+  - title: 1st SL BIOFUTURE START-UP CHALLENGE 2025 / Grand Prize
+    period: "2026.02"
+    originalLanguage: ko
+    description:
+      ko: 임상시험 결과를 예측하고 바이오 기업 데이터를 투자 위험 보고서로 만드는 AI 연구 플랫폼 BERA로 팀이 대상을 받았습니다. 저는 리서치
+        담당 팀원으로 참여해 시장 조사와 기술 조사를 맡았습니다. 수상을 계기로 San Francisco의 JPM Healthcare Week를 방문해 글로벌 바이오 투자
+        생태계를 살펴봤습니다.
+      en: Our team won the Grand Prize with BERA, an AI research platform that predicts clinical trial
+        outcomes and turns biotech company data into investment-risk reports. As a team member focused on research, I
+        was responsible for market research and technology research. The award supported my visit to San
+        Francisco during JPM Healthcare Week, where I explored the global biotech investment ecosystem.
+  - title: 2025 UGRP Technology Entrepreneurship Track / Encouragement Prize
+    period: "2026.02"
+    originalLanguage: ko
+    description:
+      ko: JARVIS 프로젝트로 장려상을 받았습니다.
+      en: Received the Encouragement Prize with the JARVIS project.
+    link:
+      href: /projects/#jarvis
+      label:
+        ko: JARVIS 프로젝트 보기
+        en: View the JARVIS project
+  - title: 2025 START-UP 48 Inter-University Entrepreneurship Ideathon / 1st Prize
+    period: "2025.07"
+    originalLanguage: ko
+    description:
+      ko: START-UP 48 대학 연합 창업 아이디어톤은 POSTECH, Seoul National University, KAIST, Yonsei University, Korea
+        University 학생 48명이 참여하는 3일간의 행사입니다. 참가자는 팀을 이뤄 산업계 멘토의 지원을 받으며 아이디어 구상, 비즈니스 모델 개발, 시제품 제작, 최종
+        발표까지 창업 과정을 경험합니다.
+      en: START-UP 48 is a three-day inter-university ideathon bringing together 48 students from POSTECH,
+        Seoul National University, KAIST, Yonsei University, and Korea University. Participants form
+        teams and go through the full startup journey, from idea generation and business model
+        development to prototyping and final pitching, supported by industry mentors.
+  - title: Academic Excellence Recognition, Department of Mathematics @ POSTECH
+    period: Fall 2024, Spring 2025
+    originalLanguage: ko
+    description:
+      ko: POSTECH 수학과에서 2024년 가을학기와 2025년 봄학기에 성적우수를 받았습니다.
+      en: Academic Excellence Recognition, Department of Mathematics, POSTECH — Fall 2024 and Spring 2025.
+  - title: 2025 Techathon / 3rd Prize
+    period: "2025.01"
+    originalLanguage: ko
+    description:
+      ko: Technology와 Ideathon을 합친 이름으로, 기술을 바탕으로 창업 아이디어를 만들고 비즈니스 모델로 구체화하는 행사입니다.
+      en: Techathon is a combination of “Technology” and “Ideathon,” a startup event where participants develop
+        startup ideas based on technology and refine them into business models.
+  - title: 2024 Crackathon / 3rd Prize
+    period: "2024.11"
+    originalLanguage: ko
+    description:
+      ko: cracking과 ideathon을 합친 이름으로, 대기업의 관습적인 틀에서 벗어나는 혁신적인 아이디어를 제안하는 행사입니다.
+      en: Crackathon is a combination of “cracking” and “ideathon,” where participants present innovative ideas
+        to break away from the conventional frameworks of large corporations.
+  - title: 2024 POSTECH Mathematics Research Paper Award / Grand Prize
+    period: "2024.11"
+    originalLanguage: ko
+    description:
+      ko: "2024 POSTECH Mathematics Research Paper Award 대상.
+          논문: “Statistical Estimation of Prime Divisor CDF for Finite N in Erdős-Kac Theorem.”"
+      en: "Paper: “Statistical Estimation of Prime Divisor CDF for Finite N in Erdős-Kac Theorem.”"
+  - title: Introducing My Research in 2023 / Finalist (Encouragement Prize)
+    period: "2023.11"
+    originalLanguage: ko
+    description:
+      ko: "Introducing My Research in 2023 최종 후보(장려상).
+          발표 주제: “Markov chain and its applications.”"
+      en: "Topic: “Markov chain and its applications.”"
+    ##link:
+    ##  href: https://youtu.be/XWeJFHQxELo?si=SbdSaJu-OA5N6v8l
+    ##  label:
+    ##    ko: 발표 영상
+    ##    en: Presentation video

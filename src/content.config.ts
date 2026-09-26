@@ -2,7 +2,8 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import {
   createAboutSchema,
-  createWorkSchema,
+  createExperienceSchema,
+  createProjectSchema,
   createWritingMetadataSchema,
   createWritingTranslationSchema,
 } from './lib/content-schema';
@@ -37,9 +38,14 @@ const writingMeta = defineCollection({
   schema: ({ image }) => createWritingMetadataSchema(image()),
 });
 
-const work = defineCollection({
-  loader: glob({ pattern: '**/*.(yaml|yml)', base: './src/content/work' }),
-  schema: ({ image }) => createWorkSchema(image()),
+const projects = defineCollection({
+  loader: glob({ pattern: '**/*.(yaml|yml)', base: './src/content/projects' }),
+  schema: createProjectSchema(),
+});
+
+const experience = defineCollection({
+  loader: glob({ pattern: '**/*.(yaml|yml)', base: './src/content/experience' }),
+  schema: createExperienceSchema(),
 });
 
 const about = defineCollection({
@@ -47,4 +53,4 @@ const about = defineCollection({
   schema: createAboutSchema(),
 });
 
-export const collections = { writing, writingMeta, work, about };
+export const collections = { writing, writingMeta, projects, experience, about };

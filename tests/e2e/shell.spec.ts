@@ -11,9 +11,11 @@ test('renders global identity, navigation, metadata, and footer', async ({ page 
   await expect(page.locator('#main-content')).toBeFocused();
   await expect(page.getByRole('link', { name: 'Sunwoo Choi' })).toHaveAttribute('href', '/');
   await expect(page.getByRole('navigation', { name: 'Primary' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'About' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Writing' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Work' })).toBeVisible();
+  const links = page.getByRole('navigation', { name: 'Primary' }).getByRole('link');
+  await expect(links).toHaveText(['About', 'Writing', 'Projects', 'Experience']);
+  for (const [index, href] of ['/about/', '/writing/', '/projects/', '/experience/'].entries()) {
+    await expect(links.nth(index)).toHaveAttribute('href', href);
+  }
   await expect(page).toHaveTitle('Sunwoo Choi');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', canonicalUrl);
   await expect(page.getByRole('contentinfo')).toContainText('Sunwoo Choi');

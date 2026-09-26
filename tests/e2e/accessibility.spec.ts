@@ -12,7 +12,7 @@ const articleKinds = [...new Set([
   cases.find((item) => item.cover),
 ].filter((item) => item !== undefined))];
 
-for (const path of ['/', '/about/', '/writing/', ...articleKinds.map(articlePath), '/work/', '/privacy/', '/404/']) {
+for (const path of ['/', '/about/', '/writing/', ...articleKinds.map(articlePath), '/projects/', '/experience/', '/privacy/', '/404/']) {
   test(`${path} has no serious or critical axe violations`, async ({ page }) => {
     const response = await page.goto(path);
     expect(response?.status()).toBe(path === '/404/' ? 404 : 200);

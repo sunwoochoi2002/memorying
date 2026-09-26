@@ -1,0 +1,45 @@
+id: work-research
+heading: Work & Lab Research
+order: 2
+entries:
+  - title: Data Analytics Intern @ Chartmetric
+    period: 2025.06–2025.12
+    originalLanguage: ko
+    description:
+      ko: Chartmetric은 신뢰할 수 있는 데이터, 시각화, 심층 인사이트, 혁신적인 기능과 고객 지원을 통해 음악 산업에서 더 빠르고 현명한 의사결정을 돕습니다.
+          저는 데이터 분석 인턴으로서 플레이리스트 추천, 아티스트를 위한 투어 장소 및 SNS 포스트 추천에 관한 프로젝트를 맡아 로직 고안부터 SQL 쿼리 구현까지의 전 과정을 맡았습니다.
+      en: Chartmetric helps the music industry make smarter and faster music business decisions by providing
+        reliable data, beautiful visuals, in-depth insights, innovative features, and rockstar customer
+        support. As a data analytics intern, I worked on projects recommending playlists, as well as tour
+        venues and social media posts for artists, taking charge of the entire process from designing the logic
+        to implementing it in SQL queries.
+  - title: Statistics & Data Science Lab @ POSTECH
+    period: 2025.02–2025.06
+    originalLanguage: ko
+    description:
+      ko: |-
+        지도교수: Minwoo Chae.
+        연구 주제: Bayesian Statistics for Data Analysis.
+      en: |-
+        Professor: Minwoo Chae.
+        Topic: Bayesian Statistics for Data Analysis.
+  - title: Stochastic Systems Lab @ POSTECH
+    period: 2024.09–2025.01
+    originalLanguage: ko
+    description:
+      ko: |-
+        지도교수: Young-Myoung Ko.
+        연구 주제: 온디바이스 데이터 생성을 위한 시뮬레이션 방법론.
+      en: |-
+        Professor: Young-Myoung Ko.
+        Topic: Simulation for on-device data generation.
+  - title: Financial Investment & Risk Management Lab @ POSTECH
+    period: 2022.01–2022.02
+    originalLanguage: ko
+    description:
+      ko: |-
+        지도교수: Bong-Gyu Jang.
+        연구 주제: 원·달러 환율 예측.
+      en: |-
+        Professor: Bong-Gyu Jang.
+        Topic: Won-Dollar Exchange Rate Forecast.

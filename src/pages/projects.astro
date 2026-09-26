@@ -12,7 +12,7 @@ const projects = await loadProjects();
     <LanguageToggle initialLanguage="ko" />
     <ol class="profile-list project-list">
       {projects.map((project) => (
-        <li class="profile-list-item">
+        <li class="profile-list-item" id={project.id}>
           <h2 lang="en">{project.data.name}</h2>
           <p class="profile-period">{project.data.period}</p>
           {project.data.award && <p class="project-award" lang="en">{project.data.award}</p>}

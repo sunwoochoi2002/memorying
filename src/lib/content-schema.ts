@@ -46,12 +46,15 @@ export function createWritingMetadataSchema<T extends z.ZodType>(imageSchema: T)
 }
 
 const bilingualTextSchema = z.strictObject({ ko: nonemptyTextSchema, en: nonemptyTextSchema });
+// An absolute URL, or a path on this site such as /projects/#jarvis.
+const profileLinkHrefSchema = z.union([z.url(), z.string().regex(/^\/(?!\/)\S*$/)]);
 const profilePeriodSchema = nonemptyTextSchema.regex(/^\d{4}\.\d{2}(?:–(?:\d{4}\.\d{2}|Present))?$/);
 const profileEntrySchema = z.strictObject({
   title: nonemptyTextSchema,
   period: nonemptyTextSchema,
+  originalLanguage: z.enum(['ko', 'en']),
   description: bilingualTextSchema,
-  link: z.strictObject({ href: z.url(), label: bilingualTextSchema }).optional(),
+  link: z.strictObject({ href: profileLinkHrefSchema, label: bilingualTextSchema }).optional(),
 });
 
 export type ProfileEntry = z.infer<typeof profileEntrySchema>;

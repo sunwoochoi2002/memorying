@@ -85,7 +85,7 @@ button { cursor: pointer; }
 .profile-less, details[open] .profile-more { display: none; }
 details[open] .profile-less { display: inline; }
 .profile-description { margin-top: 0.65rem; }
-.profile-description p { margin: 0; font-family: var(--serif-ko); font-size: 0.9375rem; line-height: 1.85; overflow-wrap: anywhere; word-break: keep-all; }
+.profile-description p { margin: 0; font-family: var(--serif-ko); font-size: 0.9375rem; line-height: 1.85; overflow-wrap: anywhere; word-break: keep-all; white-space: pre-line; }
 .profile-description p:lang(en) { font-family: var(--serif-display); font-size: 1.1875rem; line-height: 1.65; word-break: normal; }
 .profile-description .profile-link { margin-top: 0.625rem; }
 .profile-link a { color: var(--accent); }

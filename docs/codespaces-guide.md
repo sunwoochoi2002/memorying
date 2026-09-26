@@ -19,11 +19,7 @@ npm ci
 
 `git status --short` 출력이 비어 있지 않으면 여기서 멈추세요. 현재 브랜치의 기존 작업을 이해하고 해당 브랜치에서 안전하게 커밋하고 push한 후에만 `git switch main`과 `git pull --ff-only origin main`을 실행하세요.
 
-수정 전에는 작업 목적을 나타내는 새 브랜치를 만드세요. 예를 들어 다음 글을 준비한다면:
-
-```bash
-git switch -c feature/next-writing-update
-```
+수정은 `main`에서 바로 합니다. 작업용 브랜치나 Pull Request는 만들지 않습니다. 자세한 배포 순서는 [`MAINTENANCE.md`](MAINTENANCE.md)의 4번 「배포하는 순서」를 따릅니다.
 
 ## Codex 시작
 
@@ -52,7 +48,7 @@ npm run verify
 git status --short
 ```
 
-변경 범위를 확인하고 커밋한 뒤 feature 브랜치를 push하세요. 원격 반영을 확인한 다음 `codex logout`을 실행하세요. Codespace를 중지하거나 삭제하기 전에는 항상 `codex logout`을 실행하세요. 이어서 ChatGPT와 GitHub에서 로그아웃하고 private 창을 닫습니다.
+변경 범위를 확인하고 커밋합니다. `main`에 push하면 1~2분 뒤 사이트에 자동으로 배포되므로, `npm run verify`가 통과한 뒤에만 `main`에 push하세요(`git push`). 아직 공개하면 안 되는 글은 `draft: true`로 두면 push해도 사이트에 나오지 않습니다. 원격 반영을 확인한 다음 `codex logout`을 실행하세요. Codespace를 중지하거나 삭제하기 전에는 항상 `codex logout`을 실행하세요. 이어서 ChatGPT와 GitHub에서 로그아웃하고 private 창을 닫습니다.
 
 ## Codespace 삭제
 

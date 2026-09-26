@@ -5,13 +5,14 @@
 - 사이트 주소: https://sunwoochoi.com
 - 저장소: https://github.com/sunwoochoi2002/memorying
 - 폴더가 무엇인지 궁금하면 [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md)를 보세요.
+- 굵게·기울임·문단·링크 등 글쓰기 문법은 [`MARKDOWN_GUIDE.md`](MARKDOWN_GUIDE.md)를 보세요. “문법 확인해 줘”라고 요청하면 [검토 스킬](../skills/review-grammar/SKILL.md)에 따라 원문 수정 없이 제안만 받으며, 실제 수정은 직접 반영합니다.
 - 지금까지 무엇을 했는지 궁금하면 [`docs/CURRENT_WORK.md`](CURRENT_WORK.md)를 보세요.
 
 ## 1. 두 가지 방법
 
 **방법 A. Claude에게 부탁하기 (추천)**
 
-말로 요청하면 됩니다. 수정, 검사, 미리보기 만들기, 병합 요청까지 Claude가 진행하고, 병합 여부만 사용자에게 묻습니다. 요청은 이렇게 하면 됩니다.
+말로 요청하면 됩니다. 수정과 검사는 Claude가 진행하고, 검사를 통과하면 배포할지 한 번만 묻습니다. 요청에 "배포까지 해 줘"를 붙이면 묻지 않고 바로 배포합니다. 요청은 이렇게 하면 됩니다.
 
 - "새 글을 추가하고 싶어. 제목은 ○○이고 한국어 원문이야. 내용은 아래와 같아."
 - "『홀로-』를 Note로 바꿔 줘."
@@ -131,14 +132,14 @@ type: note    # Note
 | 홈의 큰 제목과 한 줄 소개 | `src/components/PersonalIntroduction.astro` |
 | About 소개와 소속 요약 | `src/content/about/profile.yaml`. [프로필 편집 안내](../src/content/about/README.md)를 참고합니다. |
 | Privacy 문장 | `src/pages/privacy.astro` |
-| Projects 항목 | `src/content/projects/` 안의 `.yaml` 파일. `order` 숫자로 순서를 정하고 `description.ko`·`.en`을 함께 고칩니다. |
-| Experience 항목 | `src/content/experience/`의 해당 섹션 `.yaml` 파일. 항목은 파일 순서대로 표시됩니다. |
+| Projects 항목 | `src/content/projects/` 안의 `.yaml` 파일. `order` 숫자로 순서를 정하고 `description.ko`·`.en`을 함께 고칩니다. 수상이 있으면 `award`에 적고, Awards에도 링크와 함께 추가합니다([프로필 편집 안내](../src/content/about/README.md) 참고). |
+| Experience 항목 | `src/content/experience/`의 해당 섹션 `.yaml` 파일. 항목은 파일 순서대로 표시되며, 끝난 시점이 최근인 것부터(진행 중인 항목이 맨 위) 적습니다. 항목마다 설명의 원문 언어를 `originalLanguage: ko` 또는 `en`으로 적습니다. |
 | 위쪽 메뉴 | `src/components/SiteHeader.astro` |
 | 아래쪽 이름, GitHub, 이메일 링크 | `src/components/SiteFooter.astro` |
 | 구독 안내 문구 | `src/components/NewsletterSignup.astro` |
 | 색, 글꼴, 글자 크기, 간격 | `src/styles/global.css` |
 
-프로필 YAML의 영문 설명은 `docs/resume.md`를 기준으로 고치고 한국어도 함께 확인합니다. 소개·군 복무·CES 2026의 기존 공개 문구는 예외입니다. 성적, 연락처, 사진, 원본 자료는 공개 YAML에 넣지 마세요. 변경 뒤에는 `npm run verify`로 검사합니다.
+프로필 YAML의 문구는 직접 고쳐도 되며, 한국어와 영문을 함께 맞춥니다. 이력 설명의 영문은 `docs/resume.md`를 참고합니다. 검사는 문구가 아니라 형식만 확인하므로, 문구를 바꿔도 검사를 고칠 필요가 없습니다(6번 참고). 성적, 연락처, 사진, 원본 자료는 공개 YAML에 넣지 마세요. 변경 뒤에는 `npm run verify`로 검사합니다.
 
 ### 3-8. 뉴스레터 보내기
 
@@ -177,16 +178,19 @@ npm run newsletter -- remembering-summer
 
 ## 4. 배포하는 순서
 
-`main` 브랜치에 병합되면 사이트가 **자동으로 배포**됩니다. 그래서 직접 `main`에 올리지 않고, 다음 순서를 지킵니다. Claude에게 부탁하면 1번부터 6번까지 진행해 줍니다.
+개인 사이트이므로 작업용 브랜치나 Pull Request(PR) 없이 `main` 브랜치에서 바로 고치고 올립니다. `main`에 올리면(push) 1~2분 뒤 사이트에 **자동으로 배포**됩니다. 그래서 올리기 전에 검사 하나만 반드시 통과시킵니다.
 
-1. 작업용 브랜치를 만듭니다. 예: `git switch -c content/remembering-summer`
+1. 작업 전에 최신 내용을 받습니다: `git switch main` 후 `git pull`
 2. 파일을 고칩니다.
-3. 미리보기로 확인합니다: `npm run dev -- --host 0.0.0.0` 후 Codespaces의 포트 4321을 엽니다. 이 포트는 private으로 유지하세요.
-4. 전체 검사를 돌립니다. 2분 정도 걸립니다: `npm run verify`
-5. 커밋하고 push한 뒤 GitHub에서 Pull Request(PR)를 만듭니다.
-6. PR에서 GitHub 검사(`verify`)가 초록색인지 확인합니다. Cloudflare가 이 PR용 **미리보기 주소**도 자동으로 만들어 줍니다. 주소는 `https://<브랜치 이름>.memorying.pages.dev` 모양이고 PR 화면의 댓글에 나옵니다. 실제 사이트와 같은 화면과 글꼴, 보안 설정으로 확인할 수 있습니다.
-7. 문제가 없으면 PR을 병합(Merge)합니다. 1~2분 뒤 https://sunwoochoi.com 에 반영됩니다.
-8. 반영된 뒤 사이트에서 직접 확인합니다.
+3. (선택) 미리보기로 확인합니다: `npm run dev -- --host 0.0.0.0` 후 Codespaces의 포트 4321을 엽니다. 이 포트는 private으로 유지하세요. 글을 새로 쓰거나 모양을 바꿨을 때 권장합니다.
+4. **필수 검사**를 돌립니다. 2분 정도 걸립니다: `npm run verify`
+   - 마지막에 오류 없이 끝나면 통과입니다. 실패하면 올리지 말고 오류 문구를 Claude에게 보여 주세요.
+5. 커밋하고 올립니다: `git add <고친 파일>`, `git commit -m "고친 내용"`, `git push`
+6. 1~2분 뒤 https://sunwoochoi.com 에서 확인합니다.
+
+올린 뒤에도 GitHub가 같은 검사(`verify`)를 한 번 더 돌립니다. GitHub 저장소의 Actions 탭에서 빨간색이 보이면 Claude에게 알려 주세요.
+
+디자인이나 구조를 크게 바꾸는 작업처럼 실제 사이트에 올리기 전에 인터넷 주소로 미리 보고 싶을 때만 예전처럼 작업용 브랜치와 PR을 쓸 수 있습니다. PR을 만들면 Cloudflare가 `https://<브랜치 이름>.memorying.pages.dev` 미리보기 주소를 만들어 줍니다. 평소에는 필요 없습니다.
 
 배포 후 확인 목록입니다.
 
@@ -200,12 +204,12 @@ npm run newsletter -- remembering-summer
 
 배포한 뒤 문제가 보이면 서두르지 말고 되돌립니다.
 
-- **방법 1**: GitHub에서 문제가 된 PR 화면 아래의 **Revert** 버튼을 눌러 되돌림 PR을 만들고, 검사가 통과하면 병합합니다. 가장 안전합니다. Claude에게 "방금 배포를 되돌려 줘"라고 해도 됩니다.
+- **방법 1**: Claude에게 "방금 배포를 되돌려 줘"라고 요청합니다. 문제가 된 커밋을 되돌리는 커밋(`git revert`)을 만들고, 검사를 통과하면 `main`에 올립니다. 가장 안전합니다.
 - **방법 2**: Cloudflare 대시보드의 Workers & Pages → memorying → Deployments에서 이전 배포를 골라 되돌릴 수 있습니다. 급할 때만 쓰세요. 이때 GitHub의 `main`은 그대로이므로 나중에 방법 1로 정리해야 합니다.
 
 ## 6. 자동 검사가 확인하는 것
 
-PR의 `verify` 검사는 사이트가 깨지지 않았는지 자동으로 확인합니다. 글에 대해서는 **저장소에 있는 글을 읽어서 기준에 맞는지만** 봅니다. 글 제목이나 개수를 미리 적어 두지 않았기 때문에, 새 글을 추가하거나 제목을 바꾸거나 Essay와 Note를 바꿔도 **검사를 고칠 필요가 없습니다.** 기준에 맞으면 그대로 통과합니다.
+`verify` 검사는 사이트가 깨지지 않았는지 자동으로 확인합니다. 배포 전에 `npm run verify`로 직접 돌리고, 올린 뒤에는 GitHub도 한 번 더 돌립니다. 글에 대해서는 **저장소에 있는 글을 읽어서 기준에 맞는지만** 봅니다. 글 제목이나 개수를 미리 적어 두지 않았기 때문에, 새 글을 추가하거나 제목을 바꾸거나 Essay와 Note를 바꿔도 **검사를 고칠 필요가 없습니다.** 기준에 맞으면 그대로 통과합니다.
 
 기준은 이렇습니다. 어기면 어느 글의 무엇이 문제인지 알려 주며 실패합니다.
 
@@ -221,13 +225,15 @@ PR의 `verify` 검사는 사이트가 깨지지 않았는지 자동으로 확인
 
 이 기준은 `tests/support/writing-rules.ts`에 있고, 기준 자체를 바꾸고 싶으면 Claude에게 요청하세요.
 
+**프로필(About, Projects, Experience)**: 문구는 확인하지 않고 형식만 봅니다. 소개와 설명에 한국어와 영문이 모두 있는지, About 소속이 4개이고 기간이 `2026.02–Present` 같은 형식인지, 프로젝트 이름과 `order`가 겹치지 않는지, Experience의 네 섹션이 모두 있는지, 각 섹션이 끝난 시점이 최근인 것부터 적혀 있는지, 수상이 있는 프로젝트가 Awards에 그 프로젝트로 가는 링크와 함께 있는지, 한국어와 English 전환이 되는지입니다. 이 기준은 `src/lib/content-schema.ts`와 `tests/unit/profile-pages.test.ts`에 있습니다.
+
 **아직 문구를 그대로 확인하는 곳**: 홈의 제목과 소개, 구독 상자 문구처럼 글이 아닌 화면의 문구는 검사가 그대로 확인합니다. 이 문구를 바꾸면 검사도 함께 고쳐야 하니 Claude에게 요청하세요(3-7 참고).
 
 ## 7. 문제가 생겼을 때
 
 | 증상 | 확인할 것 |
 | --- | --- |
-| 새 글이 사이트에 안 보임 | `draft: false`인가, 날짜가 미래가 아닌가, PR이 병합되었는가, 병합 후 1~2분이 지났는가 |
+| 새 글이 사이트에 안 보임 | `draft: false`인가, 날짜가 미래가 아닌가, `main`에 push했는가, push 후 1~2분이 지났는가 |
 | 빌드나 검사가 실패함 | 실패 화면의 오류 문구를 Claude에게 붙여 주세요. 대개 한쪽 언어 파일 누락, `[Draft]` 표시 남음, 사진 두 장, 날짜 오류입니다. |
 | 사진이 안 나옴 | 파일 이름이 정확히 `cover.<확장자>`인가, 글 폴더 안에 있는가 |
 | 구독 버튼이 안 눌림 | Cloudflare 설정 값이 지워졌을 수 있습니다. 아래 8번을 확인하세요. |
@@ -250,9 +256,10 @@ PR의 `verify` 검사는 사이트가 깨지지 않았는지 자동으로 확인
 | --- | --- |
 | 슬러그 | 글 주소의 마지막 부분. `/writing/alone/`의 `alone` |
 | draft | 초안 표시. `draft: true`면 공개 사이트에 나오지 않음 |
-| PR(Pull Request) | 「이 수정을 사이트에 반영해도 될까요?」 하는 요청서 |
-| 병합(Merge) | 수정을 `main`에 합치는 것. 합치면 자동으로 배포됨 |
-| 미리보기 | 병합하기 전에 실제 사이트와 똑같이 볼 수 있는 임시 주소 |
+| 커밋(commit) | 고친 내용을 하나의 기록으로 저장하는 것 |
+| push | 저장한 기록을 GitHub에 올리는 것. `main`에 올리면 자동으로 배포됨 |
+| 미리보기 | 올리기 전에 내 Codespace에서 사이트를 띄워 보는 것 (`npm run dev`) |
+| PR(Pull Request) | 「이 수정을 반영해도 될까요?」 하는 요청서. 큰 변경을 미리 볼 때만 선택적으로 사용 |
 | 배포 | 고친 내용이 실제 사이트에 올라가는 것 |
 | `verify` | 사이트가 깨지지 않았는지 확인하는 자동 검사 |
 

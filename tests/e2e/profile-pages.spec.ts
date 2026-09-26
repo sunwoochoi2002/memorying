@@ -31,21 +31,43 @@ test('About connects affiliations chronologically with a timeline line and nodes
 
 test('Projects and Experience render bilingual details and section anchors', async ({ page }) => {
   await page.goto('/projects/');
-  for (const name of ['Sunwoo’s Archive', 'JARVIS', 'BERA']) await expect(page.getByRole('heading', { name, exact: true })).toBeVisible();
-  const jarvis = page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'JARVIS', exact: true }) });
-  await expect(jarvis.getByText(/로컬 파일/)).toBeVisible();
+  const project = page.locator('main li').filter({ has: page.locator('h2') }).first();
+  await expect(project.locator('h2')).toBeVisible();
+  await expect(project.locator('p[data-language-fragment="ko"]')).toBeVisible();
+  await expect(project.locator('p[data-language-fragment="en"]')).toBeHidden();
   await page.getByRole('button', { name: 'English' }).click();
-  await expect(jarvis.getByText(/indexes local files/)).toBeVisible();
+  await expect(project.locator('p[data-language-fragment="en"]')).toBeVisible();
+  await expect(project.locator('p[data-language-fragment="ko"]')).toBeHidden();
   await page.goto('/experience/');
-  for (const heading of ['Education', 'Work & Research', 'Activities & Leadership', 'Awards']) await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
+  for (const heading of ['Education', 'Work & Lab Research', 'Activities & Leadership', 'Awards']) await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
   await page.getByRole('navigation', { name: 'Experience sections' }).getByRole('link', { name: 'Awards' }).click();
   await expect(page).toHaveURL(/#awards$/);
+});
+
+test('line breaks written in an Experience description stay visible', async ({ page }) => {
+  await page.goto('/experience/');
+  await page.locator('main details').evaluateAll((items) => items.forEach((item) => item.setAttribute('open', '')));
+  const shown = await page.locator('.profile-description p[data-language-fragment="ko"]').evaluateAll((items) =>
+    items.filter((item) => item.textContent!.includes('\n')).map((item) => (item as HTMLElement).innerText));
+  expect(shown.length).toBeGreaterThan(0);
+  for (const text of shown) expect(text).toContain('\n');
+});
+
+test('an award entry links to its project on the Projects page', async ({ page }) => {
+  await page.goto('/experience/');
+  const entry = page.locator('#awards details').filter({ has: page.locator('a[href^="/projects/#"]') }).first();
+  await entry.locator('summary').click();
+  const link = entry.locator('a[href^="/projects/#"]');
+  const target = (await link.getAttribute('href'))!.split('#')[1];
+  await link.click();
+  await expect(page).toHaveURL(new RegExp(`/projects/#${target}$`));
+  await expect(page.locator(`#${target}`)).toBeVisible();
 });
 
 test('legacy Work leads to Projects and Korean content works without JavaScript', async ({ browser, page }) => {
   await page.goto('/work/');
   await expect(page).toHaveURL(/\/projects\/$/);
-  await expect(page.getByRole('heading', { name: 'JARVIS', exact: true })).toBeVisible();
+  await expect(page.locator('main h2').first()).toBeVisible();
   const context = await browser.newContext({ javaScriptEnabled: false });
   try {
     const noJs = await context.newPage();

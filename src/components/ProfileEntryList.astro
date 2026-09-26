@@ -22,7 +22,7 @@ const { entries, labels } = Astro.props;
         <div class="profile-description">
           <p lang="ko" data-language-fragment="ko">{entry.description.ko}</p>
           <p lang="en" data-language-fragment="en" hidden>{entry.description.en}</p>
-          {entry.link && <p class="profile-link"><a href={entry.link.href} rel="noreferrer"><span lang="ko" data-language-fragment="ko">{entry.link.label.ko}</span><span lang="en" data-language-fragment="en" hidden>{entry.link.label.en}</span></a></p>}
+          {entry.link && <p class="profile-link"><a href={entry.link.href} rel={entry.link.href.startsWith('/') ? undefined : 'noreferrer'}><span lang="ko" data-language-fragment="ko">{entry.link.label.ko}</span><span lang="en" data-language-fragment="en" hidden>{entry.link.label.en}</span></a></p>}
         </div>
       </details>
     </li>

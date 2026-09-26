@@ -19,7 +19,7 @@ const project = {
 };
 const experience = {
   id: 'education', heading: 'Education', order: 1,
-  entries: [{ title: 'Mathematics @ POSTECH', period: '2021.02–Present', description: { ko: '수학을 공부합니다.', en: 'Mathematics student.' } }],
+  entries: [{ title: 'Mathematics @ POSTECH', period: '2021.02–Present', originalLanguage: 'ko', description: { ko: '수학을 공부합니다.', en: 'Mathematics student.' } }],
 };
 
 describe('public profile schemas', () => {
@@ -41,6 +41,24 @@ describe('public profile schemas', () => {
     expect(experienceSchema.safeParse(experience).success).toBe(true);
     expect(experienceSchema.safeParse({ ...experience, entries: [{ ...experience.entries[0], description: { en: 'English only' } }] }).success).toBe(false);
     expect(experienceSchema.safeParse({ ...experience, id: 'other' }).success).toBe(false);
+  });
+
+  it('accepts experience links to external sites or to a page on this site', () => {
+    const schema = createExperienceSchema();
+    const withLink = (href: string) => ({ ...experience, entries: [{ ...experience.entries[0], link: { href, label: { ko: '보기', en: 'View' } } }] });
+    expect(schema.safeParse(withLink('https://example.com/')).success).toBe(true);
+    expect(schema.safeParse(withLink('/projects/#bera')).success).toBe(true);
+    expect(schema.safeParse(withLink('projects')).success).toBe(false);
+    expect(schema.safeParse(withLink('//evil.example')).success).toBe(false);
+  });
+
+  it('requires each experience entry to declare the original language of its description', () => {
+    const schema = createExperienceSchema();
+    const withLanguage = (originalLanguage?: string) => ({ ...experience, entries: [{ ...experience.entries[0], originalLanguage }] });
+    expect(schema.safeParse(withLanguage('ko')).success).toBe(true);
+    expect(schema.safeParse(withLanguage('en')).success).toBe(true);
+    expect(schema.safeParse(withLanguage(undefined)).success).toBe(false);
+    expect(schema.safeParse(withLanguage('fr')).success).toBe(false);
   });
 });
 

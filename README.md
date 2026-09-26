@@ -23,6 +23,7 @@ GitHub Actions runs `npm run verify` for `main` pushes and pull requests.
 ## Everyday maintenance
 
 - Korean step-by-step guide for adding or editing writing, switching Essay and Note, photos, deploying, and rolling back: [`docs/MAINTENANCE.md`](docs/MAINTENANCE.md)
+- Markdown writing reference and read-only grammar review: [`docs/MARKDOWN_GUIDE.md`](docs/MARKDOWN_GUIDE.md)
 
 ## Resume in Codespaces
 

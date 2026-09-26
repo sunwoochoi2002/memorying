@@ -4,77 +4,103 @@ order: 3
 entries:
   - title: Military Service @ Republic of Korea Army (ROKA)
     period: 2026.02–Present
+    originalLanguage: ko
     description:
       ko: 2026년 2월부터 대한민국 육군에서 복무하고 있습니다. 개인정비시간에는 공부와 개인 프로젝트를 이어가고 있습니다.
       en: I have been serving in the Republic of Korea Army since February 2026. During off-duty hours, I
         continue to study and work on personal projects.
   - title: CES 2026
     period: "2026.01"
+    originalLanguage: ko
     description:
       ko: 미국 Las Vegas에서 열린 CES 2026에 참석했습니다.
       en: I attended CES 2026 in Las Vegas, USA.
+  - title: PAMSTER @ POSTECH
+    period: 2022.09–2025.08
+    originalLanguage: ko
+    description:
+      ko: POSTECH 비교과 활동 서포터 PAMSTER로 활동했습니다.
+      en: Extracurricular Activity Supporter, PAMSTER, POSTECH.
   - title: Korean Business Networking Conference (KBNC) 2025
     period: "2025.06"
+    originalLanguage: ko
     description:
-      ko: Korean Business Networking Conference (KBNC)는 비즈니스와 혁신에 열정을 가진 학생들을 연결하고 네트워크를 확장하는 행사입니다. KBO가 주최하며
-        글로벌 대학 학생들이 전문가 워크숍과 패널, 심층 커리어 토론, 의미 있는 네트워킹에 참여합니다.
+      ko: Korean Business Networking Conference (KBNC)는 비즈니스와 혁신에 열정을 가진 학생들을 연결하고 네트워크를 확장하는 행사입니다.
+          KBO가 주최하며 UCB 등의 글로벌 대학 학생들과 함께 전문가 워크숍과 패널, 심층 커리어 토론, 의미 있는 네트워킹을 진행했습니다.
       en: The Korean Business Networking Conference (KBNC) aims to connect students passionate about business
         and innovation while expanding this network further. Hosted by KBO, KBNC brings together global
         universities for workshops and panels led by industry experts, in-depth career development
         discussions, and meaningful networking opportunities.
   - title: POSTECH Representative, Global Student Startup Competition (GSSC) / Asian Leadership Conference 2025
     period: "2025.05"
+    originalLanguage: ko
     description:
-      ko: POSTECH 대표로 Human-Centered AI에 초점을 맞춘 글로벌 창업 프로그램에 참여했습니다. 한국의 주요 리더십 콘퍼런스에서 창업 역량을 키우고 국제 학생들과 인사이트를
+      ko: POSTECH 대표로 Human-Centered AI에 초점을 맞춘 글로벌 창업 경진대회에 참여했습니다. 한국의 주요 리더십 콘퍼런스에서 창업 역량을 키우고 국제 학생들과 인사이트를
         교류했습니다.
       en: Participated in a global entrepreneurship program focused on Human-Centered AI. Built entrepreneurial
         competencies and exchanged insights with international students at Korea's premier leadership
         conference.
   - title: Tech-Review @ POSTECH
     period: "2025.01"
+    originalLanguage: ko
     description:
-      ko: Tech-Review는 POSTECH 창업 부서의 지원을 받는 조직입니다. 최신 기술 동향을 대학 구성원과 공유하고, 창업 문화를 조성하며, 기술의 가치를 알리는 것을 목표로
+      ko: Tech-Review는 POSTECH 창업지원팀의 지원을 받는 학생단체입니다. 최신 기술 동향을 대학 구성원과 공유하고, 창업 문화를 조성하며, 기술의 가치를 알리는 것을 목표로
         합니다.
       en: Tech-Review is an organization supported by POSTECH's Startup Department. It aims to share the latest
         technological trends with university members, foster an entrepreneurial culture, and highlight
         the value of technology.
   - title: CES 2024
     period: "2024.01"
+    originalLanguage: ko
     description:
       ko: 미국 Las Vegas에서 열린 CES 2024에 참석했습니다.
       en: CES 2024, attendee, Las Vegas, USA.
   - title: Resident Director, Dormitory Building No. 8 @ POSTECH
     period: 2023.02–2023.12
+    originalLanguage: ko
     description:
-      ko: 2023년 POSTECH 기숙사 8동의 Resident Director로 활동했습니다.
-      en: Resident Director, Dormitory Building No. 8, POSTECH.
-  - title: Exchange Student Buddy Program (PBUD) @ POSTECH
-    period: 2023.02–2023.06
-    description:
-      ko: POSTECH의 교환학생 버디 프로그램 PBUD에 참여했습니다.
-      en: Exchange Student Buddy Program, PBUD, POSTECH.
+      ko: 2023년 POSTECH 기숙사 8동의 동대표로 활동했습니다.
+      en: Resident Advisor, Dormitory Building No. 8, POSTECH.
   - title: Department of Mathematics Representative @ POSTECH
     period: 2023.01–2023.12
+    originalLanguage: ko
     description:
-      ko: 2023년 POSTECH 수학과 학생대표로 활동했습니다.
+      ko: POSTECH 수학과 37대 학생회장으로 활동했습니다.
       en: Representative, Department of Mathematics, POSTECH.
   - title: Vice-captain, CHEERO @ POSTECH
     period: 2022.11–2023.10
+    originalLanguage: ko
     description:
-      ko: POSTECH 응원 동아리 CHEERO의 부주장으로 활동했습니다.
+      ko: POSTECH 응원 동아리 CHEERO의 부단장으로 활동했습니다.
       en: Vice-captain, POSTECH Cheerleading Club CHEERO.
-  - title: PAMSTER @ POSTECH
-    period: "2022.09"
+  - title: Exchange Student Buddy Program (PBUD) @ POSTECH
+    period: 2023.02–2023.06
+    originalLanguage: ko
     description:
-      ko: POSTECH 비교과 활동 서포터 PAMSTER로 활동했습니다.
-      en: Extracurricular Activity Supporter, PAMSTER, POSTECH.
+      ko: POSTECH을 방문한 외국인 교환학생이 학교에 빠르게 적응할 수 있도록 돕는 버디 프로그램 PBUD의 부원으로 활동했습니다.
+      en: Buddy Program for Exchange Student, PBUD, POSTECH.
+  - title: Undergraduate Research Program (UGRP) @ POSTECH
+    period: 2022.03–2023.01
+    originalLanguage: ko
+    description:
+      ko: "연구 주제: 수면 데이터를 분석해 개인의 최적 수면 패턴을 도출하는 알고리즘 개발."
+      en: "Topic: Development of a sleep data analysis algorithm that derives an individual's optimal sleep
+        pattern."
   - title: Head, Table-tennis Club @ POSTECH
     period: 2022.09–2022.12
+    originalLanguage: ko
     description:
       ko: POSTECH 탁구 동아리 회장으로 활동했습니다.
       en: Head, Table-tennis Club, POSTECH.
   - title: Student Cultural Planning Director, 36th Student Council @ POSTECH
     period: 2022.01–2022.12
+    originalLanguage: ko
     description:
-      ko: POSTECH 제36대 총학생회에서 문화기획부장을 맡았습니다.
+      ko: POSTECH 제36대 총학생회에서 문화기획국 국장을 맡았습니다.
       en: Director, Student Cultural Planning Department, 36th Student Council, POSTECH.
+  - title: Statistical Data Analysis and Application Contest @ National Statistical Office
+    period: 2022.06–2022.08
+    originalLanguage: ko
+    description:
+      ko: "연구 주제: 농산물 가격 변동 분석과 변동성 예측 모형 설계."
+      en: "Topic: Analysis of agricultural price fluctuations and design of volatility prediction models."

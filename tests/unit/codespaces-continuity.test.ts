@@ -49,7 +49,9 @@ describe('Codespaces continuity handoff', () => {
     expect(resumePrompt).toContain('git switch main');
     expect(resumePrompt).toContain('git pull --ff-only origin main');
     expect(resumePrompt).toContain('git status --short');
-    expect(resumePrompt).toMatch(/feature branch/i);
+    expect(resumePrompt).not.toMatch(/create a purpose-specific feature branch/i);
+    expect(resumePrompt).toMatch(/directly on main/i);
+    expect(resumePrompt).toMatch(/npm run verify[\s\S]*before pushing/i);
     expect(resumePrompt).toMatch(/non-empty.*stop.*current branch.*commit.*push.*switch.*pull/is);
     expect(resumePrompt).not.toMatch(/finish the pending CI-continuity delivery gates/i);
     expect(resumePrompt).toMatch(/env -u CLAUDECODE/);
@@ -74,7 +76,9 @@ describe('Codespaces continuity handoff', () => {
     expect(guide).toContain('git pull --ff-only origin main');
     expect(guide).toMatch(/출력이 비어 있지 않으면 여기서 멈추세요/);
     expect(guide).toMatch(/현재 브랜치.*안전하게 커밋.*push.*git switch main.*git pull --ff-only origin main/is);
-    expect(guide).toContain('git switch -c feature/next-writing-update');
+    expect(guide).not.toContain('git switch -c');
+    expect(guide).toContain('MAINTENANCE.md');
+    expect(guide).toMatch(/npm run verify[\s\S]*`main`에 push/);
     expect(guide).toContain('npm run verify');
     expect(guide).not.toContain('feature/memorying-mvp');
 

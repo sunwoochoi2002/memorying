@@ -29,12 +29,11 @@ entries:
     originalLanguage: ko
     description:
       ko: START-UP 48 대학 연합 창업 아이디어톤은 POSTECH, Seoul National University, KAIST, Yonsei University, Korea
-        University 학생 48명이 참여하는 3일간의 행사입니다. 참가자는 팀을 이뤄 산업계 멘토의 지원을 받으며 아이디어 구상, 비즈니스 모델 개발, 시제품 제작, 최종
-        발표까지 창업 과정을 경험합니다.
+        University 학생 48명이 참여하는 3일간의 행사입니다. 저희 팀은 고령자와 그 가족을 대상으로 하는 인증 위임 서비스를 고안하여 포스텍 산학협력단장상(1등)을 수상했습니다.
       en: START-UP 48 is a three-day inter-university ideathon bringing together 48 students from POSTECH,
-        Seoul National University, KAIST, Yonsei University, and Korea University. Participants form
-        teams and go through the full startup journey, from idea generation and business model
-        development to prototyping and final pitching, supported by industry mentors.
+        Seoul National University, KAIST, Yonsei University, and Korea University. Our team designed an
+        authentication delegation service for older adults and their families and won the POSTECH
+        Industry-Academic Cooperation Foundation Director's Award (1st Prize).
   - title: Academic Excellence Recognition, Department of Mathematics @ POSTECH
     period: Fall 2024, Spring 2025
     originalLanguage: ko
@@ -59,15 +58,17 @@ entries:
     period: "2024.11"
     originalLanguage: ko
     description:
-      ko: "2024 POSTECH Mathematics Research Paper Award 대상.
-          논문: “Statistical Estimation of Prime Divisor CDF for Finite N in Erdős-Kac Theorem.”"
+      ko: |-
+        "2024 POSTECH Mathematics Research Paper Award 대상.
+        논문: “Statistical Estimation of Prime Divisor CDF for Finite N in Erdős-Kac Theorem.”"
       en: "Paper: “Statistical Estimation of Prime Divisor CDF for Finite N in Erdős-Kac Theorem.”"
   - title: Introducing My Research in 2023 / Finalist (Encouragement Prize)
     period: "2023.11"
     originalLanguage: ko
     description:
-      ko: "Introducing My Research in 2023 최종 후보(장려상).
-          발표 주제: “Markov chain and its applications.”"
+      ko: |-
+        "Introducing My Research in 2023 최종 후보(장려상).
+        발표 주제: “Markov chain and its applications.”"
       en: "Topic: “Markov chain and its applications.”"
     ##link:
     ##  href: https://youtu.be/XWeJFHQxELo?si=SbdSaJu-OA5N6v8l

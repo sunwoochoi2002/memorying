@@ -127,6 +127,12 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 5. Not yet done: a live subscription test from the deployed `https://sunwoochoi.com` form (the local test and the identical form action are verified), and the remaining launch checklist in `docs/publishing.md`.
 6. Never ask for Gabia or Cloudflare credentials; the user performs every registrar and dashboard action.
 
+## Favicon, link thumbnail, and body size record
+
+1. On 2026-09-27 the user chose favicon "1A": a blue (`#2438d1`) italic Instrument Serif `s` on a paper (`#fcfcfa`) rounded square. `public/favicon.svg` holds the glyph as an outlined path (tabs do not load web fonts), with `favicon.ico` (16/32/48) and a full-bleed 180px `apple-touch-icon.png`. `tests/unit/site-icons.test.ts` checks the head links and files.
+2. The link thumbnail is `public/og-image.png` (1200×630, option "1-D"): the bare blue `s`, a blue vertical rule, `Sunwoo Choi`, and `sunwoochoi.com` on paper. It replaced `og-default.png` under a new file name so messengers refetch it; `og:image:width`, `og:image:height`, and `og:image:alt` are declared. `tests/unit/social-image.test.ts` checks that the declared size matches the file.
+3. Body text was reduced (option "B", home kept as it was): the About intro is 15px Korean / 19px English on desktop and 14px / 18px on phones, and article prose is 16px / 20px on desktop and 15px / 19px on phones. The home statement stays 17px / 16px. The e2e type-scale tests assert these sizes.
+
 ## Next independent work
 
 Proceed one project at a time:

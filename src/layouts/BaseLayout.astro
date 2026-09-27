@@ -18,7 +18,8 @@ const { title, description, lang = 'ko', canonicalUrl, type = 'website', noindex
 const pageTitle = title === 'Home' ? 'Sunwoo Choi' : `${title} — Sunwoo Choi`;
 const site = Astro.site ?? new URL('http://localhost:4321');
 const canonical = canonicalUrl ?? new URL(Astro.url.pathname, site).toString();
-const socialImage = new URL('/og-default.png', site).toString();
+const socialImage = new URL('/og-image.png', site).toString();
+const socialImageAlt = 'Sunwoo Choi, sunwoochoi.com';
 ---
 <!doctype html>
 <html lang={lang}>
@@ -27,6 +28,9 @@ const socialImage = new URL('/og-default.png', site).toString();
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <title>{pageTitle}</title>
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     {description && <meta name="description" content={description} />}
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
@@ -35,10 +39,14 @@ const socialImage = new URL('/og-default.png', site).toString();
     {description && <meta property="og:description" content={description} />}
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={socialImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={socialImageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
     {description && <meta name="twitter:description" content={description} />}
     <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:image:alt" content={socialImageAlt} />
   </head>
   <body class={bodyClass}>
     <a class="skip-link" href="#main-content">Skip to content</a>

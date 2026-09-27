@@ -46,9 +46,13 @@ test('uses the compact type scale on desktop', async ({ page }) => {
   await expect(page.locator('.site-brand')).toHaveCSS('font-size', '26px');
   await expect(page.locator('.home-writing .writing-list-item h3').first()).toHaveCSS('font-size', '22px');
 
+  await page.goto('/about/');
+  await expect(page.locator('.about-intro p[lang="ko"]').first()).toHaveCSS('font-size', '15px');
+  await expect(page.locator('.about-intro p[lang="en"]').first()).toHaveCSS('font-size', '19px');
+
   await page.goto(articlePath(koreanOriginal));
   await expect(page.locator('h1[data-language-fragment="ko"]')).toHaveCSS('font-size', '38px');
-  await expect(page.locator('[data-language-panel="ko"] p').first()).toHaveCSS('font-size', '17px');
+  await expect(page.locator('[data-language-panel="ko"] p').first()).toHaveCSS('font-size', '16px');
 });
 
 test('uses the compact type scale on phones', async ({ page }) => {
@@ -59,7 +63,11 @@ test('uses the compact type scale on phones', async ({ page }) => {
   await expect(page.locator('.hero__statement')).toHaveCSS('font-size', '16px');
   await expect(page.locator('.home-writing .writing-list-item h3').first()).toHaveCSS('font-size', '20px');
 
+  await page.goto('/about/');
+  await expect(page.locator('.about-intro p[lang="ko"]').first()).toHaveCSS('font-size', '14px');
+  await expect(page.locator('.about-intro p[lang="en"]').first()).toHaveCSS('font-size', '18px');
+
   await page.goto(articlePath(koreanOriginal));
   await expect(page.locator('h1[data-language-fragment="ko"]')).toHaveCSS('font-size', '32px');
-  await expect(page.locator('[data-language-panel="ko"] p').first()).toHaveCSS('font-size', '16px');
+  await expect(page.locator('[data-language-panel="ko"] p').first()).toHaveCSS('font-size', '15px');
 });

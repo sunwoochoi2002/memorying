@@ -266,12 +266,12 @@ test('sets writing in the self-hosted serif typefaces', async ({ page }) => {
 
   const koreanBody = page.locator('[data-language-panel="ko"] p').first();
   await expect(koreanBody).toHaveCSS('font-family', /^"?Noto Serif KR Variable"?,/);
-  await expect(koreanBody).toHaveCSS('font-size', '17px');
+  await expect(koreanBody).toHaveCSS('font-size', '16px');
 
   await page.getByRole('button', { name: 'English' }).click();
   const englishBody = page.locator('[data-language-panel="en"] p').first();
   await expect(englishBody).toHaveCSS('font-family', /^"?Instrument Serif"?,/);
-  await expect(englishBody).toHaveCSS('font-size', '21px');
+  await expect(englishBody).toHaveCSS('font-size', '20px');
 
   const loadedFamilies = await page.evaluate(async () => {
     await document.fonts.ready;

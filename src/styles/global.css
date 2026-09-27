@@ -158,8 +158,8 @@ details[open] .profile-less { display: inline; }
 .writing-cover { position: relative; aspect-ratio: 1 / 1; margin: 1.25rem 0 0; overflow: hidden; background: #fff; border: 1px solid var(--line); }
 .writing-cover img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: contain; }
 
-.prose { margin-top: 1.5rem; font-family: var(--serif-ko); font-size: 1.0625rem; line-height: 1.95; word-spacing: 0; word-break: keep-all; }
-.prose :lang(en), .prose:lang(en) { font-family: var(--serif-display); font-size: 1.3125rem; line-height: 1.7; word-spacing: 0.14em; word-break: normal; }
+.prose { margin-top: 1.5rem; font-family: var(--serif-ko); font-size: 1rem; line-height: 1.95; word-spacing: 0; word-break: keep-all; }
+.prose :lang(en), .prose:lang(en) { font-family: var(--serif-display); font-size: 1.25rem; line-height: 1.7; word-spacing: 0.14em; word-break: normal; }
 .prose p { margin-block: 0 1.3em; }
 .prose p:last-child { margin-bottom: 0; }
 .prose :is(h2, h3) { margin: 2.25em 0 0.7em; font-family: var(--serif-display); font-weight: 400; line-height: 1.25; }
@@ -199,8 +199,8 @@ details[open] .profile-less { display: inline; }
   .writing-list-item__meta > span { font-size: 1rem; }
   .meta { font-size: 1.0625rem; }
   .article-header h1 { font-size: 2rem; }
-  .prose { font-size: 1rem; }
-  .prose :lang(en), .prose:lang(en) { font-size: 1.25rem; }
+  .prose { font-size: 0.9375rem; }
+  .prose :lang(en), .prose:lang(en) { font-size: 1.1875rem; }
   .newsletter { margin-top: 3rem; }
   .newsletter h2 { font-size: 1.125rem; }
   .newsletter__copy { font-size: 0.875rem; }

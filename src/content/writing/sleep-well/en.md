@@ -18,4 +18,4 @@ When we wrestle with a worry, sometimes it starts to seem like no big deal and c
 
 But now we know: if what we are agonizing over feels too painful and hard, it may be a sign of tiredness sent by our body and brain. So, especially with long-term problems, it is probably wise to think them over in a calm state after a good night’s sleep, and to trust the thoughts that keep returning when we are in a similar condition.
 
-I close by strongly recommending ***Why We Sleep***, which yc (yoonchulyi.com) recommends as the best book of a lifetime.
+I close by strongly recommending ***Why We Sleep***, which yc ([yoonchulyi.com](https://yoonchulyi.com)) recommends as the best book of a lifetime.

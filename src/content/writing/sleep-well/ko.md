@@ -18,4 +18,4 @@ title: Why We Sleep
 
 하지만, 우리는 이제 알았다, 지금 하는 고민이 너무 고통스럽고 힘들다면, 이는 내 몸과 뇌가 보내는 피곤함의 신호일지도 모른다는 것을. 그러므로, 특히 장기적인 문제는 되도록 충분히 자고 난 후의 평온한 상태에서 고민하고, 비슷한 컨디션에서 반복되는 생각을 신뢰하는 것이 좋은 방법일 것이다.
 
-yc([yoonchulyi.com](yoonchulyi.com))가 추천하는 인생 최고의 책 <strong><em>우리는 왜 잠을 자야 할까(Why We Sleep)</em></strong>를 강력하게 추천하며 글을 마무리한다.
+yc([yoonchulyi.com](https://yoonchulyi.com))가 추천하는 인생 최고의 책 <strong><em>우리는 왜 잠을 자야 할까(Why We Sleep)</em></strong>를 강력하게 추천하며 글을 마무리한다.

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { z } from 'astro/zod';
 import { createWritingMetadataSchema, createWritingTranslationSchema } from '../../src/lib/content-schema';
 import {
@@ -19,7 +21,9 @@ const GENERATED_BODIES: Record<Language, string> = {
   ko: '한국어 본문을 작성하세요.',
   en: 'Write the English body here.',
 };
-const IMAGE_EXTENSIONS = new Set<string>([...COVER_EXTENSIONS, 'gif']);
+// Zero-width space, word joiner, and byte-order mark.
+const INVISIBLE_CHARACTERS = /[​⁠﻿]/;
+const IMAGE_EXTENSIONS =new Set<string>([...COVER_EXTENSIONS, 'gif']);
 const metadataSchema = createWritingMetadataSchema(z.any());
 const translationSchema = createWritingTranslationSchema();
 
@@ -69,6 +73,17 @@ function checkArticle(item: WritingCase, now: Date): string[] {
         problems.push(`${label}: ${file} 본문이 생성된 기본 문구 그대로입니다.`);
       }
     }
+  }
+
+  // Zero-width characters ride along when text is pasted from blogs or web
+  // editors. They are invisible but stop Markdown from seeing `##`, `-`, or `>`.
+  for (const language of ['ko', 'en'] as const) {
+    const lines = readFileSync(join(item.directory, `${language}.md`), 'utf8').split('\n');
+    lines.forEach((line, index) => {
+      if (INVISIBLE_CHARACTERS.test(line)) {
+        problems.push(`${label}: ${language}.md ${index + 1}번째 줄에 보이지 않는 문자(폭 없는 공백 등)가 있습니다. 지우세요.`);
+      }
+    });
   }
 
   const hangul = /[가-힣]/;

@@ -91,6 +91,16 @@ describe('writing rules', () => {
     })).toEqual([]);
   });
 
+  it('rejects invisible zero-width characters, which can silently break Markdown such as headings', () => {
+    const problems = problemsFor({
+      pasted: { ko: articleFile('제목', '첫 문단입니다.\n\n​## 소제목\n\n본문입니다.') },
+      marked: { en: articleFile('Title', 'English⁠ body.﻿') },
+    });
+
+    expect(problems.join('\n')).toMatch(/pasted.*ko\.md.*7번째 줄.*보이지 않는 문자/);
+    expect(problems.join('\n')).toMatch(/marked.*en\.md.*5번째 줄.*보이지 않는 문자/);
+  });
+
   it('rejects a translation written in the wrong script', () => {
     const problems = problemsFor({
       mixed: { ko: articleFile('Title', 'This is English.'), en: articleFile('제목', '한국어입니다.') },

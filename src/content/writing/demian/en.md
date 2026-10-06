@@ -24,10 +24,13 @@ It was work that took a very long time. So I was happy to feel that, through a s
 
 Those notebooks also hold passages I have treasured from the books I read. Here are a few from *Demian* that resonated deeply with me.
 
-> “I am only interested in the steps I took in life, in order to attain self-realization. All the pretty resting-places, happy isles and children’s paradises, whose charm is not unknown to me, I leave lying behind me in the shimmer of a distant horizon, and I have no desire to set foot there again.” — p. 65 in the Korean edition I read
+> “I am only interested in the steps I took in life, in order to attain self-realization. All the pretty resting-places, happy isles and children’s paradises, whose charm is not unknown to me, I leave lying behind me in the shimmer of a distant horizon, and I have no desire to set foot there again.”
+> <small>— p. 65 in the Korean edition I read</small>
 
-> “Wise speeches have no value at all, absolutely none. […] To escape from yourself is a sin. You should be able to creep right into yourself, like a tortoise.” — p. 88 in the Korean edition I read
+> “Wise speeches have no value at all, absolutely none. […] To escape from yourself is a sin. You should be able to creep right into yourself, like a tortoise.”
+> <small>— p. 88 in the Korean edition I read</small>
 
-> “However, it was not this learned instruction which was of service to my inner self, but rather the contrary. What did me good was the self-progression I made, the increasing confidence in my own dreams, thoughts and presentiments, and the consciousness of the power that I carried in me.” — p. 161 in the Korean edition I read
+> “However, it was not this learned instruction which was of service to my inner self, but rather the contrary. What did me good was the self-progression I made, the increasing confidence in my own dreams, thoughts and presentiments, and the consciousness of the power that I carried in me.”
+> <small>— p. 161 in the Korean edition I read</small>
 
 *The English quotations are from the [1923 edition of Demian](https://www.gutenberg.org/files/74222/74222-h/74222-h.htm), available through Project Gutenberg. The page numbers refer to the Korean edition I read; the ellipsis marks an omission from the English text.*

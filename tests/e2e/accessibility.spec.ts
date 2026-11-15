@@ -1,18 +1,17 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { articlePath, loadWritingCases } from '../support/writing-content';
+import { articlePath, categoryPath, loadCategories, loadWritingCases } from '../support/writing-content';
 
 const cases = loadWritingCases({ fixtures: true });
 const koreanOriginal = cases.find((item) => item.originalLanguage === 'ko');
 const englishOriginal = cases.find((item) => item.originalLanguage === 'en');
-// Articles are checked by kind (Essay, Note, with a cover) rather than by name.
+// Articles are checked by kind (one per category, one with a cover) rather than by name.
 const articleKinds = [...new Set([
-  cases.find((item) => item.type === 'essay'),
-  cases.find((item) => item.type === 'note'),
+  ...loadCategories().map((category) => cases.find((item) => item.category === category.slug)),
   cases.find((item) => item.cover),
 ].filter((item) => item !== undefined))];
 
-for (const path of ['/', '/about/', '/writing/', ...articleKinds.map(articlePath), '/projects/', '/experience/', '/privacy/', '/404/']) {
+for (const path of ['/', '/about/', '/writing/', ...loadCategories().map((category) => categoryPath(category.slug)), ...articleKinds.map(articlePath), '/projects/', '/experience/', '/privacy/', '/404/']) {
   test(`${path} has no serious or critical axe violations`, async ({ page }) => {
     const response = await page.goto(path);
     expect(response?.status()).toBe(path === '/404/' ? 404 : 200);

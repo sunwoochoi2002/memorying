@@ -22,7 +22,7 @@ GitHub Actions runs `npm run verify` for `main` pushes and pull requests.
 
 ## Everyday maintenance
 
-- Korean step-by-step guide for adding or editing writing, switching Essay and Note, photos, deploying, and rolling back: [`docs/MAINTENANCE.md`](docs/MAINTENANCE.md)
+- Korean step-by-step guide for adding or editing writing, changing or adding categories, photos, deploying, and rolling back: [`docs/MAINTENANCE.md`](docs/MAINTENANCE.md)
 - Markdown writing reference and read-only grammar review: [`docs/MARKDOWN_GUIDE.md`](docs/MARKDOWN_GUIDE.md)
 
 ## Resume in Codespaces
@@ -33,7 +33,7 @@ GitHub Actions runs `npm run verify` for `main` pushes and pull requests.
 
 ## Content
 
-- Writing: `src/content/writing/YYYY-MM-DD/<slug>/` (drafts: `src/content/writing/drafts/YYYY-MM-DD/<slug>/`); run `npm run organize:writing` after changing `publishedAt` or `draft`.
+- Writing: `src/content/writing/<category>/YYYY-MM-DD/<slug>/` (drafts: `src/content/writing/drafts/<category>/YYYY-MM-DD/<slug>/`); categories are registered in `src/content/categories.yaml`. Create a draft with `npm run new:writing -- <slug> --original <ko|en> --category <slug>`, and run `npm run organize:writing` (preview with `-- --dry-run`) after changing `category`, `publishedAt`, or `draft`.
 - Folder guide and writing/photo conventions: [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md)
 - Selected Work: `src/content/work/`
 - Product design: `docs/superpowers/specs/2026-07-24-memorying-design.md`

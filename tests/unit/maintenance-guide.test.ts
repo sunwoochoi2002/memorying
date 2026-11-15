@@ -1,36 +1,83 @@
-import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import {
+  linkResolves,
+  npmRunScripts,
+  packageScripts,
+  readRepositoryText,
+  relativeMarkdownLinks,
+  SECRET_ASSIGNMENT,
+} from '../support/repository-documents';
 
-const read = (path: string) => readFile(resolve(process.cwd(), path), 'utf8');
+// Structure only: these checks never pin a heading or sentence, so the guides can be reworded freely.
+const COMMAND_DOCUMENTS = ['docs/MAINTENANCE.md', 'README.md', 'docs/codespaces-guide.md'];
+const LINKED_DOCUMENTS = [...COMMAND_DOCUMENTS, 'docs/CURRENT_WORK.md'];
 
-describe('Korean maintenance guide', () => {
-  it('explains every routine task with the real commands and fields', async () => {
-    const guide = await read('docs/MAINTENANCE.md');
+describe('maintenance documents', () => {
+  it.each(COMMAND_DOCUMENTS)('%s only names npm scripts that exist in package.json', (path) => {
+    const scripts = packageScripts();
+    const named = npmRunScripts(readRepositoryText(path));
 
-    for (const command of ['npm run new:writing', 'npm run dev', 'npm run verify']) {
-      expect(guide).toContain(command);
-    }
-    for (const field of ['publishedAt', 'updatedAt', 'type: note', 'type: essay', 'originalLanguage', 'draft: true', 'draft: false']) {
-      expect(guide).toContain(field);
-    }
-    for (const heading of ['새 글 추가', '글 내용 고치기', 'Essay와 Note 바꾸기', '글 숨기기와 삭제', '사진 넣기', '뉴스레터', '되돌리기', '문제가 생겼을 때']) {
-      expect(guide).toContain(heading);
-    }
-    for (const path of ['src/content/writing/', 'src/content/about/profile.yaml', 'src/content/projects/', 'src/content/experience/', 'src/components/PersonalIntroduction.astro']) {
-      expect(guide).toContain(path);
-    }
-    expect(guide).toContain('https://sunwoochoi.com');
-    expect(guide).toContain('자동 검사가 확인하는 것');
-    expect(guide).toContain('tests/support/writing-rules.ts');
-    expect(guide).not.toContain('검사가 옛 목록을 기준으로 하기 때문입니다');
+    expect(named.length).toBeGreaterThan(0);
+    expect(named.filter((script) => !scripts.includes(script))).toEqual([]);
   });
 
-  it('never asks the reader to store secrets and stays linked from the README', async () => {
-    const [guide, readme] = await Promise.all([read('docs/MAINTENANCE.md'), read('README.md')]);
+  it.each(LINKED_DOCUMENTS)('%s has relative links that point at existing files', (path) => {
+    const links = relativeMarkdownLinks(path);
 
-    expect(guide).not.toMatch(/\b(?:API_KEY|TOKEN|PASSWORD)\s*=\s*\S+/i);
-    expect(readme).toContain('docs/MAINTENANCE.md');
+    expect(links.length).toBeGreaterThan(0);
+    expect(links.filter((link) => !linkResolves(link))).toEqual([]);
+  });
+
+  it('README links to the maintenance guide and the current work checkpoint', () => {
+    const targets = relativeMarkdownLinks('README.md').map((link) => link.path);
+
+    expect(targets).toContain('docs/MAINTENANCE.md');
+    expect(targets).toContain('docs/CURRENT_WORK.md');
+  });
+
+  it('never stores a secret value in a document', () => {
+    for (const path of [...LINKED_DOCUMENTS, 'AGENTS.md', 'docs/PROJECT_STRUCTURE.md', 'docs/publishing.md', '.devcontainer/devcontainer.json']) {
+      expect(readRepositoryText(path), path).not.toMatch(SECRET_ASSIGNMENT);
+    }
+  });
+});
+
+describe('document structure helpers', () => {
+  it('resolves relative links with anchors and ignores external, anchor-only and fenced links', async () => {
+    const { mkdtemp, mkdir, rm, writeFile } = await import('node:fs/promises');
+    const { tmpdir } = await import('node:os');
+    const { join } = await import('node:path');
+    const directory = await mkdtemp(join(tmpdir(), 'doc-links-'));
+    try {
+      await mkdir(join(directory, 'docs'));
+      await writeFile(join(directory, 'docs/guide.md'), 'x');
+      await writeFile(
+        join(directory, 'README.md'),
+        [
+          '[guide](docs/guide.md#section)',
+          '[missing](docs/missing.md)',
+          '[web](https://example.com/a.md) [mail](mailto:a@example.com) [top](#top) [site](/writing/a/)',
+          '```md',
+          '[fenced](docs/fenced.md)',
+          '```',
+        ].join('\n'),
+      );
+      const links = relativeMarkdownLinks(join(directory, 'README.md'));
+
+      expect(links.map((link) => [link.target, linkResolves(link)])).toEqual([
+        ['docs/guide.md#section', true],
+        ['docs/missing.md', false],
+      ]);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  it('finds npm run scripts and secret assignments', () => {
+    expect(npmRunScripts('`npm run organize:writing -- --dry-run` and npm run verify; npm test')).toEqual(['organize:writing', 'verify']);
+    expect('OPENAI_API_KEY=sk-123').toMatch(SECRET_ASSIGNMENT);
+    expect('GITHUB_TOKEN = abc').toMatch(SECRET_ASSIGNMENT);
+    expect('SITE_URL=https://sunwoochoi.com and PUBLIC_BUTTONDOWN_USERNAME=sunwoochoi').not.toMatch(SECRET_ASSIGNMENT);
   });
 });
 

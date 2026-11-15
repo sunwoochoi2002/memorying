@@ -5,12 +5,19 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { checkWriting } from '../support/writing-rules';
 
 const roots: string[] = [];
-const GOOD_META = 'publishedAt: 2025-01-01\ntype: essay\noriginalLanguage: ko\ndraft: false\nfeatured: false\n';
+const GOOD_META = 'publishedAt: 2025-01-01\ncategory: essay\noriginalLanguage: ko\ndraft: false\nfeatured: false\n';
+// A registry of the test's own, so the checks never depend on the real category list.
+const CATEGORIES = '- slug: essay\n  name: { ko: 에세이, en: Essay }\n  newsletter: true\n- slug: note\n  name: { ko: 노트, en: Note }\n  newsletter: false\n';
 const articleFile = (title: string, body: string, extraFront = '') => `---\ntitle: ${title}\n${extraFront}---\n\n${body}\n`;
 
-function project(articles: Record<string, { meta?: string; ko?: string; en?: string; files?: Record<string, string> }>) {
+function project(
+  articles: Record<string, { meta?: string; ko?: string; en?: string; files?: Record<string, string> }>,
+  categories: string | null = CATEGORIES,
+) {
   const root = mkdtempSync(join(tmpdir(), 'writing-rules-'));
   roots.push(root);
+  mkdirSync(join(root, 'src/content'), { recursive: true });
+  if (categories !== null) writeFileSync(join(root, 'src/content/categories.yaml'), categories);
   for (const [slug, article] of Object.entries(articles)) {
     const directory = join(root, 'src/content/writing', slug);
     mkdirSync(directory, { recursive: true });
@@ -33,19 +40,19 @@ describe('writing rules', () => {
     expect(checkWriting()).toEqual([]);
   });
 
-  it('approves any well-formed article, whatever its title, type, or language', () => {
+  it('approves any well-formed article, whatever its title, category, or language', () => {
     expect(problemsFor({
       alpha: {},
-      'a-note': { meta: 'publishedAt: 2024-02-02\ntype: note\noriginalLanguage: en\ndraft: false\nfeatured: false\n' },
-      hidden: { meta: 'publishedAt: 2030-01-01\ntype: essay\noriginalLanguage: ko\ndraft: true\nfeatured: false\n' },
+      'a-note': { meta: 'publishedAt: 2024-02-02\ncategory: note\noriginalLanguage: en\ndraft: false\nfeatured: false\n' },
+      hidden: { meta: 'publishedAt: 2030-01-01\ncategory: essay\noriginalLanguage: ko\ndraft: true\nfeatured: false\n' },
       pictured: { files: { 'cover.png': 'x', 'cover.alt.ko.txt': '사진', 'cover.alt.en.txt': 'Photo' } },
     })).toEqual([]);
   });
 
-  it('rejects a bad slug, type, language, or draft flag', () => {
+  it('rejects a bad slug, category, language, or draft flag', () => {
     const problems = problemsFor({
       'Bad_Slug': {},
-      typo: { meta: 'publishedAt: 2025-01-01\ntype: essay2\noriginalLanguage: jp\ndraft: maybe\nfeatured: false\n' },
+      typo: { meta: 'publishedAt: 2025-01-01\ncategory: essay2\noriginalLanguage: jp\ndraft: maybe\nfeatured: false\n' },
     });
 
     expect(problems.join('\n')).toMatch(/Bad_Slug.*슬러그/);
@@ -73,7 +80,7 @@ describe('writing rules', () => {
     const problems = problemsFor({
       marker: { ko: articleFile('"[Draft] 제목"', '본문') },
       placeholder: { en: articleFile('Title', 'Write the English body here.') },
-      future: { meta: 'publishedAt: 2999-01-01\ntype: essay\noriginalLanguage: ko\ndraft: false\nfeatured: false\n' },
+      future: { meta: 'publishedAt: 2999-01-01\ncategory: essay\noriginalLanguage: ko\ndraft: false\nfeatured: false\n' },
     });
 
     expect(problems.join('\n')).toMatch(/marker.*\[Draft\]/);
@@ -84,7 +91,7 @@ describe('writing rules', () => {
   it('allows draft markers, placeholders, and future dates while an article is still a draft', () => {
     expect(problemsFor({
       wip: {
-        meta: 'publishedAt: 2999-01-01\ntype: essay\noriginalLanguage: ko\ndraft: true\nfeatured: false\n',
+        meta: 'publishedAt: 2999-01-01\ncategory: essay\noriginalLanguage: ko\ndraft: true\nfeatured: false\n',
         ko: articleFile('"[Draft] 제목"', '한국어 본문을 작성하세요.'),
         en: articleFile('"[Draft] Title"', 'Write the English body here.'),
       },
@@ -122,17 +129,49 @@ describe('writing rules', () => {
     expect(problems.join('\n')).not.toMatch(/referenced/);
   });
 
-  it('rejects alt-text files without a photo, and misplaced featured flags', () => {
+  it('rejects alt-text files without a photo', () => {
+    expect(problemsFor({ orphan: { files: { 'cover.alt.ko.txt': '사진' } } }).join('\n')).toMatch(/orphan.*대체 텍스트/);
+  });
+
+  it('lets one published article in any category be featured, but not two', () => {
+    const featured = (date: string, category: string, draft = false) =>
+      ({ meta: `publishedAt: ${date}\ncategory: ${category}\noriginalLanguage: ko\ndraft: ${draft}\nfeatured: true\n` });
+
+    expect(problemsFor({ featurednote: featured('2025-01-01', 'note'), wip: featured('2025-01-02', 'essay', true) })).toEqual([]);
+    const problems = problemsFor({ one: featured('2025-01-02', 'essay'), two: featured('2025-01-03', 'note') });
+    expect(problems).toHaveLength(1);
+    expect(problems[0]).toMatch(/대표 글.*하나.*one.*two/);
+  });
+
+  it('rejects a category that is not in the registry, in Korean, naming the registered ones', () => {
     const problems = problemsFor({
-      orphan: { files: { 'cover.alt.ko.txt': '사진' } },
-      featurednote: { meta: 'publishedAt: 2025-01-01\ntype: note\noriginalLanguage: ko\ndraft: false\nfeatured: true\n' },
-      one: { meta: 'publishedAt: 2025-01-02\ntype: essay\noriginalLanguage: ko\ndraft: false\nfeatured: true\n' },
-      two: { meta: 'publishedAt: 2025-01-03\ntype: essay\noriginalLanguage: ko\ndraft: false\nfeatured: true\n' },
+      poem: { meta: 'publishedAt: 2025-01-01\ncategory: poem\noriginalLanguage: ko\ndraft: false\nfeatured: false\n' },
+      legacy: { meta: 'publishedAt: 2025-01-01\ntype: essay\noriginalLanguage: ko\ndraft: false\nfeatured: false\n' },
     });
 
-    expect(problems.join('\n')).toMatch(/orphan.*대체 텍스트/);
-    expect(problems.join('\n')).toMatch(/featurednote.*Essay/);
-    expect(problems.join('\n')).toMatch(/대표 글.*하나/);
+    expect(problems.join('\n')).toMatch(/poem.*카테고리.*poem.*essay, note/);
+    expect(problems.join('\n')).toMatch(/legacy.*카테고리/);
+    expect(problems.join('\n')).not.toMatch(/Unknown category|Invalid input/);
+  });
+
+  it('follows whatever categories the registry lists', () => {
+    const poem = { meta: 'publishedAt: 2025-01-01\ncategory: poem\noriginalLanguage: ko\ndraft: false\nfeatured: false\n' };
+    const registry = '- slug: poem\n  name: { ko: 시, en: Poem }\n  newsletter: false\n';
+
+    expect(checkWriting({ root: project({ verse: poem }, registry) })).toEqual([]);
+  });
+
+  it('reserves the article slug "category" for category pages, in Korean', () => {
+    const problems = problemsFor({ category: {} });
+
+    expect(problems).toHaveLength(1);
+    expect(problems[0]).toMatch(/"category".*예약/);
+  });
+
+  it('reports a missing or broken category registry in Korean instead of crashing', () => {
+    expect(checkWriting({ root: project({ alpha: {} }, null) }).join('\n')).toMatch(/categories\.yaml.*카테고리 목록/);
+    expect(checkWriting({ root: project({ alpha: {} }, '- slug: drafts\n  name: { ko: 초안, en: Drafts }\n  newsletter: false\n') }).join('\n'))
+      .toMatch(/categories\.yaml.*카테고리 목록.*drafts/);
   });
 
   it('reports a missing translation file as a problem instead of crashing', () => {

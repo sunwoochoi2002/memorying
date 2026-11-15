@@ -4,7 +4,9 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { beforeAll, describe, expect, it } from 'vitest';
 import {
   articlePath,
+  categoryPath,
   loadWritingCases,
+  loadCategories,
   originalTitle,
   visibleCases,
 } from '../support/writing-content';
@@ -29,10 +31,13 @@ const fixtures = loadWritingCases({ fixtures: true }).filter((item) => item.sour
 const published = visibleCases(writing, { includeDrafts: false });
 const realDrafts = writing.filter((item) => item.draft);
 const onHome = published.slice(0, HOME_LIST_LENGTH);
+const categories = loadCategories();
 
 interface BuiltSite {
   homepage: string;
   archive: string;
+  /** Built category pages keyed by category slug. */
+  categoryPages: Record<string, string>;
   sitemap: string;
   /** The content-layer store Astro writes during the build; it lists every loaded entry. */
   loadedEntries: string;
@@ -52,6 +57,10 @@ function buildSite(extraEnv: Record<string, string>): BuiltSite {
   return {
     homepage: readFileSync('dist/index.html', 'utf8'),
     archive: readFileSync('dist/writing/index.html', 'utf8'),
+    categoryPages: Object.fromEntries(categories.map(({ slug }) => [
+      slug,
+      readFileSync(`dist${categoryPath(slug)}index.html`, 'utf8'),
+    ])),
     sitemap: readdirSync('dist')
       .filter((name) => /^sitemap.*\.xml$/.test(name))
       .map((name) => readFileSync(`dist/${name}`, 'utf8'))
@@ -65,7 +74,7 @@ function expectPublishedWriting(site: BuiltSite) {
     expect(site.archive).toContain('아직 공개된 글이 없습니다');
   } else {
     expect(site.archive).not.toContain('아직 공개된 글이 없습니다');
-    expect(site.archive).toContain('data-writing-filters');
+    expect(site.archive).toContain('data-writing-list');
   }
 
   for (const item of published) {
@@ -76,6 +85,20 @@ function expectPublishedWriting(site: BuiltSite) {
 
   const archiveLinks = new Set(site.archive.match(/href="\/writing\/[a-z0-9-]+\/"/g) ?? []);
   expect(archiveLinks.size).toBe(published.length);
+
+  // Sidebar counts on 전체보기 count published writing only.
+  expect(site.archive).toMatch(new RegExp(`전체보기 <span class="category-nav__count"[^>]*>${published.length}</span>`));
+  for (const { slug } of categories) {
+    const inCategory = published.filter((item) => item.category === slug);
+    const page = site.categoryPages[slug];
+    const pageLinks = new Set(page.match(/href="\/writing\/[a-z0-9-]+\/"/g) ?? []);
+    expect(pageLinks.size, `${slug} page lists only its published writing`).toBe(inCategory.length);
+    for (const item of inCategory) expect(page, `${item.slug} on the ${slug} page`).toContain(`href="${articlePath(item)}"`);
+    expect(site.archive, `${slug} sidebar count`).toMatch(
+      new RegExp(`href="${categoryPath(slug)}"[^>]*>[^<]*<span class="category-nav__count"[^>]*>${inCategory.length}</span>`),
+    );
+    expect(site.sitemap, `${slug} category page in the sitemap`).toContain(`${SITE}${categoryPath(slug)}`);
+  }
 
   const homeLinks = new Set(site.homepage.match(/href="\/writing\/[a-z0-9-]+\/"/g) ?? []);
   expect(homeLinks.size).toBe(onHome.length);
@@ -93,6 +116,9 @@ function expectHiddenWriting(site: BuiltSite, hidden: typeof writing) {
     expect(site.homepage, `${item.slug} draft on the home page`).not.toContain(escapeHtml(originalTitle(item)));
     expect(existsSync(`dist/writing/${item.slug}/index.html`), `${item.slug} draft page`).toBe(false);
     expect(site.sitemap, `${item.slug} draft in the sitemap`).not.toContain(articlePath(item));
+    for (const [slug, page] of Object.entries(site.categoryPages)) {
+      expect(page, `${item.slug} draft on the ${slug} page`).not.toContain(`href="${articlePath(item)}"`);
+    }
   }
 }
 

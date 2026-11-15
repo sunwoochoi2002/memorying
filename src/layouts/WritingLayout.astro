@@ -4,7 +4,8 @@ import ContentMetadata from '../components/ContentMetadata.astro';
 import LanguageToggle from '../components/LanguageToggle.astro';
 import NewsletterSignup from '../components/NewsletterSignup.astro';
 import BaseLayout from './BaseLayout.astro';
-import { originalTranslation, type WritingArticle } from '../lib/writing';
+import { findWritingCategory, originalTranslation, type WritingArticle } from '../lib/writing';
+import { loadWritingCategories } from '../lib/writing-categories';
 
 interface Props {
   item: WritingArticle;
@@ -14,6 +15,7 @@ const { item } = Astro.props;
 const original = originalTranslation(item);
 const { ko, en } = item.translations;
 const { originalLanguage } = item;
+const category = findWritingCategory(loadWritingCategories(), item.category);
 ---
 
 <BaseLayout
@@ -49,7 +51,7 @@ const { originalLanguage } = item;
         <div lang="ko" data-language-panel="ko" hidden={originalLanguage !== 'ko'}><slot name="ko" /></div>
         <div lang="en" data-language-panel="en" hidden={originalLanguage !== 'en'}><slot name="en" /></div>
       </div>
-      {item.type === 'essay' && <NewsletterSignup id="essay-end" />}
+      {category.newsletter && <NewsletterSignup id="essay-end" />}
       <p class="article-back"><a class="text-link" href="/writing/" lang="en">← Back to Writing</a></p>
     </div>
   </article>

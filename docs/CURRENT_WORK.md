@@ -25,7 +25,7 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 
 ## Product invariants
 
-- Each article keeps `meta.yaml`, `ko.md`, and `en.md` together under `src/content/writing/YYYY-MM-DD/<slug>/` (drafts under `src/content/writing/drafts/YYYY-MM-DD/<slug>/`).
+- Each article keeps `meta.yaml`, `ko.md`, and `en.md` together under `src/content/writing/<category>/YYYY-MM-DD/<slug>/` (drafts under `src/content/writing/drafts/<category>/YYYY-MM-DD/<slug>/`); `<category>` must be registered in `src/content/categories.yaml`.
 - Archive and home views show the declared original language first.
 - Article detail pages switch language at one stable URL and identify the original.
 - Published dates use `YYYY-MM-DD`, and bilingual titles preserve word boundaries.
@@ -45,7 +45,7 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 2. Content changes that came with it: article and list summaries are no longer shown (descriptions stay in meta tags), the Writing page intro sentence and every small uppercase eyebrow label are gone, the home page shows only the heading `Sunwoo’s Archive` (the Buttondown newsletter name; the header brand stays `Sunwoo Choi`) and the tagline, with `전체 글 보기` on the `Writing` heading line, and the subscribe block reads `새 에세이를 이메일로 받아 보세요.` with `새 에세이가 올라오면 남겨 주신 이메일 주소로 보내 드립니다. 구독은 언제든 취소할 수 있습니다.` The greeting paragraph removed from the home page still lives on the About page, which no longer carries the sentence "Memorying은 작업과 생각을 천천히 쌓아가는 개인적인 공간입니다."
 3. Fonts are self-hosted from the OFL-1.1 Fontsource npm packages. `public/_headers` allows only same-origin resources (`default-src 'self'`), so `astro.config.mjs` sets `assetsInlineLimit: 0` and `tests/unit/production-writing.test.ts` fails if any font is inlined as a `data:` URI. Korean text uses 124 unicode-range slices (about 6 MB in `dist/_astro/`); browsers fetch only the slices a page needs.
 4. Dates remain `YYYY-MM-DD` (product invariant); the demo's dotted dates were not adopted. English article text is set in Instrument Serif at 24px with extra word spacing; if it reads too dense, Newsreader was the compared alternative.
-5. Known content nit, not changed: `src/content/writing/2025-11-21/alone/ko.md` contains `신경쓰지는`, which standard spelling writes as `신경 쓰지는`. Content edits need the author's approval.
+5. Known content nit, not changed: `src/content/writing/note/2025-11-21/alone/ko.md` contains `신경쓰지는`, which standard spelling writes as `신경 쓰지는`. Content edits need the author's approval.
 
 ## Compact layout and photo covers record
 
@@ -58,7 +58,7 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 
 ## Maintenance guide record
 
-1. `docs/MAINTENANCE.md` (Korean) is the user's routine-operations guide: new writing, edits, Essay and Note switching, hiding and deleting, photos, dates, non-writing copy, newsletter sending, the deploy flow with Cloudflare preview URLs, rollback, and what needs a conversation first. `tests/unit/maintenance-guide.test.ts` keeps it from rotting (commands, metadata fields, headings, README link).
+1. `docs/MAINTENANCE.md` (Korean) is the user's routine-operations guide: new writing, edits, changing and adding categories (Essay and Note switching until 2026-11-15), hiding and deleting, photos, dates, non-writing copy, newsletter sending, the deploy flow with Cloudflare preview URLs, rollback, and what needs a conversation first. Since 2026-11-15 `tests/unit/maintenance-guide.test.ts` checks structure only (every `npm run` script it names exists, relative links resolve, README links to it, no secret assignments); it no longer pins headings or sentences.
 2. The trap first documented there (tests hard-coded the four essays, so publishing a new one failed `verify`) was removed by the content-driven checks below.
 
 ## Content-driven checks record
@@ -138,7 +138,7 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 Proceed one project at a time:
 
 1. With the user's own test email, run one live subscribe, confirm, and unsubscribe test from `https://sunwoochoi.com` (the user performs it), then finish the remaining launch checklist in `docs/publishing.md`.
-2. Review or replace writing copy directly in the article’s `src/content/writing/YYYY-MM-DD/<slug>/` folder (or `drafts/YYYY-MM-DD/<slug>/` for a draft); after the original-language edits are ready, request one batch translation for all affected `ko.md`, `en.md`, and any `cover.alt.*.txt` files.
+2. Review or replace writing copy directly in the article’s `src/content/writing/<category>/YYYY-MM-DD/<slug>/` folder (or `drafts/<category>/YYYY-MM-DD/<slug>/` for a draft); after the original-language edits are ready, request one batch translation for all affected `ko.md`, `en.md`, and any `cover.alt.*.txt` files.
 3. Optionally submit `https://sunwoochoi.com/sitemap-index.xml` to Google Search Console and Naver Search Advisor (the user owns those accounts).
 
 Buttondown delivery and Notion automation remain separate projects. The Cloudflare Pages project, the `sunwoochoi.com` DNS zone, and `SITE_URL` are live production settings; changing any of them needs explicit authorization.
@@ -146,19 +146,32 @@ Buttondown delivery and Notion automation remain separate projects. The Cloudfla
 ## Date-based writing storage (2026-11-13)
 
 - Approved design: [`dated-writing-design.md`](superpowers/specs/2026-11-13-dated-writing-design.md); implementation plan: [`dated-writing.md`](superpowers/plans/2026-11-13-dated-writing.md).
-- Real writing now lives in `src/content/writing/YYYY-MM-DD/<slug>/`; drafts live in `src/content/writing/drafts/YYYY-MM-DD/<slug>/`. The last folder remains the stable slug and public URLs remain `/writing/<slug>/`.
-- `meta.yaml` remains authoritative for publication and dates even before folder organization. `npm run new:writing` creates a dated draft. After editing `publishedAt` or `draft`, run `npm run organize:writing` to move the whole article folder. The organizer validates every date, global duplicate slug, and destination before any move; reruns are safe and unrelated files are preserved.
+- Real writing lived in `src/content/writing/YYYY-MM-DD/<slug>/` and drafts in `src/content/writing/drafts/YYYY-MM-DD/<slug>/`. Since 2026-11-15 the layout is `src/content/writing/<category>/YYYY-MM-DD/<slug>/` (drafts `src/content/writing/drafts/<category>/YYYY-MM-DD/<slug>/`); see the writing categories record below. The last folder remains the stable slug and public URLs remain `/writing/<slug>/`.
+- `meta.yaml` remains authoritative for category, publication, and dates even before folder organization. `npm run new:writing` creates a dated draft. After editing `category`, `publishedAt`, or `draft`, run `npm run organize:writing` to move the whole article folder. The organizer validates every date, global duplicate slug, and destination before any move; reruns are safe and unrelated files are preserved.
 - Recursive loading, covers, content checks, and newsletter lookup support both dated real writing and the unchanged flat test fixtures.
-- Migration preserved all 15 articles and 51 writing files byte for byte (SHA-256 checked). No writing text or metadata was edited by the migration. On 2026-11-15 the author set `suffering-to-success` to `draft: true` (it now lives in `drafts/2026-10-17/`) and asked to commit the previously untracked drafts `chain-of-thoughts` and `suffering-to-success`; drafts are tracked in git and only hidden from the public site.
+- Migration preserved all 15 articles and 51 writing files byte for byte (SHA-256 checked). No writing text or metadata was edited by the migration. On 2026-11-15 the author set `suffering-to-success` to `draft: true` (it now lives in `drafts/essay/2026-10-17/`) and asked to commit the previously untracked drafts `chain-of-thoughts` and `suffering-to-success`; drafts are tracked in git and only hidden from the public site.
 - Both P2 review findings were fixed on 2026-11-15: `src/lib/writing-loader.ts` rejects a duplicate slug added while `astro dev` runs, and automatic covers come only from files directly inside a loaded article folder. Committed on `main`; pushing (deployment) needs separate user approval. Verification results are recorded in `.superpowers/sdd/2026-11-13-dated-writing/implementation-report.md`.
-- Deferred to the planned writing input/storage/maintenance overhaul: while `astro dev` runs, moving an article folder (for example by `npm run organize:writing`) can drop it from the preview until restart if the watcher reports the new file before the old one is removed, and a rejected duplicate appears only after restart once the original is deleted. `npm run organize:writing` ignores unknown arguments such as `--help` and moves folders immediately; it has no dry run.
+- Deferred to the planned writing input/storage/maintenance overhaul: while `astro dev` runs, moving an article folder (for example by `npm run organize:writing`) can drop it from the preview until restart if the watcher reports the new file before the old one is removed, and a rejected duplicate appears only after restart once the original is deleted. These two P3 preview issues remain open. Resolved on 2026-11-15: `npm run organize:writing` now refuses unknown arguments such as `--help` (it prints `Usage: npm run organize:writing [-- --dry-run]` and exits before reading anything), and `npm run organize:writing -- --dry-run` lists planned moves without changing anything.
+
+## Writing categories (2026-11-15)
+
+- Approved design: [`writing-categories-design.md`](superpowers/specs/2026-11-15-writing-categories-design.md); implementation plan: [`writing-categories.md`](superpowers/plans/2026-11-15-writing-categories.md). Implementation reports: `.superpowers/sdd/2026-11-15-writing-categories/`.
+- Categories are registered in `src/content/categories.yaml` (`slug`, `name.ko`/`name.en`, `newsletter: true|false`); file order is sidebar order. `drafts` and `category` are reserved category slugs, and `category` is a forbidden article slug. Each article's `meta.yaml` has `category: <slug>` instead of `type:`; an unregistered category fails the build and the organizer. The "only Essays may be featured" rule is gone; at most one published article may be featured.
+- Layout: `src/content/writing/<category>/YYYY-MM-DD/<slug>/`, drafts `src/content/writing/drafts/<category>/YYYY-MM-DD/<slug>/`. The 15 articles moved to `essay` and `note` byte for byte (SHA-256 checked, 51 files); article URLs `/writing/<slug>/` are unchanged.
+- Commands: `npm run new:writing -- <slug> --original <ko|en> --category <slug>` creates a dated draft under `drafts/<category>/`. `npm run organize:writing` moves folders after editing `category`, `publishedAt`, or `draft`; `-- --dry-run` previews; unknown options are refused.
+- UI (design B, "네이버형 상자", approved): `/writing/` is 전체보기 and `/writing/category/<slug>/` is a static page per category (in the sitemap). Desktop shows a bordered category sidebar with counts and `aria-current`; phones show horizontal bordered chips above the list. Sidebar rows and chips are 44px tall. Archive pages are 56rem wide; reading pages stay 39rem. Rows on 전체보기 and the home page show the Korean category name (category pages omit it); the article meta line links to its category. The Essay/Note filter buttons are gone; old `/writing/?type=<slug>` URLs redirect to the category page. The empty-state copy is "이 카테고리에는 아직 공개된 글이 없습니다." The subscribe block appears at the end of articles whose category has `newsletter: true`.
+- No admin tool: the site stays a static, GitHub-based site. Follow-up (separate plan): easier GitHub authoring (for example a GitHub Actions "new writing" button or automatic organizing) and the two remaining P3 dev-preview folder-move issues above.
+- Document wording tests were reduced to structural checks (`npm run` scripts exist, relative links resolve, README links, no secrets, devcontainer contract).
+- Independent review fixes: `npm run organize:writing --dry-run` without `--` (npm keeps the flag and sets `npm_config_dry_run`) is treated as a dry run instead of moving folders; `new:writing` no longer mistakes `drafts`, category, or date folder names for taken slugs; the build rejects an article folder named `category`; the production build test checks category pages (published-only lists, sidebar counts, sitemap, no drafts).
+- Deferred (P3, preview only): `src/content.config.ts` reads the category list once, so after editing `categories.yaml` while `astro dev` runs, articles in a newly added category fail validation until the dev server is restarted.
+- Status: committed on `main` after verify; push needs approval.
 
 ## Resume checklist
 
 1. Run `git status --short`. If its output is non-empty, stop; understand the existing work on its current branch and safely commit and push it before running `git switch main` and `git pull --ff-only origin main`.
 2. Resume from updated `main` and work directly on main. Since 2026-09-26 routine work uses no feature branches or pull requests (see `docs/MAINTENANCE.md` section 4). Pushing to `main` deploys production, so run `npm run verify` before pushing and ask the user once before the push unless they already asked to deploy.
-3. Follow strict TDD and the approved Superpowers plan for implementation.
-4. Run focused tests and `npm run verify` before committing or pushing, including checkpoint-only changes; `tests/unit/codespaces-continuity.test.ts` asserts the wording of this file.
+3. Follow the risk-based testing rule in `AGENTS.md` and the approved Superpowers plan for implementation.
+4. Run focused tests and `npm run verify` before committing or pushing, including checkpoint-only changes; `tests/unit/codespaces-continuity.test.ts` checks that this file's relative links resolve.
 5. Astro 7 detects AI agent shells and starts `astro dev` in the background, which makes Playwright's `webServer` fail with `Process from config.webServer exited early`. From an agent shell run browser tests and `npm run verify` as `env -u CLAUDECODE npm run verify` (or the equivalent for that agent), and stop leftovers with `npx astro dev stop`.
 
 ## Resume prompt

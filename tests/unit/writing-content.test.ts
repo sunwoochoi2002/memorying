@@ -5,10 +5,10 @@ import { afterEach, describe, expect, it } from 'vitest';
 import {
   firstPlainLine,
   isoDatetime,
+  loadCategories,
   loadWritingCases,
   originalTitle,
   representativeCases,
-  typeLabel,
   visibleCases,
 } from '../support/writing-content';
 
@@ -24,7 +24,7 @@ function project(
     for (const [slug, article] of Object.entries(group)) {
       const directory = join(root, base, slug);
       mkdirSync(directory, { recursive: true });
-      writeFileSync(join(directory, 'meta.yaml'), article.meta ?? 'publishedAt: 2025-01-01\ntype: essay\noriginalLanguage: ko\ndraft: false\nfeatured: false\n');
+      writeFileSync(join(directory, 'meta.yaml'), article.meta ?? 'publishedAt: 2025-01-01\ncategory: essay\noriginalLanguage: ko\ndraft: false\nfeatured: false\n');
       if (article.ko !== null) writeFileSync(join(directory, 'ko.md'), article.ko ?? `---\ntitle: 제목 ${slug}\n---\n\n본문입니다.\n`);
       if (article.en !== null) writeFileSync(join(directory, 'en.md'), article.en ?? `---\ntitle: Title ${slug}\n---\n\nBody text.\n`);
       for (const [name, text] of Object.entries(article.files ?? {})) writeFileSync(join(directory, name), text);
@@ -40,38 +40,36 @@ afterEach(() => {
 describe('writing content reader', () => {
   it('reads metadata and both translations and sorts newest first with a slug tie-break', () => {
     const root = project({
-      older: { meta: 'publishedAt: 2024-05-01\ntype: note\noriginalLanguage: en\ndraft: true\nfeatured: false\n' },
-      'b-same-day': { meta: 'publishedAt: 2025-03-03\ntype: essay\noriginalLanguage: ko\ndraft: false\nfeatured: false\n' },
-      'a-same-day': { meta: 'publishedAt: 2025-03-03\ntype: essay\noriginalLanguage: ko\ndraft: false\nfeatured: false\nupdatedAt: 2025-04-01\n' },
+      older: { meta: 'publishedAt: 2024-05-01\ncategory: note\noriginalLanguage: en\ndraft: true\nfeatured: false\n' },
+      'b-same-day': { meta: 'publishedAt: 2025-03-03\ncategory: essay\noriginalLanguage: ko\ndraft: false\nfeatured: false\n' },
+      'a-same-day': { meta: 'publishedAt: 2025-03-03\ncategory: essay\noriginalLanguage: ko\ndraft: false\nfeatured: false\nupdatedAt: 2025-04-01\n' },
     });
 
     const cases = loadWritingCases({ root });
 
     expect(cases.map((item) => item.slug)).toEqual(['a-same-day', 'b-same-day', 'older']);
-    expect(cases[0]).toMatchObject({ type: 'essay', originalLanguage: 'ko', draft: false, publishedAt: '2025-03-03', updatedAt: '2025-04-01', source: 'content' });
-    expect(cases[2]).toMatchObject({ type: 'note', originalLanguage: 'en', draft: true });
+    expect(cases[0]).toMatchObject({ category: 'essay', originalLanguage: 'ko', draft: false, publishedAt: '2025-03-03', updatedAt: '2025-04-01', source: 'content' });
+    expect(cases[2]).toMatchObject({ category: 'note', originalLanguage: 'en', draft: true });
     expect(cases[0].translations.ko).toMatchObject({ title: '제목 a-same-day' });
     expect(cases[0].translations.en.body).toBe('Body text.');
     expect(originalTitle(cases[2])).toBe('Title older');
     expect(isoDatetime(cases[0])).toBe('2025-03-03T00:00:00.000Z');
-    expect(typeLabel('essay')).toBe('Essay');
-    expect(typeLabel('note')).toBe('Note');
   });
 
   it('discovers nested writing and flat fixtures while ignoring hidden directories and symlinks', () => {
     const root = project({
-      '2025-01-01/live': {},
-      'drafts/2025-01-01/hidden': { meta: 'publishedAt: 2025-01-01\ndraft: true\n' },
+      'essay/2025-01-01/live': {},
+      'drafts/note/2025-01-01/hidden': { meta: 'publishedAt: 2025-01-01\ndraft: true\n' },
       '.ignored/secret': {},
     }, { sample: {} });
-    symlinkSync(join(root, 'src/content/writing/2025-01-01'), join(root, 'src/content/writing/link'));
+    symlinkSync(join(root, 'src/content/writing/essay/2025-01-01'), join(root, 'src/content/writing/link'));
     const cases = loadWritingCases({ root, fixtures: true });
     expect(cases.map((item) => item.slug)).toEqual(['hidden', 'live', 'sample']);
     expect(visibleCases(cases, { includeDrafts: false }).map((item) => item.slug)).toEqual(['live', 'sample']);
   });
 
   it('rejects duplicate leaf slugs across dates and draft areas', () => {
-    const root = project({ '2025-01-01/same': {}, 'drafts/2025-01-02/same': {} });
+    const root = project({ 'essay/2025-01-01/same': {}, 'drafts/note/2025-01-02/same': {} });
     expect(() => loadWritingCases({ root })).toThrow(/Duplicate writing slug: same/);
   });
 
@@ -92,7 +90,7 @@ describe('writing content reader', () => {
   });
 
   it('adds the test fixtures only when asked and marks their source', () => {
-    const root = project({ real: {} }, { sample: { meta: 'publishedAt: 2026-01-01\ntype: note\noriginalLanguage: en\ndraft: true\nfeatured: false\n' } });
+    const root = project({ real: {} }, { sample: { meta: 'publishedAt: 2026-01-01\ncategory: note\noriginalLanguage: en\ndraft: true\nfeatured: false\n' } });
 
     expect(loadWritingCases({ root }).map((item) => item.slug)).toEqual(['real']);
     const withFixtures = loadWritingCases({ root, fixtures: true });
@@ -102,7 +100,7 @@ describe('writing content reader', () => {
   it('hides drafts unless they are requested', () => {
     const root = project({
       live: {},
-      hidden: { meta: 'publishedAt: 2025-06-06\ntype: essay\noriginalLanguage: ko\ndraft: true\nfeatured: false\n' },
+      hidden: { meta: 'publishedAt: 2025-06-06\ncategory: essay\noriginalLanguage: ko\ndraft: true\nfeatured: false\n' },
     });
     const cases = loadWritingCases({ root });
 
@@ -112,8 +110,20 @@ describe('writing content reader', () => {
 
   it('explains what is missing instead of crashing', () => {
     expect(() => loadWritingCases({ root: project({ broken: { en: null } }) })).toThrow(/"broken".*en\.md/);
-    expect(() => loadWritingCases({ root: project({ broken: { meta: 'type: essay\n' } }) })).toThrow(/"broken".*publishedAt/);
+    expect(() => loadWritingCases({ root: project({ broken: { meta: 'category: essay\n' } }) })).toThrow(/"broken".*publishedAt/);
     expect(() => loadWritingCases({ root: project({ broken: { ko: 'no frontmatter here' } }) })).toThrow(/"broken".*ko\.md.*front/i);
+  });
+
+  it('reads the category registry of a project root in file order', () => {
+    const root = project({});
+    mkdirSync(join(root, 'src/content'), { recursive: true });
+    writeFileSync(join(root, 'src/content/categories.yaml'), '- slug: poem\n  name: { ko: 시, en: Poem }\n  newsletter: true\n- slug: list\n  name: { ko: 목록, en: List }\n  newsletter: false\n');
+
+    expect(loadCategories(root)).toEqual([
+      { slug: 'poem', name: { ko: '시', en: 'Poem' }, newsletter: true },
+      { slug: 'list', name: { ko: '목록', en: 'List' }, newsletter: false },
+    ]);
+    expect(loadCategories().length).toBeGreaterThan(0);
   });
 
   it('picks a plain sentence to look for on the page', () => {

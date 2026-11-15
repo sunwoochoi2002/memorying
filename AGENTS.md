@@ -20,7 +20,13 @@ For unfinished work, first read [`docs/CURRENT_WORK.md`](docs/CURRENT_WORK.md). 
 
 ## Delivery workflow
 
-Use strict TDD: write and observe the focused failing test before implementation, then make the smallest change green. Use Superpowers Subagent-Driven Development for approved implementation plans. Have one implementer at a time, following implementation → tests → review → fixes. Before completion, run the relevant focused tests and `npm run verify`. Work directly on `main` without feature branches or pull requests; pushing to `main` deploys production, so push only after `npm run verify` passes and the user approves the deploy (see `docs/MAINTENANCE.md` section 4).
+Test by risk (approved by the user on 2026-11-15):
+
+- Test first for anything that touches writing data: moving, creating, or deleting article files; validation rules (schemas, `tests/support/writing-rules.ts`); and data migrations. Write and observe the focused failing test, then make the smallest change green.
+- For UI and layout, get the user's approval on a visual (Claude Artifact mockup or dev-server screenshots) first, then add behavioral tests.
+- For simple wiring and documentation, do not write tests first; rely on `npm run verify`. Do not add tests that pin document wording.
+
+Use Superpowers Subagent-Driven Development for approved multi-step implementation plans, with one implementer at a time, following implementation → tests → review → fixes. Make small fixes directly. Before completion, run the relevant focused tests and `npm run verify`. Work directly on `main` without feature branches or pull requests; pushing to `main` deploys production, so push only after `npm run verify` passes and the user approves the deploy (see `docs/MAINTENANCE.md` section 4).
 
 Run `npm ci` for a lockfile-exact environment. Preview with `npm run dev -- --host 0.0.0.0`. Check `git status --short` before and after work, and preserve unrelated user changes.
 

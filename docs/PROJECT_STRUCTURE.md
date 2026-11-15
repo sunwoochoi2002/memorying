@@ -6,8 +6,9 @@ Memorying은 글을 중심으로 운영하는 이중 언어 아카이브입니�
 
 | 경로 | 용도 |
 | --- | --- |
-| `src/content/writing/YYYY-MM-DD/<slug>/` | 글 한 편의 언어별 제목·본문, 메타데이터, 선택 사진을 함께 보관합니다. |
-| `src/content/writing/drafts/YYYY-MM-DD/<slug>/` | 공개하지 않은 초안을 같은 날짜 기준으로 보관합니다. |
+| `src/content/writing/<category>/YYYY-MM-DD/<slug>/` | 글 한 편의 언어별 제목·본문, 메타데이터, 선택 사진을 함께 보관합니다. 카테고리 → 날짜 → 글 순서로 폴더가 나뉩니다. |
+| `src/content/writing/drafts/<category>/YYYY-MM-DD/<slug>/` | 공개하지 않은 초안을 같은 카테고리·날짜 기준으로 보관합니다. |
+| `src/content/categories.yaml` | 글 카테고리 목록입니다. 영문 이름(`slug`), 한국어·영어 이름, 구독 블록 표시 여부(`newsletter`)를 적고, 적힌 순서가 Writing 화면의 카테고리 순서입니다. |
 | `src/content/about/profile.yaml` | About 소개와 네 개의 소속 요약입니다. |
 | `src/content/projects/*.yaml` | Projects에 표시할 프로젝트별 한국어·영어 설명입니다. |
 | `src/content/experience/*.yaml` | Experience의 교육·일과 연구·활동·수상 기록입니다. 자세한 편집법은 `src/content/about/README.md`를 봅니다. |
@@ -19,13 +20,13 @@ Memorying은 글을 중심으로 운영하는 이중 언어 아카이브입니�
 | `scripts/` | 검사나 콘텐츠 생성에 쓰는 도우미 명령입니다. |
 | `tests/` | 사이트가 예상대로 동작하는지 확인하는 테스트입니다. |
 | `tests/support/` | 테스트가 저장소의 글을 읽어 기준과 비교하는 도구입니다. `writing-rules.ts`에 글이 지켜야 할 기준이 있습니다. 글 제목이나 개수를 테스트에 직접 적지 않으므로 새 글을 추가해도 테스트를 고칠 필요가 없습니다. |
-| `tests/fixtures/writing/<slug>/` | 테스트에만 쓰는 샘플 글입니다. 실제 아카이브에는 나타나지 않고, `WRITING_FIXTURES=1`로 테스트를 실행할 때만 읽힙니다. Note 유형, 영어 원문, 사진, 비공개 초안처럼 실제 글에 아직 없는 경우를 검증합니다. |
+| `tests/fixtures/writing/<slug>/` | 테스트에만 쓰는 샘플 글입니다. 실제 아카이브에는 나타나지 않고, `WRITING_FIXTURES=1`로 테스트를 실행할 때만 읽힙니다. 구독 블록이 없는 카테고리, 영어 원문, 사진, 비공개 초안처럼 실제 글에 아직 없는 경우를 검증합니다. |
 
 ## 글 한 편의 폴더
 
 ```text
-src/content/writing/YYYY-MM-DD/<slug>/
-├── meta.yaml           # 게시일, 글 종류, 원문 언어, 공개 상태 등
+src/content/writing/<category>/YYYY-MM-DD/<slug>/
+├── meta.yaml           # 게시일, 카테고리, 원문 언어, 공개 상태 등
 ├── ko.md              # 한국어 제목·본문
 ├── en.md              # 영어 제목·본문
 ├── cover.jpg           # 선택 사항: 상세 페이지에만 보일 사진
@@ -33,7 +34,7 @@ src/content/writing/YYYY-MM-DD/<slug>/
 └── cover.alt.en.txt    # 선택 사항: 사진의 영어 대체 텍스트
 ```
 
-날짜 폴더는 `meta.yaml`의 `publishedAt`을 따릅니다. `npm run new:writing -- <slug> --original ko`는 오늘 날짜의 `drafts/YYYY-MM-DD/<slug>/`에 초안을 만듭니다. `draft`나 `publishedAt`을 고친 뒤 `npm run organize:writing`으로 위치를 맞춥니다. 명령은 충돌과 잘못된 날짜를 이동 전에 검사하고, 글 폴더 전체를 옮깁니다. 공개 여부·정렬은 정리 전에도 메타데이터를 따릅니다. 마지막 폴더 이름이 슬러그이므로 `/writing/<slug>/` 주소는 바뀌지 않습니다. 테스트 샘플은 기존의 `tests/fixtures/writing/<slug>/`에 그대로 둡니다.
+카테고리 폴더는 `meta.yaml`의 `category`를, 날짜 폴더는 `publishedAt`을 따릅니다. `npm run new:writing -- <slug> --original ko --category essay`는 오늘 날짜의 `drafts/essay/YYYY-MM-DD/<slug>/`에 초안을 만듭니다. `category`, `draft`, `publishedAt`을 고친 뒤 `npm run organize:writing`으로 위치를 맞춥니다(`-- --dry-run`을 붙이면 옮길 목록만 보여 줍니다). 명령은 충돌, 잘못된 날짜, 등록되지 않은 카테고리를 이동 전에 검사하고, 글 폴더 전체를 옮깁니다. 공개 여부·카테고리·정렬은 정리 전에도 메타데이터를 따릅니다. 마지막 폴더 이름이 슬러그이므로 `/writing/<slug>/` 주소는 바뀌지 않습니다. 카테고리별 목록은 `/writing/category/<category>/`에 있습니다. 테스트 샘플은 기존의 `tests/fixtures/writing/<slug>/`에 그대로 둡니다.
 
 사진은 `cover.jpg` 자리에 `avif`, `jpeg`, `jpg`, `png`, `svg`, `webp` 중 하나로 **한 장만** 넣을 수 있습니다. 사진 파일만 있으면 글의 상세 페이지에 표시되고, 사진이 없으면 본문만 표시됩니다. 사진 크기는 제각각이어도 됩니다. 사진은 항상 같은 크기의 **정사각형 흰색 틀** 안에 원본 그대로(자르지 않고) 들어가고, 남는 자리는 흰색으로 채워집니다. 빌드할 때 화면에 맞는 가벼운 WebP로 자동 변환되므로 원본을 미리 줄일 필요는 없습니다.
 

@@ -10,7 +10,7 @@ import type { WritingArticle } from '../../src/lib/writing';
 const article = (overrides: Partial<WritingArticle> = {}): WritingArticle => ({
   slug: 'alone',
   publishedAt: new Date('2025-11-21T00:00:00Z'),
-  type: 'essay',
+  category: 'essay',
   originalLanguage: 'ko',
   draft: false,
   featured: false,
@@ -115,11 +115,11 @@ describe('automatic writing covers', () => {
     expect(resolved.coverImageAlt).toEqual(manualAlt);
   });
 
-  it('finds the cover of an article stored in a dated folder', () => {
+  it('finds the cover of an article stored in category and dated folders', () => {
     const covers = collectAutomaticWritingCovers(
-      { '../content/writing/2025-11-21/alone/cover.png': { default: image } },
-      { '../content/writing/2025-11-21/alone/cover.alt.en.txt': 'Headphones' },
-      articleDirectories('../content/writing/2025-11-21/alone'),
+      { '../content/writing/note/2025-11-21/alone/cover.png': { default: image } },
+      { '../content/writing/note/2025-11-21/alone/cover.alt.en.txt': 'Headphones' },
+      articleDirectories('../content/writing/note/2025-11-21/alone'),
     );
 
     expect(covers).toEqual({ alone: { image, alt: { ko: '', en: 'Headphones' } } });

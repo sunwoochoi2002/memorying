@@ -1,15 +1,19 @@
 ---
-import { formatWritingDate, originalTranslation, type WritingArticle } from '../lib/writing';
+import { findWritingCategory, formatWritingDate, originalTranslation, type WritingArticle } from '../lib/writing';
+import { loadWritingCategories } from '../lib/writing-categories';
 
 interface Props {
   item: WritingArticle;
   headingLevel?: 2 | 3;
   compact?: boolean;
+  /** Category pages leave the label out: every row there shares it. */
+  showCategory?: boolean;
 }
 
-const { item, headingLevel = 2, compact = false } = Astro.props;
+const { item, headingLevel = 2, compact = false, showCategory = true } = Astro.props;
 const translation = originalTranslation(item);
 const Heading = headingLevel === 2 ? 'h2' : 'h3';
+const category = findWritingCategory(loadWritingCategories(), item.category);
 ---
 
 <article class:list={['writing-list-item', { 'writing-list-item--compact': compact }]}>
@@ -17,7 +21,7 @@ const Heading = headingLevel === 2 ? 'h2' : 'h3';
     <Heading lang={item.originalLanguage}><a href={`/writing/${item.slug}/`}>{translation.title}</a></Heading>
   </div>
   <p class="writing-list-item__meta">
-    <span lang="en">{item.type === 'essay' ? 'Essay' : 'Note'}</span>
+    {showCategory && <span lang="ko">{category.name.ko}</span>}
     <time lang={item.originalLanguage} datetime={item.publishedAt.toISOString()}>
       {formatWritingDate(item.publishedAt)}
     </time>

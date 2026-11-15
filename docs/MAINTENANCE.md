@@ -15,7 +15,7 @@
 말로 요청하면 됩니다. 수정과 검사는 Claude가 진행하고, 검사를 통과하면 배포할지 한 번만 묻습니다. 요청에 "배포까지 해 줘"를 붙이면 묻지 않고 바로 배포합니다. 요청은 이렇게 하면 됩니다.
 
 - "새 글을 추가하고 싶어. 제목은 ○○이고 한국어 원문이야. 내용은 아래와 같아."
-- "『홀로-』를 Note로 바꿔 줘."
+- "『홀로-』를 에세이 카테고리로 옮겨 줘."
 - "『Teammates』 3번째 문단의 오타를 고쳐 줘."
 - "홈 소개 문구를 ○○로 바꿔 줘."
 
@@ -27,9 +27,9 @@
 
 | 하고 싶은 일 | 고치는 곳 | 자세히 |
 | --- | --- | --- |
-| 새 글 쓰기 | `src/content/writing/drafts/YYYY-MM-DD/<슬러그>/` 폴더 | 3-1 |
+| 새 글 쓰기 | `src/content/writing/drafts/<카테고리>/YYYY-MM-DD/<슬러그>/` 폴더 | 3-1 |
 | 글의 오타·문장 고치기 | 그 글의 `ko.md`, `en.md` | 3-2 |
-| Essay를 Note로, 또는 반대로 | 그 글의 `meta.yaml` | 3-3 |
+| 글의 카테고리 바꾸기, 카테고리 추가·이름 변경·순서 변경 | 그 글의 `meta.yaml`, `src/content/categories.yaml` | 3-3 |
 | 글 잠시 숨기기, 지우기 | 그 글의 `meta.yaml`, 폴더 | 3-4 |
 | 글에 사진 넣기·바꾸기·빼기 | 그 글 폴더의 `cover.*` 파일 | 3-5 |
 | 글 날짜 바꾸기 | 그 글의 `meta.yaml` | 3-6 |
@@ -43,10 +43,10 @@
 1. 터미널에서 글 폴더를 만듭니다. 슬러그는 공개 주소의 일부입니다. 소문자 영문, 숫자, 하이픈만 쓸 수 있고 **한 번 공개하면 바꾸지 않는 것이 원칙**입니다.
 
 ```bash
-npm run new:writing -- remembering-summer --original ko
+npm run new:writing -- remembering-summer --original ko --category essay
 ```
 
-원문이 영어면 `--original en`으로 씁니다. `YYYY-MM-DD`는 명령을 실행한 날짜입니다. 그러면 `src/content/writing/drafts/YYYY-MM-DD/remembering-summer/` 아래에 파일 3개가 만들어집니다.
+원문이 영어면 `--original en`으로 씁니다. `--category`에는 `src/content/categories.yaml`에 등록된 카테고리의 영문 이름(지금은 `essay` 또는 `note`)을 씁니다. 카테고리는 꼭 적어야 합니다. `YYYY-MM-DD`는 명령을 실행한 날짜입니다. 그러면 `src/content/writing/drafts/essay/YYYY-MM-DD/remembering-summer/` 아래에 파일 3개가 만들어집니다.
 
 - `meta.yaml`: 글의 정보
 - `ko.md`: 한국어 제목, 본문
@@ -57,14 +57,14 @@ npm run new:writing -- remembering-summer --original ko
 | 항목 | 뜻 | 값 |
 | --- | --- | --- |
 | `publishedAt` | 공개 날짜 | `2025-11-21` 형식 |
-| `type` | 글 종류 | `essay` 또는 `note` |
+| `category` | 글의 카테고리. Writing 화면에서 이 카테고리를 누르면 이 글이 나옵니다. | `categories.yaml`에 등록된 영문 이름 (예: `essay`, `note`) |
 | `originalLanguage` | 원문 언어. 목록에서 이 언어의 제목이 먼저 보입니다. | `ko` 또는 `en` |
 | `draft` | 공개 여부 | `true`면 숨김, `false`면 공개 |
 | `updatedAt` | 수정 날짜 (선택) | `2026-10-01` 형식 |
 | `featured` | 대표 글 표시. 지금은 화면에 쓰이지 않으니 그대로 두세요. | `false` |
 
 2. `ko.md`와 `en.md`의 맨 위 `title`을 채우고 본문을 씁니다. **두 언어를 모두 채워야** 합니다. 글에는 제목과 본문만 있고, 설명(`description`)은 없습니다. 파일에 `description`을 적으면 검사가 실패합니다. 번역이 필요하면 Claude에게 "영어 번역해 줘"라고 요청하세요.
-3. 글 종류가 Note라면 `meta.yaml`에서 `type: essay`를 `type: note`로 바꿉니다.
+3. 카테고리를 잘못 골랐다면 `meta.yaml`의 `category`를 고칩니다(3-3 참고).
 4. 날짜를 확인합니다. 명령을 실행한 날짜가 `publishedAt`에 들어가 있습니다. 미래 날짜는 공개할 수 없습니다.
 5. 미리보기로 확인합니다. 새 글은 `draft: true` 상태라 미리보기에서는 보이지만 공개 사이트에는 나오지 않습니다.
 
@@ -73,12 +73,12 @@ npm run dev -- --host 0.0.0.0
 ```
 
 6. 공개할 준비가 되면 `meta.yaml`의 `draft: true`를 `draft: false`로 바꿉니다. `[Draft]`가 붙은 제목이 남아 있으면 빌드가 실패합니다.
-7. `npm run organize:writing`을 실행합니다. `publishedAt` 날짜에 맞춰 공개 글은 `src/content/writing/YYYY-MM-DD/<슬러그>/`로, 초안은 `src/content/writing/drafts/YYYY-MM-DD/<슬러그>/`로 글 폴더 전체가 이동합니다. 두 언어와 사진, 첨부 파일은 함께 유지되며 글 주소는 그대로입니다.
+7. `npm run organize:writing`을 실행합니다. `category`와 `publishedAt`에 맞춰 공개 글은 `src/content/writing/<카테고리>/YYYY-MM-DD/<슬러그>/`로, 초안은 `src/content/writing/drafts/<카테고리>/YYYY-MM-DD/<슬러그>/`로 글 폴더 전체가 이동합니다. 두 언어와 사진, 첨부 파일은 함께 유지되며 글 주소는 그대로입니다.
 8. 4번 「배포하는 순서」로 올립니다.
 
 ### 3-2. 글 내용 고치기
 
-1. `src/content/writing/YYYY-MM-DD/<슬러그>/ko.md` 또는 `en.md`를 (초안은 `writing/drafts/YYYY-MM-DD/<슬러그>/`) 열어 고칩니다. 원문과 번역이 어긋나지 않게, 뜻이 바뀌는 수정은 두 파일 모두에서 합니다.
+1. `src/content/writing/<카테고리>/YYYY-MM-DD/<슬러그>/ko.md` 또는 `en.md`를 (초안은 `writing/drafts/<카테고리>/YYYY-MM-DD/<슬러그>/`) 열어 고칩니다. 원문과 번역이 어긋나지 않게, 뜻이 바뀌는 수정은 두 파일 모두에서 합니다.
 2. 크게 고쳤다면 `meta.yaml`에 수정한 날짜를 추가할 수 있습니다. 글 위쪽에 「Updated 날짜」가 표시됩니다.
 
 ```yaml
@@ -87,26 +87,67 @@ updatedAt: 2026-10-01
 
 3. 4번 「배포하는 순서」로 올립니다. 주소는 바뀌지 않습니다.
 
-### 3-3. Essay와 Note 바꾸기
+### 3-3. 카테고리 바꾸기와 추가하기
 
-`meta.yaml`에서 `type` 한 줄만 바꿉니다.
+카테고리는 글을 묶는 칸입니다. Writing 화면 왼쪽(휴대폰에서는 제목 아래 가로 줄)에 「전체보기」와 함께 카테고리 이름과 글 수가 나옵니다. 카테고리 목록은 `src/content/categories.yaml` 한 파일에 있습니다.
 
 ```yaml
-type: essay   # Essay
-type: note    # Note
+- slug: essay          # 폴더 이름과 주소에 쓰는 영문 이름
+  name: { ko: 에세이, en: Essay }
+  newsletter: true     # 글 끝에 구독 블록을 보여 줄지
+- slug: note
+  name: { ko: 노트, en: Note }
+  newsletter: false
 ```
+
+**글의 카테고리 바꾸기**
+
+1. 그 글의 `meta.yaml`에서 `category` 한 줄만 바꿉니다.
+
+```yaml
+category: essay   # 에세이
+category: note    # 노트
+```
+
+2. 옮겨질 위치를 먼저 확인합니다. 이 명령은 목록만 보여 주고 아무것도 옮기지 않습니다.
+
+```bash
+npm run organize:writing -- --dry-run
+```
+
+3. 목록이 맞으면 `npm run organize:writing`을 실행합니다. 글 폴더가 `<새 카테고리>/YYYY-MM-DD/<슬러그>/`로 통째로 옮겨지고, 비게 된 이전 날짜·카테고리 폴더는 지워집니다.
 
 바뀌는 것은 다음과 같습니다.
 
-- 목록과 글 위쪽의 「Essay」 또는 「Note」 표시가 바뀌고, Writing의 필터도 그에 맞게 나뉩니다.
-- 구독 안내 상자는 **Essay에만** 나옵니다. Note로 바꾸면 사라집니다.
-- Note도 같은 명령으로 메일을 만들 수 있습니다. 보낼지는 직접 정합니다.
-- 글 주소는 바뀌지 않습니다.
-- `featured: true`인 글은 Note로 바꿀 수 없습니다. 먼저 `featured: false`로 바꾸세요. `featured`는 지금 화면에 쓰이지 않으니 건드리지 않아도 됩니다. 여러 글에 `true`를 주면 빌드가 실패합니다.
+- 목록의 카테고리 표시, 글 위쪽의 카테고리 링크, Writing 왼쪽 목록의 글 수가 바뀝니다.
+- 구독 안내 상자는 `newsletter: true`인 카테고리(지금은 에세이)의 글 끝에만 나옵니다.
+- 어느 카테고리의 글이든 같은 명령으로 메일을 만들 수 있습니다. 보낼지는 직접 정합니다.
+- 글 주소 `/writing/<슬러그>/`는 바뀌지 않습니다.
+
+**카테고리 추가하기**
+
+`categories.yaml`에 세 줄을 더합니다. `slug`는 소문자 영문, 숫자, 하이픈만 쓰고, 다른 카테고리와 겹치면 안 됩니다. `drafts`와 `category`는 사이트가 쓰는 이름이라 쓸 수 없습니다. `name`에는 한국어와 영어 이름을 모두 씁니다.
+
+```yaml
+- slug: travel
+  name: { ko: 여행, en: Travel }
+  newsletter: false
+```
+
+새 카테고리는 `/writing/category/travel/` 주소로 열립니다. 글이 하나도 없으면 「이 카테고리에는 아직 공개된 글이 없습니다.」가 보입니다. 이 카테고리로 새 글을 쓰려면 `--category travel`로 만듭니다.
+
+**이름 바꾸기, 순서 바꾸기, 지우기**
+
+- **화면에 보이는 이름만 바꾸기**: `name`의 `ko`, `en`만 고칩니다. 폴더와 주소는 그대로입니다.
+- **순서 바꾸기**: 파일 안에서 항목의 순서를 바꿉니다. 적힌 순서가 곧 왼쪽 목록의 순서입니다.
+- **영문 이름(`slug`) 바꾸기**: `categories.yaml`의 `slug`와, 그 카테고리 글들의 `meta.yaml` `category`를 모두 같은 새 이름으로 바꾼 뒤 위의 2~3번(`--dry-run` 확인 후 정리)을 합니다. 카테고리 주소 `/writing/category/<slug>/`가 바뀌니, 이미 공유한 카테고리 주소는 끊깁니다. 글 주소는 그대로입니다. 비어 있는 옛 카테고리 폴더가 남으면 지워도 됩니다(Git은 빈 폴더를 기록하지 않습니다).
+- **지우기**: 먼저 그 카테고리의 글을 모두 다른 카테고리로 옮긴 다음 `categories.yaml`에서 항목을 지웁니다. 목록에 없는 카테고리를 쓰는 글이 남아 있으면 정리 명령과 검사가 모두 멈추고 어느 글인지 알려 줍니다.
+
+`featured: true`는 지금 화면에 쓰이지 않으니 건드리지 않아도 됩니다. 여러 공개 글에 `true`를 주면 빌드가 실패합니다.
 
 ### 3-4. 글 숨기기와 삭제
 
-**잠시 숨기기 (추천)**: `meta.yaml`에서 `draft: false`를 `draft: true`로 바꿉니다. 목록, 홈, 사이트맵에서 빠지고 글 주소도 열리지 않습니다. 나중에 `false`로 돌리면 그대로 돌아옵니다. 바꾼 뒤 `npm run organize:writing`을 실행해 초안·공개 폴더 위치도 맞춥니다. 명령 실행 전에도 공개 여부는 `draft` 값으로 결정됩니다.
+**잠시 숨기기 (추천)**: `meta.yaml`에서 `draft: false`를 `draft: true`로 바꿉니다. 목록, 홈, 사이트맵에서 빠지고 글 주소도 열리지 않습니다. 나중에 `false`로 돌리면 그대로 돌아옵니다. 바꾼 뒤 `npm run organize:writing`을 실행해 초안(`drafts/`)·공개 폴더 위치도 맞춥니다. 명령 실행 전에도 공개 여부는 `draft` 값으로 결정됩니다.
 
 **완전히 지우기**: 글 폴더 전체를 지웁니다. 되돌리려면 Git 기록에서 복원해야 하므로, 정말 필요할 때만 하세요.
 
@@ -130,7 +171,7 @@ type: note    # Note
 npm run organize:writing
 ```
 
-이 명령은 모든 글의 날짜와 슬러그 중복, 목적지 충돌을 먼저 검사합니다. 문제가 있으면 이동을 시작하지 않습니다. 비어 있는 이전 날짜 폴더만 지우고, 관계없는 파일은 남깁니다. 여러 번 실행해도 안전합니다. 날짜·공개 여부는 폴더 이름보다 `meta.yaml` 값이 우선이며, 정리 전에도 목록 정렬과 공개 여부에 적용됩니다. 폴더를 옮겨도 마지막 `<슬러그>`와 `/writing/<슬러그>/` 주소는 바뀌지 않습니다.
+이 명령은 모든 글의 날짜, 카테고리, 슬러그 중복, 목적지 충돌을 먼저 검사합니다. 문제가 있으면 이동을 시작하지 않습니다. 비어 있는 이전 날짜·카테고리 폴더만 지우고, 관계없는 파일은 남깁니다. 여러 번 실행해도 안전합니다. 무엇이 옮겨질지 미리 보고 싶으면 `npm run organize:writing -- --dry-run`을 실행합니다. 목록만 보여 주고 아무것도 옮기지 않습니다. 그 밖의 옵션을 붙이면 사용법만 보여 주고 멈춥니다. 날짜·카테고리·공개 여부는 폴더 이름보다 `meta.yaml` 값이 우선이며, 정리 전에도 목록 정렬과 공개 여부에 적용됩니다. 폴더를 옮겨도 마지막 `<슬러그>`와 `/writing/<슬러그>/` 주소는 바뀌지 않습니다.
 
 ### 3-7. 글이 아닌 페이지의 문구 고치기
 
@@ -170,7 +211,7 @@ Sunwoo Choi
 구독 취소 링크는 Buttondown이 자동으로 붙입니다. 메일은 **원문 언어 한 가지**로 만들고, 다른 언어는 사이트 링크에서 바꿔 읽습니다.
 
 1. 글이 공개되어 있는지 확인합니다(`draft: false`).
-2. 터미널에서 메일을 만듭니다. 슬러그는 날짜나 `drafts`를 뺀 마지막 글 폴더 이름입니다. 명령이 날짜 폴더를 찾아 읽으므로 호출 방식은 그대로입니다.
+2. 터미널에서 메일을 만듭니다. 슬러그는 카테고리, 날짜, `drafts`를 뺀 마지막 글 폴더 이름입니다. 명령이 글 폴더를 찾아 읽으므로 호출 방식은 그대로입니다.
 
 ```bash
 npm run newsletter -- remembering-summer
@@ -216,7 +257,7 @@ npm run newsletter -- remembering-summer
 
 ## 6. 자동 검사가 확인하는 것
 
-`verify` 검사는 사이트가 깨지지 않았는지 자동으로 확인합니다. 배포 전에 `npm run verify`로 직접 돌리고, 올린 뒤에는 GitHub도 한 번 더 돌립니다. 글에 대해서는 **저장소에 있는 글을 읽어서 기준에 맞는지만** 봅니다. 글 제목이나 개수를 미리 적어 두지 않았기 때문에, 새 글을 추가하거나 제목을 바꾸거나 Essay와 Note를 바꿔도 **검사를 고칠 필요가 없습니다.** 기준에 맞으면 그대로 통과합니다.
+`verify` 검사는 사이트가 깨지지 않았는지 자동으로 확인합니다. 배포 전에 `npm run verify`로 직접 돌리고, 올린 뒤에는 GitHub도 한 번 더 돌립니다. 글에 대해서는 **저장소에 있는 글을 읽어서 기준에 맞는지만** 봅니다. 글 제목이나 개수를 미리 적어 두지 않았기 때문에, 새 글을 추가하거나 제목을 바꾸거나 카테고리를 바꾸거나 새 카테고리를 만들어도 **검사를 고칠 필요가 없습니다.** 기준에 맞으면 그대로 통과합니다.
 
 기준은 이렇습니다. 어기면 어느 글의 무엇이 문제인지 알려 주며 실패합니다.
 
@@ -224,10 +265,10 @@ npm run newsletter -- remembering-summer
 - `ko.md`와 `en.md`가 모두 있고, 제목과 본문이 비어 있지 않습니다.
 - 한국어 파일에는 한글이, 영어 파일에는 영문이 있습니다. 언어가 뒤바뀐 실수를 잡습니다.
 - 공개된 글에는 `[Draft]` 표시, 생성된 기본 문구, 미래 날짜가 없습니다. 숨긴 글(`draft: true`)은 이 기준을 적용하지 않습니다.
-- `type`은 `essay` 또는 `note`, `originalLanguage`는 `ko` 또는 `en`입니다.
-- 대표 글(`featured: true`)은 Essay만 될 수 있고, 공개된 대표 글은 하나뿐입니다.
+- `category`는 `src/content/categories.yaml`에 등록된 카테고리, `originalLanguage`는 `ko` 또는 `en`입니다. 글 폴더 이름(슬러그)으로 `category`는 쓸 수 없습니다.
+- 공개된 대표 글(`featured: true`)은 하나뿐입니다.
 - 사진은 글마다 `cover.<확장자>` 한 장뿐입니다. 이름이 다른 사진(예: `IMG_1234.png`)이 글 폴더에 있으면 「화면에 쓰이지 않는다」며 알려 줍니다. 이름만 `cover.`로 바꾸면 됩니다.
-- 화면 동작은 글마다 확인합니다. 목록 순서와 제목, 날짜, 종류 표시, 필터, 한국어와 English 전환, 사진 틀, 구독 상자(Essay에만), 화면 크기별 모양이 그 글의 실제 내용과 맞는지 봅니다.
+- 화면 동작은 글마다 확인합니다. 목록 순서와 제목, 날짜, 카테고리 표시, 카테고리 목록과 글 수, 카테고리 페이지, 한국어와 English 전환, 사진 틀, 구독 상자(`newsletter: true`인 카테고리에만), 화면 크기별 모양이 그 글의 실제 내용과 맞는지 봅니다.
 - 배포용 빌드에서는 숨긴 글이 목록, 홈, 사이트맵, 주소에 하나도 나오지 않는지 봅니다.
 
 이 기준은 `tests/support/writing-rules.ts`에 있고, 기준 자체를 바꾸고 싶으면 Claude에게 요청하세요.
@@ -262,6 +303,7 @@ npm run newsletter -- remembering-summer
 | 용어 | 뜻 |
 | --- | --- |
 | 슬러그 | 글 주소의 마지막 부분. `/writing/alone/`의 `alone` |
+| 카테고리 | 글을 묶는 칸. `src/content/categories.yaml`에 등록하고, 글의 `meta.yaml` `category`에 적음 |
 | draft | 초안 표시. `draft: true`면 공개 사이트에 나오지 않음 |
 | 커밋(commit) | 고친 내용을 하나의 기록으로 저장하는 것 |
 | push | 저장한 기록을 GitHub에 올리는 것. `main`에 올리면 자동으로 배포됨 |

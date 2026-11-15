@@ -1,6 +1,6 @@
 # Publishing Memorying
 
-> 일상적인 수정 작업(새 글, 오타, Essay와 Note 전환, 사진, 배포, 되돌리기)은 [`MAINTENANCE.md`](MAINTENANCE.md)에 순서대로 정리되어 있습니다. 이 문서는 글쓰기 규칙과 배포 전 점검표를 다룹니다.
+> 일상적인 수정 작업(새 글, 오타, 카테고리 바꾸기·추가, 사진, 배포, 되돌리기)은 [`MAINTENANCE.md`](MAINTENANCE.md)에 순서대로 정리되어 있습니다. 이 문서는 글쓰기 규칙과 배포 전 점검표를 다룹니다.
 
 Memorying의 글은 이 저장소가 유일한 원본입니다. 처음 한 번의 Notion 이전 이후에는 새 글을 Notion에서 시작하지 않고, 이 저장소에서 바로 작성합니다.
 
@@ -9,19 +9,19 @@ Memorying의 글은 이 저장소가 유일한 원본입니다. 처음 한 번�
 새 글마다 아래 명령을 실행합니다. `slug`는 공개 URL의 일부가 되므로 소문자 영문·숫자와 단일 하이픈만 사용합니다.
 
 ```bash
-npm run new:writing -- <slug> --original <ko|en>
+npm run new:writing -- <slug> --original <ko|en> --category <slug>
 ```
 
 예를 들어 한국어 원문 글을 시작하려면 다음과 같이 실행합니다.
 
 ```bash
-npm run new:writing -- remembering-summer --original ko
+npm run new:writing -- remembering-summer --original ko --category essay
 ```
 
 명령은 다음 구조를 만듭니다.
 
 ```text
-src/content/writing/drafts/YYYY-MM-DD/remembering-summer/
+src/content/writing/drafts/essay/YYYY-MM-DD/remembering-summer/
 ├── meta.yaml
 ├── ko.md
 └── en.md
@@ -35,13 +35,13 @@ src/content/writing/drafts/YYYY-MM-DD/remembering-summer/
 
 ```yaml
 publishedAt: 2026-07-25
-type: essay
+category: essay
 originalLanguage: ko
 draft: true
 featured: false
 ```
 
-`publishedAt`, `type`, `originalLanguage`, `draft`, 선택적인 `updatedAt`, `featured`, 표지 이미지 정보는 모두 `meta.yaml`의 책임입니다. `type`은 `essay` 또는 `note`이며, 대표 글(`featured`)은 공개된 Essay 하나에만 사용할 수 있습니다.
+`publishedAt`, `category`, `originalLanguage`, `draft`, 선택적인 `updatedAt`, `featured`, 표지 이미지 정보는 모두 `meta.yaml`의 책임입니다. `category`는 `src/content/categories.yaml`에 등록된 카테고리(지금은 `essay` 또는 `note`)이며, 대표 글(`featured`)은 공개된 글 하나에만 사용할 수 있습니다.
 
 `ko.md`와 `en.md`에는 각 언어의 제목과 본문을 따로 작성합니다. 원문 언어와 번역문을 모두 채워야 합니다. 사이트는 `originalLanguage`에 기록된 원문을 먼저 보여 주고, 독자는 같은 URL에서 한국어와 English 사이를 전환합니다.
 
@@ -110,7 +110,7 @@ npm run verify
 3. 데스크톱과 모바일에서 테스트 메일을 확인합니다.
 4. 검토 후 Buttondown에서 직접 발송을 승인합니다.
 
-Note도 같은 명령으로 메일을 만들 수 있으며, 보낼지는 직접 정합니다.
+어느 카테고리의 글이든 같은 명령으로 메일을 만들 수 있으며, 보낼지는 직접 정합니다.
 
 ## 별도인 Cloudflare와 도메인 작업
 
@@ -133,4 +133,4 @@ Cloudflare Pages 배포, DNS 변경, 도메인 연결, 최종 `SITE_URL` 설정�
 - [ ] 실제 테스트 이메일로 구독과 Buttondown 확인 흐름을 점검했다.
 - [ ] Essay 뉴스레터의 정식 URL과 수신·구독 해지 흐름을 점검했다.
 
-`YYYY-MM-DD`는 `publishedAt` 날짜입니다. 공개 상태(`draft`)나 날짜를 바꾼 뒤 `npm run organize:writing`으로 폴더를 맞춥니다. 공개 글은 `writing/YYYY-MM-DD/<slug>/`, 초안은 `writing/drafts/YYYY-MM-DD/<slug>/`에 보관됩니다. 공개 여부는 메타데이터가 결정하며 글 주소는 `/writing/<slug>/`로 유지됩니다.
+`YYYY-MM-DD`는 `publishedAt` 날짜입니다. 카테고리(`category`), 공개 상태(`draft`), 날짜를 바꾼 뒤 `npm run organize:writing`으로 폴더를 맞춥니다(`-- --dry-run`은 옮길 목록만 보여 줍니다). 공개 글은 `writing/<category>/YYYY-MM-DD/<slug>/`, 초안은 `writing/drafts/<category>/YYYY-MM-DD/<slug>/`에 보관됩니다. 공개 여부는 메타데이터가 결정하며 글 주소는 `/writing/<slug>/`로 유지됩니다.

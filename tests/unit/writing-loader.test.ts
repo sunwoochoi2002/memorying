@@ -25,9 +25,12 @@ function writeMeta(root: string, relativeDirectory: string, publishedAt = '2026-
 }
 
 /** Runs the real Astro glob loader against a temporary project with a fake dev watcher. */
-async function startWatchedLoader(root: string) {
-  type Entry = { id: string; filePath?: string; digest?: string };
-  const entries = new Map<string, Entry>();
+type Entry = { id: string; filePath?: string; digest?: string };
+const digestOf = (contents: string) => createHash('sha256').update(contents).digest('hex');
+
+/** `cached` mimics entries left in Astro's data store by an earlier dev server or build. */
+async function startWatchedLoader(root: string, cached: Entry[] = []) {
+  const entries = new Map<string, Entry>(cached.map((entry) => [entry.id, entry]));
   const handlers: Record<string, (path: string) => Promise<void>> = {};
   const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
   const rootUrl = pathToFileURL(`${root}/`);
@@ -41,7 +44,7 @@ async function startWatchedLoader(root: string) {
     logger,
     watcher: { add: () => {}, on: (event: string, handler: (path: string) => Promise<void>) => { handlers[event] = handler; } },
     parseData: async ({ data }: { data: unknown }) => data,
-    generateDigest: (contents: string) => createHash('sha256').update(contents).digest('hex'),
+    generateDigest: digestOf,
     entryTypes: new Map([['.yaml', { getEntryInfo: ({ contents }: { contents: string }) => ({ data: parse(contents), body: '' }) }]]),
     store: {
       keys: () => [...entries.keys()],
@@ -87,26 +90,36 @@ describe('writing collection loader', () => {
     expect(entries.get('same')?.filePath).toBe('src/content/writing/2026-01-01/same/meta.yaml');
   });
 
-  it('accepts edits to the same file and an article moved to another date folder', async () => {
+  it('accepts edits to the same file and an article moved to another category and date folder', async () => {
     const root = tempRoot();
-    const original = writeMeta(root, '2026-01-01/same');
+    const original = writeMeta(root, 'essay/2026-01-01/same');
     const { entries, handlers, logger } = await startWatchedLoader(root);
 
     writeFileSync(original, 'publishedAt: 2026-03-01\n');
     await handlers.change(original);
-    mkdirSync(join(root, 'src/content/writing/2026-03-01'), { recursive: true });
-    renameSync(join(root, 'src/content/writing/2026-01-01/same'), join(root, 'src/content/writing/2026-03-01/same'));
+    mkdirSync(join(root, 'src/content/writing/note/2026-03-01'), { recursive: true });
+    renameSync(join(root, 'src/content/writing/essay/2026-01-01/same'), join(root, 'src/content/writing/note/2026-03-01/same'));
     await handlers.unlink(original);
-    await handlers.add(join(root, 'src/content/writing/2026-03-01/same/meta.yaml'));
+    await handlers.add(join(root, 'src/content/writing/note/2026-03-01/same/meta.yaml'));
 
-    expect(entries.get('same')?.filePath).toBe('src/content/writing/2026-03-01/same/meta.yaml');
+    expect(entries.get('same')?.filePath).toBe('src/content/writing/note/2026-03-01/same/meta.yaml');
     expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  it('refreshes a cached entry whose unchanged file was moved to another folder before startup', async () => {
+    const root = tempRoot();
+    writeMeta(root, 'essay/2026-01-01/same');
+    const cached = { id: 'same', filePath: 'src/content/writing/2026-01-01/same/meta.yaml', digest: digestOf('publishedAt: 2026-01-01\n') };
+
+    const { entries } = await startWatchedLoader(root, [cached]);
+
+    expect(entries.get('same')?.filePath).toBe('src/content/writing/essay/2026-01-01/same/meta.yaml');
   });
 
   it('fails the initial load when two folders share a slug', async () => {
     const root = tempRoot();
-    writeMeta(root, '2026-01-01/same');
-    writeMeta(root, 'drafts/2026-02-01/same');
+    writeMeta(root, 'essay/2026-01-01/same');
+    writeMeta(root, 'drafts/note/2026-02-01/same');
 
     await expect(startWatchedLoader(root)).rejects.toThrow('Duplicate writing slug: same');
   });

@@ -14,7 +14,7 @@ afterEach(async () => {
 
 async function createArticle(
   slug: string,
-  options: { originalLanguage?: 'ko' | 'en'; draft?: boolean; type?: string } = {},
+  options: { originalLanguage?: 'ko' | 'en'; draft?: boolean; category?: string } = {},
 ) {
   const root = await mkdtemp(join(tmpdir(), 'memorying-newsletter-'));
   temporaryRoots.push(root);
@@ -22,7 +22,7 @@ async function createArticle(
   await mkdir(directory);
   await writeFile(
     join(directory, 'meta.yaml'),
-    `publishedAt: 2026-09-01\ntype: ${options.type ?? 'essay'}\noriginalLanguage: ${options.originalLanguage ?? 'ko'}\ndraft: ${options.draft ?? false}\nfeatured: false\n`,
+    `publishedAt: 2026-09-01\ncategory: ${options.category ?? 'essay'}\noriginalLanguage: ${options.originalLanguage ?? 'ko'}\ndraft: ${options.draft ?? false}\nfeatured: false\n`,
   );
   await writeFile(
     join(directory, 'ko.md'),
@@ -78,7 +78,7 @@ describe('newsletter template', () => {
   });
 
   it('allows notes as well as essays', async () => {
-    const root = await createArticle('quiet-note', { type: 'note' });
+    const root = await createArticle('quiet-note', { category: 'note' });
 
     await expect(buildNewsletter({ root, slug: 'quiet-note', siteUrl })).resolves.toMatchObject({
       subject: '여름을 기억하며',
@@ -93,7 +93,7 @@ describe('newsletter template', () => {
     await expect(buildNewsletter({ root, slug: '../escape', siteUrl })).rejects.toThrow(/Invalid writing slug/);
   });
 
-  it.each(['2026-09-01', 'drafts/2026-09-01'])('finds metadata-published writing inside %s without changing its public URL', async (parent) => {
+  it.each(['2026-09-01', 'drafts/2026-09-01', 'essay/2026-09-01', 'drafts/essay/2026-09-01'])('finds metadata-published writing inside %s without changing its public URL', async (parent) => {
     const root = await createArticle('remembering-summer');
     await mkdir(join(root, parent), { recursive: true });
     await rename(join(root, 'remembering-summer'), join(root, parent, 'remembering-summer'));
@@ -104,8 +104,8 @@ describe('newsletter template', () => {
 
   it('refuses duplicate slugs across storage parents', async () => {
     const root = await createArticle('remembering-summer');
-    await mkdir(join(root, '2026-09-01/remembering-summer'), { recursive: true });
-    await writeFile(join(root, '2026-09-01/remembering-summer/meta.yaml'), 'draft: false');
+    await mkdir(join(root, 'note/2026-09-01/remembering-summer'), { recursive: true });
+    await writeFile(join(root, 'note/2026-09-01/remembering-summer/meta.yaml'), 'draft: false');
     await expect(buildNewsletter({ root, slug: 'remembering-summer' })).rejects.toThrow(/Duplicate writing slug/);
   });
 

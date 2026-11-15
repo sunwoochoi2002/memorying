@@ -49,13 +49,25 @@ export function assertUniqueWritingSlugs(articles) {
   }
 }
 
-/** Includes unfinished folders with no metadata, so scaffolding cannot reuse their slug. */
-export function writingSlugExists(root, slug) {
+const ARTICLE_FILES = ['meta.yaml', 'meta.yml', 'ko.md', 'en.md'];
+
+/**
+ * Includes unfinished folders with no metadata, so scaffolding cannot reuse their slug.
+ * Storage folders (`drafts`, a registered category, a date) above articles are not slugs.
+ */
+export function writingSlugExists(root, slug, categories = []) {
+  const isStorageName = (name) => name === 'drafts' || categories.includes(name) || /^\d{4}-\d{2}-\d{2}$/.test(name);
   function visit(directory) {
-    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const entries = readdirSync(directory, { withFileTypes: true });
+    if (directory !== root && entries.some((entry) => entry.isFile() && ARTICLE_FILES.includes(entry.name))) return false;
+    for (const entry of entries) {
       if (entry.name.startsWith('.')) continue;
-      if (entry.name === slug) return true;
-      if (entry.isDirectory() && visit(join(directory, entry.name))) return true;
+      const path = join(directory, entry.name);
+      if (entry.name === slug) {
+        if (!entry.isDirectory() || !isStorageName(entry.name)) return true;
+        if (readdirSync(path, { withFileTypes: true }).some((child) => child.isFile() && ARTICLE_FILES.includes(child.name))) return true;
+      }
+      if (entry.isDirectory() && visit(path)) return true;
     }
     return false;
   }

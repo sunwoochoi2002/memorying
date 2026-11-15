@@ -42,6 +42,8 @@ button { cursor: pointer; }
 
 /* One centered reading column shared by the header, the page, and the footer */
 .container { width: min(calc(100% - 2 * var(--gutter)), var(--column)); margin-inline: auto; }
+/* The writing archive pages widen that shared column for the category sidebar */
+.layout-wide { --column: 56rem; }
 .section, .article { padding-block: 4rem 3rem; }
 
 /* Header and footer */
@@ -105,20 +107,40 @@ details[open] .profile-less { display: inline; }
 .writing-list-item__meta { display: contents; }
 .writing-list-item__meta time { grid-area: date; color: var(--accent); font-size: 1.125rem; font-variant-numeric: tabular-nums; }
 .writing-list-item__meta > span { grid-area: type; color: var(--muted); font-size: 1.0625rem; font-style: italic; text-align: right; }
+.writing-list-item__meta > span:lang(ko) { font-family: var(--serif-ko); font-size: 0.875rem; font-style: normal; }
 .meta { margin: 0; color: var(--muted); font-size: 1.125rem; line-height: 1.4; font-variant-numeric: tabular-nums; }
-.meta span:first-child { font-style: italic; }
+.meta__category { color: inherit; }
+.meta__category:hover { color: var(--accent); }
+.meta__category :lang(en) { font-style: italic; }
+.meta__category :lang(ko) { font-family: var(--serif-ko); font-size: 0.9375rem; }
 .meta time { color: var(--accent); }
 
-/* Filters */
-.filters { margin: 1rem 0 0; }
-.filter-group { display: flex; flex-wrap: wrap; gap: 0 1.5rem; margin: 0; padding: 0; border: 0; }
-.filter-group legend { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.filter-button { min-width: 2.75rem; min-height: 2.75rem; padding: 0; border: 0; border-bottom: 1px solid transparent; border-radius: 0; background: transparent; color: var(--muted); font-size: 1.3125rem; line-height: 1; }
-.filter-button:hover { color: var(--accent); }
-.filter-button[aria-pressed="true"] { border-bottom-color: var(--accent); color: var(--accent); }
-[data-filter-status] { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* Writing archive: category sidebar beside the list (chips above it on narrow screens) */
+.writing-archive { display: grid; grid-template-columns: 13rem minmax(0, 1fr); grid-template-rows: auto 1fr; grid-template-areas: "nav title" "nav body"; column-gap: 3.5rem; align-items: start; }
+.writing-archive__title { grid-area: title; }
+.writing-archive__body { grid-area: body; min-width: 0; }
+.category-nav { grid-area: nav; padding: 1rem 1.25rem 0.75rem; border: 1px solid var(--line); }
+.category-nav__title { margin: 0; padding-bottom: 0.625rem; border-bottom: 1px solid var(--line); font-family: var(--serif-ko); font-size: 0.9375rem; font-weight: 600; }
+.category-nav__list { margin: 0.375rem 0 0; padding: 0; list-style: none; }
+.category-nav__link { min-height: 2.75rem; display: flex; align-items: center; gap: 0.375rem; padding-left: 0.75rem; font-family: var(--serif-ko); font-size: 0.9375rem; text-decoration: none; }
+.category-nav__link--all { padding-left: 0; font-weight: 600; }
+.category-nav__count { color: var(--muted); font-family: var(--serif-display); font-size: 1rem; font-weight: 400; }
+.category-nav__count::before { content: "("; }
+.category-nav__count::after { content: ")"; }
+.category-nav__link:hover .category-nav__count,
+.category-nav__link[aria-current="page"],
+.category-nav__link[aria-current="page"] .category-nav__count { color: var(--accent); }
+.writing-archive__head { margin: 0.875rem 0 0; padding-bottom: 0.625rem; border-bottom: 1px solid var(--ink); font-family: var(--serif-ko); font-size: 1rem; }
+.writing-archive__name { color: var(--accent); }
+.writing-archive__count { color: var(--muted); font-size: 0.875rem; }
+.writing-archive__list > li { border-bottom: 1px solid var(--line); }
+.writing-archive .writing-list-item { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title meta"; column-gap: 1.5rem; padding-block: 0.375rem; }
+.writing-archive .writing-list-item__meta { grid-area: meta; display: flex; align-items: baseline; justify-content: flex-end; gap: 0.75rem; margin: 0; }
+.writing-archive .writing-list-item__meta time { color: var(--muted); font-size: 1.0625rem; }
+.writing-archive .writing-list-item__meta > span { font-size: 0.8125rem; text-align: left; }
+
+/* Empty lists */
 .empty-state { margin: 1rem 0 0; color: var(--muted); font-family: var(--serif-ko); font-size: 1rem; }
-.empty-state .filter-button { margin-left: 0.75rem; font-family: var(--serif-ko); font-size: 1rem; }
 
 /* Subscribe */
 .newsletter { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--line); background: transparent; }
@@ -198,6 +220,20 @@ details[open] .profile-less { display: inline; }
   .writing-list-item__meta time { font-size: 1.0625rem; }
   .writing-list-item__meta > span { font-size: 1rem; }
   .meta { font-size: 1.0625rem; }
+  .writing-archive { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "title" "nav" "body"; }
+  /* Padding keeps the focus ring inside the sideways-scrolling chip row */
+  .category-nav { margin: 0.375rem -0.625rem 0; padding: 0.625rem; border: 0; overflow-x: auto; }
+  .category-nav__title { display: none; }
+  .category-nav__list { display: flex; gap: 0.5rem; margin: 0; white-space: nowrap; }
+  .category-nav__link { display: inline-flex; gap: 0.3125rem; padding: 0 0.875rem; border: 1px solid var(--line); font-size: 0.875rem; font-weight: 400; }
+  .category-nav__link[aria-current="page"] { border-color: var(--accent); }
+  .category-nav__count { font-size: 0.9375rem; }
+  .category-nav__count::before, .category-nav__count::after { content: none; }
+  .writing-archive__head { margin-top: 0.625rem; padding-bottom: 0.5rem; font-size: 0.9375rem; }
+  .writing-archive__count { font-size: 0.8125rem; }
+  .writing-archive .writing-list-item { display: block; padding-block: 0.375rem; }
+  .writing-archive .writing-list-item__meta { justify-content: flex-start; }
+  .writing-archive .writing-list-item__meta time { font-size: 0.9375rem; }
   .article-header h1 { font-size: 2rem; }
   .prose { font-size: 0.9375rem; }
   .prose :lang(en), .prose:lang(en) { font-size: 1.1875rem; }

@@ -1,0 +1,37 @@
+---
+import { filterWritingArticles, writingCategoryPath, type WritingArticle, type WritingCategory } from '../lib/writing';
+
+interface Props {
+  categories: readonly WritingCategory[];
+  writing: WritingArticle[];
+  /** The category being shown, or undefined for 전체보기. */
+  current?: string;
+}
+
+const { categories, writing, current } = Astro.props;
+const items = [
+  { href: '/writing/', label: '전체보기', count: writing.length, current: current === undefined, all: true },
+  ...categories.map((category) => ({
+    href: writingCategoryPath(category.slug),
+    label: category.name.ko,
+    count: filterWritingArticles(writing, category.slug).length,
+    current: current === category.slug,
+    all: false,
+  })),
+];
+---
+
+<nav class="category-nav" aria-label="카테고리" lang="ko">
+  <p class="category-nav__title" aria-hidden="true">카테고리</p>
+  <ul class="category-nav__list">
+    {items.map((item) => (
+      <li>
+        <a
+          class:list={['category-nav__link', { 'category-nav__link--all': item.all }]}
+          href={item.href}
+          aria-current={item.current ? 'page' : undefined}
+        >{item.label} <span class="category-nav__count" lang="en">{item.count}</span></a>
+      </li>
+    ))}
+  </ul>
+</nav>

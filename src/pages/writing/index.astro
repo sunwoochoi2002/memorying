@@ -1,32 +1,20 @@
 ---
-import WritingListItem from '../../components/WritingListItem.astro';
-import WritingFilters from '../../components/WritingFilters.astro';
-import NewsletterSignup from '../../components/NewsletterSignup.astro';
+import WritingArchive from '../../components/WritingArchive.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { loadWritingArticles } from '../../lib/content';
+import { loadWritingCategories } from '../../lib/writing-categories';
 
 const writing = await loadWritingArticles();
+const categorySlugs = loadWritingCategories().map((category) => category.slug);
 ---
 
-<BaseLayout title="Writing" description="Essays and notes by Sunwoo Choi.">
-  <section class="container section">
-    <div class="column">
-    <h1 class="section-title">Writing</h1>
-    {writing.length ? (
-      <div data-writing-archive>
-        <WritingFilters />
-        <ul class="writing-list" data-writing-list>
-          {writing.map((item) => (
-            <li data-writing-item data-type={item.type}>
-              <WritingListItem item={item} />
-            </li>
-          ))}
-        </ul>
-      </div>
-    ) : (
-      <p class="empty-state">아직 공개된 글이 없습니다. 곧 이곳에 Essay와 Note를 기록할 예정입니다.</p>
-    )}
-    <NewsletterSignup id="writing-archive" />
-    </div>
-  </section>
+<BaseLayout title="Writing" description="Essays and notes by Sunwoo Choi." wide>
+  <Fragment slot="head">
+    <script is:inline define:vars={{ categorySlugs }}>
+      // Old links used /writing/?type=<category>; send them to that category's page.
+      const type = new URLSearchParams(location.search).get('type');
+      if (type !== null && categorySlugs.includes(type)) location.replace(`/writing/category/${type}/`);
+    </script>
+  </Fragment>
+  <WritingArchive writing={writing} />
 </BaseLayout>

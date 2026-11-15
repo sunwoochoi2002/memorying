@@ -1,0 +1,25 @@
+---
+import WritingArchive from '../../../components/WritingArchive.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { loadWritingArticles } from '../../../lib/content';
+import type { WritingCategory } from '../../../lib/writing';
+import { loadWritingCategories } from '../../../lib/writing-categories';
+
+export function getStaticPaths() {
+  return loadWritingCategories().map((category) => ({
+    params: { category: category.slug },
+    props: { category },
+  }));
+}
+
+interface Props {
+  category: WritingCategory;
+}
+
+const { category } = Astro.props;
+const writing = await loadWritingArticles();
+---
+
+<BaseLayout title={`${category.name.ko} — Writing`} description={`${category.name.en} writing by Sunwoo Choi.`} wide>
+  <WritingArchive writing={writing} category={category.slug} />
+</BaseLayout>

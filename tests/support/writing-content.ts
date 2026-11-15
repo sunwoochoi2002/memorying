@@ -2,6 +2,10 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse } from 'yaml';
 import { assertUniqueWritingSlugs, discoverWritingDirectories } from '../../scripts/writing-directories.mjs';
+import { readWritingCategories } from '../../scripts/writing-categories.mjs';
+import type { WritingCategory } from '../../src/lib/writing';
+
+export { findWritingCategory, type WritingCategory } from '../../src/lib/writing';
 
 /**
  * Reads the writing that actually exists in the repository, so tests can derive
@@ -10,10 +14,10 @@ import { assertUniqueWritingSlugs, discoverWritingDirectories } from '../../scri
 
 export const CONTENT_DIRECTORY = 'src/content/writing';
 export const FIXTURE_DIRECTORY = 'tests/fixtures/writing';
+export const CATEGORIES_FILE = 'src/content/categories.yaml';
 export const COVER_EXTENSIONS = ['avif', 'jpeg', 'jpg', 'png', 'svg', 'webp'] as const;
 
 export type Language = 'ko' | 'en';
-export type WritingType = 'essay' | 'note';
 
 export interface Translation {
   title: string;
@@ -25,7 +29,8 @@ export interface WritingCase {
   slug: string;
   source: 'content' | 'fixture';
   directory: string;
-  type: WritingType;
+  /** The raw `category` value; writing-rules checks it against the registry. */
+  category: string;
   originalLanguage: Language;
   draft: boolean;
   featured: boolean;
@@ -83,7 +88,7 @@ export function readWritingCase(directory: string, slug: string, source: Writing
     slug,
     source,
     directory,
-    type: meta.type as WritingType,
+    category: String(meta.category ?? ''),
     originalLanguage: meta.originalLanguage as Language,
     draft: meta.draft === true,
     featured: meta.featured === true,
@@ -98,6 +103,11 @@ export function readWritingCase(directory: string, slug: string, source: Writing
     coverFiles,
     files,
   };
+}
+
+/** The category registry, in display order. */
+export function loadCategories(root: string = process.cwd()): WritingCategory[] {
+  return readWritingCategories(join(root, CATEGORIES_FILE));
 }
 
 export interface WritingDirectory {
@@ -138,9 +148,9 @@ export function visibleCases(cases: WritingCase[], options: { includeDrafts: boo
 
 export const originalTitle = (item: WritingCase): string => item.translations[item.originalLanguage].title;
 export const otherLanguage = (item: WritingCase): Language => (item.originalLanguage === 'ko' ? 'en' : 'ko');
-export const typeLabel = (type: WritingType): 'Essay' | 'Note' => (type === 'essay' ? 'Essay' : 'Note');
 export const isoDatetime = (item: WritingCase): string => `${item.publishedAt}T00:00:00.000Z`;
 export const articlePath = (item: WritingCase): string => `/writing/${item.slug}/`;
+export const categoryPath = (slug: string): string => `/writing/category/${slug}/`;
 
 /** A plain sentence from the body that should appear verbatim on the page. */
 export function firstPlainLine(body: string): string | undefined {

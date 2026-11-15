@@ -1,25 +1,24 @@
 import { describe, expect, it } from 'vitest';
 import {
-  buildWritingSearch,
-  filterWriting,
   filterWritingArticles,
+  findWritingCategory,
   formatWritingDate,
   getWritingMetaSourceId,
   getWritingSourceId,
   normalizeWritingSlug,
   originalTranslation,
   parseWritingTranslationId,
-  parseWritingFilters,
   selectFeaturedArticle,
   sortWritingArticles,
   assertWritingArticleInvariants,
   type WritingArticle,
+  type WritingCategory,
 } from '../../src/lib/writing';
 
 const article = (overrides: Partial<WritingArticle> = {}): WritingArticle => ({
   slug: 'base',
   publishedAt: new Date('2026-07-01T00:00:00Z'),
-  type: 'essay',
+  category: 'essay',
   originalLanguage: 'ko',
   draft: false,
   featured: false,
@@ -57,18 +56,20 @@ describe('writing article domain', () => {
     expect(normalizeWritingSlug('small-beginning')).toBe('small-beginning');
   });
 
-  it('filters logical articles by type only', () => {
-    const entries = [article({ slug: 'essay' }), article({ slug: 'note', type: 'note' })];
-    expect(filterWriting(entries, { type: 'essay' }).map(({ slug }) => slug)).toEqual(['essay']);
-    expect(filterWriting(entries, { type: 'all' })).toHaveLength(2);
-    expect(filterWriting(entries, { type: 'note' }).map(({ slug }) => slug)).toEqual(['note']);
+  it('filters logical articles by category only', () => {
+    const entries = [article({ slug: 'essay' }), article({ slug: 'note', category: 'note' })];
+    expect(filterWritingArticles(entries, 'essay').map(({ slug }) => slug)).toEqual(['essay']);
+    expect(filterWritingArticles(entries, 'note').map(({ slug }) => slug)).toEqual(['note']);
+    expect(filterWritingArticles(entries, 'poem')).toEqual([]);
   });
 
-  it('ignores legacy language queries and serializes type-only filters', () => {
-    expect(parseWritingFilters('?type=essay&lang=en')).toEqual({ type: 'essay' });
-    expect(parseWritingFilters('?type=article&lang=ko')).toEqual({ type: 'all' });
-    expect(buildWritingSearch({ type: 'note' })).toBe('?type=note');
-    expect(buildWritingSearch({ type: 'all' })).toBe('');
+  it('finds a category by slug and refuses one that is not registered', () => {
+    const categories: WritingCategory[] = [
+      { slug: 'essay', name: { ko: '에세이', en: 'Essay' }, newsletter: true },
+      { slug: 'note', name: { ko: '노트', en: 'Note' }, newsletter: false },
+    ];
+    expect(findWritingCategory(categories, 'note')).toBe(categories[1]);
+    expect(() => findWritingCategory(categories, 'poem')).toThrow(/poem/);
   });
 });
 
@@ -84,15 +85,10 @@ describe('bilingual writing article domain', () => {
     expect(originalTranslation(article()).title).toBe('기본 제목');
   });
 
-  it.each(['2026-11-13/quiet-note', 'drafts/2026-11-13/quiet-note'])('keeps nested %s IDs independent of storage parents', (directory) => {
+  it.each(['2026-11-13/quiet-note', 'drafts/2026-11-13/quiet-note', 'note/2026-11-13/quiet-note', 'drafts/note/2026-11-13/quiet-note'])('keeps nested %s IDs independent of storage parents', (directory) => {
     expect(getWritingSourceId(`${directory}/ko.md`)).toBe('quiet-note/ko');
     expect(getWritingSourceId(`${directory}/en.md`)).toBe('quiet-note/en');
     expect(getWritingMetaSourceId(`${directory}/meta.yaml`)).toBe('quiet-note');
-  });
-
-  it('filters articles by type', () => {
-    expect(filterWritingArticles([article(), article({ slug: 'note', type: 'note' })], 'note'))
-      .toHaveLength(1);
   });
 
   it('sorts newest first and uses code-point slug order as a deterministic tie-breaker', () => {
@@ -117,26 +113,24 @@ describe('bilingual writing article domain', () => {
     expect(entries.map(({ slug }) => slug)).toEqual(['old', 'new']);
   });
 
-  it('selects an explicit featured essay and ignores featured notes', () => {
+  it('selects the explicitly featured article in any category', () => {
     const entries = [
-      article({ slug: 'new', publishedAt: new Date('2026-07-01') }),
-      article({ slug: 'note', type: 'note', featured: true, publishedAt: new Date('2026-07-02') }),
-      article({ slug: 'old-featured', featured: true, publishedAt: new Date('2026-06-01') }),
+      article({ slug: 'new', publishedAt: new Date('2026-07-03') }),
+      article({ slug: 'old-featured', category: 'note', featured: true, publishedAt: new Date('2026-06-01') }),
     ];
 
     expect(selectFeaturedArticle(entries)?.slug).toBe('old-featured');
   });
 
-  it('falls back to the newest essay and returns no featured article when only notes exist', () => {
+  it('falls back to the newest article in any category, and to nothing when there is no writing', () => {
     const entries = [
       article({ slug: 'z', publishedAt: new Date('2026-07-01') }),
-      article({ slug: 'note', type: 'note', publishedAt: new Date('2026-07-02') }),
+      article({ slug: 'note', category: 'note', publishedAt: new Date('2026-07-02') }),
       article({ slug: 'a', publishedAt: new Date('2026-07-01') }),
-      article({ slug: 'old', publishedAt: new Date('2026-06-01') }),
     ];
 
-    expect(selectFeaturedArticle(entries)?.slug).toBe('a');
-    expect(selectFeaturedArticle([article({ type: 'note' })])).toBeUndefined();
+    expect(selectFeaturedArticle(entries)?.slug).toBe('note');
+    expect(selectFeaturedArticle([])).toBeUndefined();
   });
 
   it('accepts stable lowercase ASCII alphanumeric slugs separated by single hyphens', () => {
@@ -158,10 +152,10 @@ describe('bilingual writing article domain', () => {
     ])).not.toThrow();
   });
 
-  it('rejects multiple published featured essays', () => {
+  it('rejects multiple published featured articles, whatever their categories', () => {
     expect(() => assertWritingArticleInvariants([
       article({ slug: 'one', featured: true }),
-      article({ slug: 'two', featured: true }),
-    ])).toThrow('Only one published essay may be featured.');
+      article({ slug: 'two', category: 'note', featured: true }),
+    ])).toThrow('Only one published article may be featured.');
   });
 });

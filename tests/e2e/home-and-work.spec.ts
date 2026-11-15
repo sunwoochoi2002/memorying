@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { articlePath, isoDatetime, loadWritingCases, originalTitle } from '../support/writing-content';
+import { articlePath, findWritingCategory, isoDatetime, loadCategories, loadWritingCases, originalTitle } from '../support/writing-content';
 
 // The dev server shows drafts and loads the test fixtures, so the home list is the newest few of all of them.
 const HOME_LIST_LENGTH = 3;
 const recent = loadWritingCases({ fixtures: true }).slice(0, HOME_LIST_LENGTH);
+const categories = loadCategories();
 
 test('home is a compact person-first introduction with recent original-language writing', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
@@ -33,6 +34,9 @@ test('home is a compact person-first introduction with recent original-language 
     await expect(row.locator('time'), item.slug).toHaveText(item.publishedAt);
     await expect(row.locator('time'), item.slug).toHaveAttribute('lang', item.originalLanguage);
     await expect(row.locator('time'), item.slug).toHaveAttribute('datetime', isoDatetime(item));
+    const label = row.locator('.writing-list-item__meta > span');
+    await expect(label, item.slug).toHaveText(findWritingCategory(categories, item.category).name.ko);
+    await expect(label, item.slug).toHaveAttribute('lang', 'ko');
   }
   await expect(page.locator('.home-writing .writing-list-item__copy > p')).toHaveCount(0);
   await expect(page.locator('.home-writing img')).toHaveCount(0);

@@ -8,6 +8,11 @@ import { createWritingGlobPattern } from './writing-sources';
  * already claimed by another file that still exists is rejected. During the initial load
  * that fails the build; for files added while the dev server runs, Astro logs the error
  * and keeps the existing article.
+ *
+ * Astro reuses a cached entry whose file contents are unchanged, including its old
+ * `filePath`, so an article folder moved by `npm run organize:writing` would keep pointing
+ * at its former location (and lose its cover). Entries whose cached file no longer exists
+ * are dropped before each load so they are read again from where they now live.
  */
 export function createWritingLoader(
   directories: readonly string[],
@@ -16,7 +21,7 @@ export function createWritingLoader(
 ) {
   const entryById = new Map<string, string>();
 
-  return glob({
+  const loader = glob({
     pattern: createWritingGlobPattern(directories, filePattern),
     base: '.',
     generateId: ({ entry, base }) => {
@@ -29,4 +34,15 @@ export function createWritingLoader(
       return id;
     },
   });
+
+  return {
+    ...loader,
+    load: async (context: Parameters<typeof loader.load>[0]) => {
+      for (const id of context.store.keys()) {
+        const filePath = context.store.get(id)?.filePath;
+        if (filePath && !existsSync(new URL(encodeURI(filePath), context.config.root))) context.store.delete(id);
+      }
+      return loader.load(context);
+    },
+  };
 }

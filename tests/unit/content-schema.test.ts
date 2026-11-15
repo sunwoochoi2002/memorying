@@ -62,11 +62,11 @@ describe('public profile schemas', () => {
   });
 });
 
-const metadataSchema = createWritingMetadataSchema(z.string());
+const metadataSchema = createWritingMetadataSchema(z.string(), ['essay', 'note']);
 const translationSchema = createWritingTranslationSchema();
 const metadata = {
   publishedAt: new Date('2026-07-01T00:00:00Z'),
-  type: 'essay' as const,
+  category: 'essay',
   originalLanguage: 'ko' as const,
   draft: false,
 };
@@ -100,9 +100,24 @@ describe('bilingual writing schemas', () => {
 
   it('rejects invalid shared metadata values', () => {
     expect(metadataSchema.safeParse({ ...metadata, originalLanguage: 'kr' }).success).toBe(false);
-    expect(metadataSchema.safeParse({ ...metadata, type: 'note', featured: true }).success).toBe(false);
     expect(metadataSchema.safeParse({ ...metadata, publishedAt: new Date('2100-01-01T00:00:00Z') }).success).toBe(false);
     expect(metadataSchema.safeParse({ ...metadata, canonicalUrl: 'not a URL' }).success).toBe(false);
+  });
+
+  it('accepts only categories from the registry it was given', () => {
+    expect(metadataSchema.safeParse({ ...metadata, category: 'note' }).success).toBe(true);
+    expect(createWritingMetadataSchema(z.string(), ['poem']).safeParse({ ...metadata, category: 'poem' }).success).toBe(true);
+    const unknown = metadataSchema.safeParse({ ...metadata, category: 'poem' });
+    expect(unknown.success).toBe(false);
+    if (!unknown.success) expect(unknown.error.issues[0].path).toEqual(['category']);
+    const { category: _category, ...withoutCategory } = metadata;
+    expect(metadataSchema.safeParse(withoutCategory).success).toBe(false);
+    expect(metadataSchema.safeParse({ ...withoutCategory, type: 'essay' }).success).toBe(false);
+  });
+
+  it('lets an article in any category be featured', () => {
+    expect(metadataSchema.safeParse({ ...metadata, category: 'note', featured: true }).success).toBe(true);
+    expect(metadataSchema.safeParse({ ...metadata, category: 'essay', featured: true }).success).toBe(true);
   });
 
   it('requires bilingual cover alternative text exactly when a cover image is used', () => {

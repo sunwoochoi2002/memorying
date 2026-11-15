@@ -1,0 +1,40 @@
+---
+import NewsletterSignup from './NewsletterSignup.astro';
+import WritingCategoryNav from './WritingCategoryNav.astro';
+import WritingListItem from './WritingListItem.astro';
+import { filterWritingArticles, findWritingCategory, type WritingArticle } from '../lib/writing';
+import { loadWritingCategories } from '../lib/writing-categories';
+
+interface Props {
+  writing: WritingArticle[];
+  /** A registered category slug; undefined shows every article (전체보기). */
+  category?: string;
+}
+
+const { writing, category } = Astro.props;
+const categories = loadWritingCategories();
+const shown = category === undefined ? writing : filterWritingArticles(writing, category);
+const label = category === undefined ? '전체보기' : findWritingCategory(categories, category).name.ko;
+---
+
+<section class="container section writing-archive" data-writing-archive>
+  <h1 class="section-title writing-archive__title">Writing</h1>
+  <WritingCategoryNav categories={categories} writing={writing} current={category} />
+  <div class="writing-archive__body">
+    <p class="writing-archive__head" lang="ko">
+      <span class="writing-archive__name">{label}</span>{' '}<span class="writing-archive__count">{shown.length}개의 글</span>
+    </p>
+    {shown.length ? (
+      <ul class="writing-list writing-archive__list" data-writing-list>
+        {shown.map((item) => (
+          <li data-writing-item data-category={item.category}>
+            <WritingListItem item={item} showCategory={category === undefined} />
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="empty-state" lang="ko">이 카테고리에는 아직 공개된 글이 없습니다.</p>
+    )}
+    <NewsletterSignup id="writing-archive" />
+  </div>
+</section>

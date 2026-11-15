@@ -8,7 +8,6 @@ const contentDateSchema = z
 const writingMetadataCoreSchema = z.object({
   publishedAt: contentDateSchema,
   updatedAt: contentDateSchema.optional(),
-  type: z.enum(['essay', 'note']),
   originalLanguage: z.enum(['ko', 'en']),
   draft: z.boolean(),
   featured: z.boolean().default(false),
@@ -19,9 +18,14 @@ export function createWritingTranslationSchema() {
   return z.strictObject({ title: nonemptyTextSchema });
 }
 
-export function createWritingMetadataSchema<T extends z.ZodType>(imageSchema: T) {
+/** `categorySlugs` comes from src/content/categories.yaml (see scripts/writing-categories.mjs). */
+export function createWritingMetadataSchema<T extends z.ZodType>(imageSchema: T, categorySlugs: readonly string[]) {
+  const registered = new Set(categorySlugs);
   return writingMetadataCoreSchema
     .extend({
+      category: z.string().refine((slug) => registered.has(slug), {
+        message: `Unknown category. Register it in src/content/categories.yaml (registered: ${[...registered].join(', ')}).`,
+      }),
       coverImage: imageSchema.optional(),
       coverImageAlt: z.object({
         ko: nonemptyTextSchema,
@@ -29,9 +33,6 @@ export function createWritingMetadataSchema<T extends z.ZodType>(imageSchema: T)
       }).optional(),
     })
     .superRefine((value, context) => {
-      if (value.type === 'note' && value.featured) {
-        context.addIssue({ code: 'custom', path: ['featured'], message: 'Only essays may be featured.' });
-      }
       if (!value.draft && value.publishedAt.getTime() > Date.now()) {
         context.addIssue({ code: 'custom', path: ['publishedAt'], message: 'Published writing cannot use a future date.' });
       }

@@ -1,11 +1,12 @@
 import type { ImageMetadata } from 'astro';
 
-export type WritingType = 'essay' | 'note';
 export type WritingLanguage = 'ko' | 'en';
-export type WritingTypeFilter = WritingType | 'all';
 
-export interface WritingFilters {
-  type: WritingTypeFilter;
+/** One entry of src/content/categories.yaml (read by scripts/writing-categories.mjs). */
+export interface WritingCategory {
+  slug: string;
+  name: Record<WritingLanguage, string>;
+  newsletter: boolean;
 }
 
 export interface WritingTranslation {
@@ -17,7 +18,7 @@ export interface WritingArticle {
   slug: string;
   publishedAt: Date;
   updatedAt?: Date;
-  type: WritingType;
+  category: string;
   originalLanguage: WritingLanguage;
   draft: boolean;
   featured: boolean;
@@ -87,42 +88,29 @@ export function sortWritingArticles(entries: WritingArticle[]): WritingArticle[]
 }
 
 export function selectFeaturedArticle(entries: WritingArticle[]): WritingArticle | undefined {
-  const essays = sortWritingArticles(entries.filter((entry) => entry.type === 'essay'));
-  return essays.find((entry) => entry.featured) ?? essays[0];
+  const sorted = sortWritingArticles(entries);
+  return sorted.find((entry) => entry.featured) ?? sorted[0];
 }
 
-export function filterWriting(entries: WritingArticle[], filters: WritingFilters): WritingArticle[] {
-  return filterWritingArticles(entries, filters.type);
+export function findWritingCategory(categories: readonly WritingCategory[], slug: string): WritingCategory {
+  const category = categories.find((entry) => entry.slug === slug);
+  if (!category) throw new Error(`Unknown writing category: ${slug}`);
+  return category;
 }
 
-export function filterWritingArticles(entries: WritingArticle[], type: WritingTypeFilter): WritingArticle[] {
-  return entries.filter((entry) => type === 'all' || entry.type === type);
+export function filterWritingArticles(entries: WritingArticle[], category: string): WritingArticle[] {
+  return entries.filter((entry) => entry.category === category);
 }
 
-export function parseWritingFilters(search: string | URLSearchParams): WritingFilters {
-  const parameters = typeof search === 'string'
-    ? new URLSearchParams(search.startsWith('?') ? search.slice(1) : search)
-    : search;
-  const type = parameters.get('type');
-  return {
-    type: type === 'essay' || type === 'note' ? type : 'all',
-  };
-}
-
-export function buildWritingSearch(filters: WritingFilters): string {
-  const parameters = new URLSearchParams();
-  if (filters.type !== 'all') parameters.set('type', filters.type);
-  const value = parameters.toString();
-  return value ? `?${value}` : '';
+export function writingCategoryPath(slug: string): string {
+  return `/writing/category/${slug}/`;
 }
 
 export function assertWritingArticleInvariants(entries: WritingArticle[]): void {
   assertWritingSlugInvariants(entries);
 
-  const featured = entries.filter(
-    (entry) => !entry.draft && entry.type === 'essay' && entry.featured,
-  );
-  if (featured.length > 1) throw new Error('Only one published essay may be featured.');
+  const featured = entries.filter((entry) => !entry.draft && entry.featured);
+  if (featured.length > 1) throw new Error('Only one published article may be featured.');
 }
 
 function assertWritingSlugInvariants(entries: Array<Pick<WritingArticle, 'slug'>>): void {

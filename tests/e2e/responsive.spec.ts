@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test';
-import { articlePath, loadWritingCases, representativeCases } from '../support/writing-content';
+import { articlePath, categoryPath, loadCategories, loadWritingCases, representativeCases } from '../support/writing-content';
 
 const cases = loadWritingCases({ fixtures: true });
 const widths = [320, 390, 768, 1024, 1440];
 // One article with a cover and one without stand in for every article.
-const paths = ['/', '/about/', '/writing/', ...representativeCases(cases).map(articlePath), '/projects/', '/experience/', '/privacy/', '/404/'];
+const categories = loadCategories();
+const paths = ['/', '/about/', '/writing/', ...categories.map((category) => categoryPath(category.slug)), ...representativeCases(cases).map(articlePath), '/projects/', '/experience/', '/privacy/', '/404/'];
 
 for (const width of widths) {
   for (const path of paths) {
@@ -27,7 +28,7 @@ test('site writing actions provide 44px touch targets at 320px', async ({ page }
   const controls = [
     page.getByRole('link', { name: 'Sunwoo Choi' }),
     ...await page.getByRole('navigation', { name: 'Primary' }).getByRole('link').all(),
-    ...await page.locator('[data-writing-filters]').getByRole('button').all(),
+    ...await page.getByRole('navigation', { name: '카테고리' }).getByRole('link').all(),
     ...await page.locator('[data-writing-item]').getByRole('link').all(),
   ];
 
@@ -58,14 +59,29 @@ test('site writing actions provide 44px touch targets at 320px', async ({ page }
   await page.keyboard.press('Tab');
   await page.keyboard.press('Tab');
   await page.keyboard.press('Tab');
-  const filterButton = page.locator('[data-filter-group="type"]').getByRole('button', { name: 'All' });
-  await expect(filterButton).toBeFocused();
-  const filterFocus = await filterButton.evaluate((element) => {
+  // After the primary navigation, focus moves through 전체보기 and each category chip in order, then the list.
+  const categoryLinks = page.getByRole('navigation', { name: '카테고리' }).getByRole('link');
+  await expect(categoryLinks.first()).toHaveAttribute('href', '/writing/');
+  await expect(categoryLinks.first()).toBeFocused();
+  const chipFocus = await categoryLinks.first().evaluate((element) => {
     const style = getComputedStyle(element);
     return { outlineWidth: style.outlineWidth, boxShadow: style.boxShadow };
   });
-  expect(Number.parseFloat(filterFocus.outlineWidth)).toBeGreaterThanOrEqual(3);
-  expect(filterFocus.boxShadow).not.toBe('none');
+  expect(Number.parseFloat(chipFocus.outlineWidth)).toBeGreaterThanOrEqual(3);
+  expect(chipFocus.boxShadow).not.toBe('none');
+  for (const category of categories) {
+    await page.keyboard.press('Tab');
+    await expect(categoryLinks.and(page.locator(`[href="${categoryPath(category.slug)}"]`))).toBeFocused();
+  }
+  await page.keyboard.press('Tab');
+  await expect(page.locator('[data-writing-item]').first().getByRole('link')).toBeFocused();
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  for (const control of await categoryLinks.all()) {
+    const box = await control.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.height, 'desktop sidebar row').toBeGreaterThanOrEqual(44);
+  }
 
   await page.goto('/');
   for (const control of [

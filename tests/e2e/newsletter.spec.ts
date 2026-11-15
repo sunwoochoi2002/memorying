@@ -1,9 +1,25 @@
 import { expect, test } from '@playwright/test';
-import { articlePath, loadWritingCases } from '../support/writing-content';
+import { articlePath, categoryPath, findWritingCategory, loadCategories, loadWritingCases } from '../support/writing-content';
 
 const cases = loadWritingCases({ fixtures: true });
-const essay = cases.find((item) => item.type === 'essay');
-const note = cases.find((item) => item.type === 'note');
+const categories = loadCategories();
+// "essay" and "note" stand for writing in a newsletter category and in one without.
+const essay = cases.find((item) => findWritingCategory(categories, item.category).newsletter);
+const note = cases.find((item) => !findWritingCategory(categories, item.category).newsletter);
+
+test('the fixtures guarantee writing in a newsletter category and in one without', () => {
+  const fixtures = cases.filter((item) => item.source === 'fixture');
+  expect(fixtures.some((item) => findWritingCategory(categories, item.category).newsletter)).toBe(true);
+  expect(fixtures.some((item) => !findWritingCategory(categories, item.category).newsletter)).toBe(true);
+});
+
+for (const path of ['/writing/', ...categories.map((category) => categoryPath(category.slug))]) {
+  test(`${path} keeps the subscription form under the list`, async ({ page }) => {
+    await page.goto(path);
+    await expect(page.getByRole('form', { name: 'Newsletter subscription' })).toHaveCount(1);
+    await expect(page.locator('#writing-archive-email')).toHaveCount(1);
+  });
+}
 
 test('collects only an email and links to the privacy notice', async ({ page }) => {
   await page.goto('/writing/');

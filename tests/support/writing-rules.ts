@@ -1,9 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { z } from 'astro/zod';
+import { isReservedWritingSlug } from '../../scripts/writing-categories.mjs';
 import { createWritingMetadataSchema, createWritingTranslationSchema } from '../../src/lib/content-schema';
 import {
+  CATEGORIES_FILE,
   COVER_EXTENSIONS,
+  loadCategories,
   readWritingCase,
   writingDirectories,
   type Language,
@@ -24,31 +27,40 @@ const GENERATED_BODIES: Record<Language, string> = {
 // Zero-width space, word joiner, and byte-order mark.
 const INVISIBLE_CHARACTERS = /[​⁠﻿]/;
 const IMAGE_EXTENSIONS =new Set<string>([...COVER_EXTENSIONS, 'gif']);
-const metadataSchema = createWritingMetadataSchema(z.any());
 const translationSchema = createWritingTranslationSchema();
 
 const extensionOf = (name: string) => name.split('.').at(-1)?.toLowerCase() ?? '';
 
-function checkArticle(item: WritingCase, now: Date): string[] {
+/** `categorySlugs` is undefined when the registry itself is broken (reported separately). */
+function checkArticle(item: WritingCase, now: Date, categorySlugs: string[] | undefined): string[] {
   const label = `글 "${item.slug}"`;
   const problems: string[] = [];
 
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item.slug)) {
     problems.push(`${label}: 슬러그(폴더 이름)는 소문자 영문, 숫자, 하이픈만 쓸 수 있습니다. 예: my-first-essay`);
   }
+  if (isReservedWritingSlug(item.slug)) {
+    problems.push(`${label}: "${item.slug}"는 카테고리 페이지 주소(/writing/category/)에 쓰는 예약어라 슬러그(폴더 이름)로 쓸 수 없습니다. 다른 이름을 쓰세요.`);
+  }
 
   // Reuse the site's own schema so these checks can never drift from the build.
-  const meta = metadataSchema.safeParse(item.meta);
+  const meta = createWritingMetadataSchema(z.any(), categorySlugs ?? []).safeParse(item.meta);
   if (!meta.success) {
     for (const issue of meta.error.issues) {
       const field = issue.path.join('.');
-      if (field === 'featured' || issue.message.includes('future date')) continue; // reported below in Korean
+      if (field === 'category' || issue.message.includes('future date')) continue; // reported below in Korean
       problems.push(`${label}: meta.yaml ${field}: ${issue.message}`);
     }
   }
 
-  if (item.featured && item.type !== 'essay') {
-    problems.push(`${label}: 대표 글(featured)은 Essay만 될 수 있습니다. Note는 featured: false여야 합니다.`);
+  if (categorySlugs && !categorySlugs.includes(item.category)) {
+    const registered = `등록된 카테고리: ${categorySlugs.join(', ')}. 새 카테고리는 ${CATEGORIES_FILE}에 먼저 추가하세요.`;
+    if (item.meta.category === undefined) {
+      const legacy = item.meta.type === undefined ? '' : ' 예전 type: 줄은 category: 줄로 바꾸세요.';
+      problems.push(`${label}: meta.yaml에 카테고리(category)가 없습니다.${legacy} ${registered}`);
+    } else {
+      problems.push(`${label}: meta.yaml 카테고리(category) "${item.category}"는 등록되지 않았습니다. ${registered}`);
+    }
   }
   if (!item.draft && new Date(`${item.publishedAt}T00:00:00Z`).getTime() > now.getTime()) {
     problems.push(`${label}: 공개된 글에는 미래 날짜(${item.publishedAt})를 쓸 수 없습니다.`);
@@ -128,11 +140,18 @@ export function checkWriting(options: { root?: string; now?: Date; fixtures?: bo
     }
   }
 
-  for (const item of cases) problems.push(...checkArticle(item, now));
+  let categorySlugs: string[] | undefined;
+  try {
+    categorySlugs = loadCategories(root).map(({ slug }) => slug);
+  } catch (error) {
+    problems.push(`${CATEGORIES_FILE}: 카테고리 목록을 읽을 수 없습니다. ${error instanceof Error ? error.message : String(error)}`);
+  }
 
-  const featuredEssays = cases.filter((item) => !item.draft && item.type === 'essay' && item.featured);
-  if (featuredEssays.length > 1) {
-    problems.push(`대표 글(featured: true)로 표시된 공개 Essay는 하나만 가능합니다. 지금: ${featuredEssays.map((item) => item.slug).join(', ')}`);
+  for (const item of cases) problems.push(...checkArticle(item, now, categorySlugs));
+
+  const featured = cases.filter((item) => !item.draft && item.featured).map((item) => item.slug).sort();
+  if (featured.length > 1) {
+    problems.push(`대표 글(featured: true)로 표시된 공개 글은 하나만 가능합니다. 지금: ${featured.join(', ')}`);
   }
 
   return problems;

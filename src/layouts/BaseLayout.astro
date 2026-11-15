@@ -13,8 +13,10 @@ interface Props {
   type?: 'website' | 'article';
   noindex?: boolean;
   bodyClass?: string;
+  /** Widens the shared header, page and footer column (writing archive pages only). */
+  wide?: boolean;
 }
-const { title, description, lang = 'ko', canonicalUrl, type = 'website', noindex = false, bodyClass } = Astro.props;
+const { title, description, lang = 'ko', canonicalUrl, type = 'website', noindex = false, bodyClass, wide = false } = Astro.props;
 const pageTitle = title === 'Home' ? 'Sunwoo Choi' : `${title} — Sunwoo Choi`;
 const site = Astro.site ?? new URL('http://localhost:4321');
 const canonical = canonicalUrl ?? new URL(Astro.url.pathname, site).toString();
@@ -47,8 +49,9 @@ const socialImageAlt = 'Sunwoo Choi, sunwoochoi.com';
     {description && <meta name="twitter:description" content={description} />}
     <meta name="twitter:image" content={socialImage} />
     <meta name="twitter:image:alt" content={socialImageAlt} />
+    <slot name="head" />
   </head>
-  <body class={bodyClass}>
+  <body class:list={[bodyClass, { 'layout-wide': wide }]}>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <SiteHeader />
     <main id="main-content" tabindex="-1"><slot /></main>

@@ -1,15 +1,20 @@
 ---
-import { formatWritingDate, type WritingArticle } from '../lib/writing';
+import { findWritingCategory, formatWritingDate, writingCategoryPath, type WritingArticle } from '../lib/writing';
+import { loadWritingCategories } from '../lib/writing-categories';
 
 interface Props {
   item: WritingArticle;
 }
 
 const { item } = Astro.props;
+const category = findWritingCategory(loadWritingCategories(), item.category);
 ---
 
 <p class="meta" lang={item.originalLanguage}>
-  <span>{item.type === 'essay' ? 'Essay' : 'Note'}</span>
+  <a class="meta__category" href={writingCategoryPath(category.slug)}>
+    <span lang="ko" data-language-fragment="ko" hidden={item.originalLanguage !== 'ko'}>{category.name.ko}</span>
+    <span lang="en" data-language-fragment="en" hidden={item.originalLanguage !== 'en'}>{category.name.en}</span>
+  </a>
   <span> · <time datetime={item.publishedAt.toISOString()}>{formatWritingDate(item.publishedAt)}</time></span>
   {item.updatedAt && (
     <span> · Updated <time datetime={item.updatedAt.toISOString()}>{formatWritingDate(item.updatedAt)}</time></span>

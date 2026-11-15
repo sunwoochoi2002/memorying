@@ -16,7 +16,7 @@ const metadataEntry = (
   filePath: `src/content/writing/${id}/meta.yaml`,
   data: {
     publishedAt: new Date('2026-07-01T00:00:00Z'),
-    type: 'essay' as const,
+    category: 'essay',
     originalLanguage: 'ko' as const,
     draft: false,
     featured: false,

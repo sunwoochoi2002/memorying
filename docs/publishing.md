@@ -21,7 +21,7 @@ npm run new:writing -- remembering-summer --original ko
 명령은 다음 구조를 만듭니다.
 
 ```text
-src/content/writing/remembering-summer/
+src/content/writing/drafts/YYYY-MM-DD/remembering-summer/
 ├── meta.yaml
 ├── ko.md
 └── en.md
@@ -132,3 +132,5 @@ Cloudflare Pages 배포, DNS 변경, 도메인 연결, 최종 `SITE_URL` 설정�
 - [ ] `npm run verify`를 통과했다.
 - [ ] 실제 테스트 이메일로 구독과 Buttondown 확인 흐름을 점검했다.
 - [ ] Essay 뉴스레터의 정식 URL과 수신·구독 해지 흐름을 점검했다.
+
+`YYYY-MM-DD`는 `publishedAt` 날짜입니다. 공개 상태(`draft`)나 날짜를 바꾼 뒤 `npm run organize:writing`으로 폴더를 맞춥니다. 공개 글은 `writing/YYYY-MM-DD/<slug>/`, 초안은 `writing/drafts/YYYY-MM-DD/<slug>/`에 보관됩니다. 공개 여부는 메타데이터가 결정하며 글 주소는 `/writing/<slug>/`로 유지됩니다.

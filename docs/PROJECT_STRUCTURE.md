@@ -6,7 +6,8 @@ Memorying은 글을 중심으로 운영하는 이중 언어 아카이브입니�
 
 | 경로 | 용도 |
 | --- | --- |
-| `src/content/writing/<slug>/` | 글 한 편의 언어별 제목·본문, 메타데이터, 선택 사진을 함께 보관합니다. |
+| `src/content/writing/YYYY-MM-DD/<slug>/` | 글 한 편의 언어별 제목·본문, 메타데이터, 선택 사진을 함께 보관합니다. |
+| `src/content/writing/drafts/YYYY-MM-DD/<slug>/` | 공개하지 않은 초안을 같은 날짜 기준으로 보관합니다. |
 | `src/content/about/profile.yaml` | About 소개와 네 개의 소속 요약입니다. |
 | `src/content/projects/*.yaml` | Projects에 표시할 프로젝트별 한국어·영어 설명입니다. |
 | `src/content/experience/*.yaml` | Experience의 교육·일과 연구·활동·수상 기록입니다. 자세한 편집법은 `src/content/about/README.md`를 봅니다. |
@@ -23,7 +24,7 @@ Memorying은 글을 중심으로 운영하는 이중 언어 아카이브입니�
 ## 글 한 편의 폴더
 
 ```text
-src/content/writing/<slug>/
+src/content/writing/YYYY-MM-DD/<slug>/
 ├── meta.yaml           # 게시일, 글 종류, 원문 언어, 공개 상태 등
 ├── ko.md              # 한국어 제목·본문
 ├── en.md              # 영어 제목·본문
@@ -31,6 +32,8 @@ src/content/writing/<slug>/
 ├── cover.alt.ko.txt    # 선택 사항: 사진의 한국어 대체 텍스트
 └── cover.alt.en.txt    # 선택 사항: 사진의 영어 대체 텍스트
 ```
+
+날짜 폴더는 `meta.yaml`의 `publishedAt`을 따릅니다. `npm run new:writing -- <slug> --original ko`는 오늘 날짜의 `drafts/YYYY-MM-DD/<slug>/`에 초안을 만듭니다. `draft`나 `publishedAt`을 고친 뒤 `npm run organize:writing`으로 위치를 맞춥니다. 명령은 충돌과 잘못된 날짜를 이동 전에 검사하고, 글 폴더 전체를 옮깁니다. 공개 여부·정렬은 정리 전에도 메타데이터를 따릅니다. 마지막 폴더 이름이 슬러그이므로 `/writing/<slug>/` 주소는 바뀌지 않습니다. 테스트 샘플은 기존의 `tests/fixtures/writing/<slug>/`에 그대로 둡니다.
 
 사진은 `cover.jpg` 자리에 `avif`, `jpeg`, `jpg`, `png`, `svg`, `webp` 중 하나로 **한 장만** 넣을 수 있습니다. 사진 파일만 있으면 글의 상세 페이지에 표시되고, 사진이 없으면 본문만 표시됩니다. 사진 크기는 제각각이어도 됩니다. 사진은 항상 같은 크기의 **정사각형 흰색 틀** 안에 원본 그대로(자르지 않고) 들어가고, 남는 자리는 흰색으로 채워집니다. 빌드할 때 화면에 맞는 가벼운 WebP로 자동 변환되므로 원본을 미리 줄일 필요는 없습니다.
 

@@ -25,7 +25,7 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 
 ## Product invariants
 
-- Each article keeps `meta.yaml`, `ko.md`, and `en.md` together under `src/content/writing/<slug>/`.
+- Each article keeps `meta.yaml`, `ko.md`, and `en.md` together under `src/content/writing/YYYY-MM-DD/<slug>/` (drafts under `src/content/writing/drafts/YYYY-MM-DD/<slug>/`).
 - Archive and home views show the declared original language first.
 - Article detail pages switch language at one stable URL and identify the original.
 - Published dates use `YYYY-MM-DD`, and bilingual titles preserve word boundaries.
@@ -45,7 +45,7 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 2. Content changes that came with it: article and list summaries are no longer shown (descriptions stay in meta tags), the Writing page intro sentence and every small uppercase eyebrow label are gone, the home page shows only the heading `Sunwoo’s Archive` (the Buttondown newsletter name; the header brand stays `Sunwoo Choi`) and the tagline, with `전체 글 보기` on the `Writing` heading line, and the subscribe block reads `새 에세이를 이메일로 받아 보세요.` with `새 에세이가 올라오면 남겨 주신 이메일 주소로 보내 드립니다. 구독은 언제든 취소할 수 있습니다.` The greeting paragraph removed from the home page still lives on the About page, which no longer carries the sentence "Memorying은 작업과 생각을 천천히 쌓아가는 개인적인 공간입니다."
 3. Fonts are self-hosted from the OFL-1.1 Fontsource npm packages. `public/_headers` allows only same-origin resources (`default-src 'self'`), so `astro.config.mjs` sets `assetsInlineLimit: 0` and `tests/unit/production-writing.test.ts` fails if any font is inlined as a `data:` URI. Korean text uses 124 unicode-range slices (about 6 MB in `dist/_astro/`); browsers fetch only the slices a page needs.
 4. Dates remain `YYYY-MM-DD` (product invariant); the demo's dotted dates were not adopted. English article text is set in Instrument Serif at 24px with extra word spacing; if it reads too dense, Newsreader was the compared alternative.
-5. Known content nit, not changed: `src/content/writing/alone/ko.md` contains `신경쓰지는`, which standard spelling writes as `신경 쓰지는`. Content edits need the author's approval.
+5. Known content nit, not changed: `src/content/writing/2025-11-21/alone/ko.md` contains `신경쓰지는`, which standard spelling writes as `신경 쓰지는`. Content edits need the author's approval.
 
 ## Compact layout and photo covers record
 
@@ -138,10 +138,20 @@ This file is the durable handoff for a fresh human or agent. Read it with `AGENT
 Proceed one project at a time:
 
 1. With the user's own test email, run one live subscribe, confirm, and unsubscribe test from `https://sunwoochoi.com` (the user performs it), then finish the remaining launch checklist in `docs/publishing.md`.
-2. Review or replace writing copy directly in `src/content/writing/<slug>/` (now only the four real essays); after the original-language edits are ready, request one batch translation for all affected `ko.md`, `en.md`, and any `cover.alt.*.txt` files.
+2. Review or replace writing copy directly in the article’s `src/content/writing/YYYY-MM-DD/<slug>/` folder (or `drafts/YYYY-MM-DD/<slug>/` for a draft); after the original-language edits are ready, request one batch translation for all affected `ko.md`, `en.md`, and any `cover.alt.*.txt` files.
 3. Optionally submit `https://sunwoochoi.com/sitemap-index.xml` to Google Search Console and Naver Search Advisor (the user owns those accounts).
 
 Buttondown delivery and Notion automation remain separate projects. The Cloudflare Pages project, the `sunwoochoi.com` DNS zone, and `SITE_URL` are live production settings; changing any of them needs explicit authorization.
+
+## Date-based writing storage (2026-11-13)
+
+- Approved design: [`dated-writing-design.md`](superpowers/specs/2026-11-13-dated-writing-design.md); implementation plan: [`dated-writing.md`](superpowers/plans/2026-11-13-dated-writing.md).
+- Real writing now lives in `src/content/writing/YYYY-MM-DD/<slug>/`; drafts live in `src/content/writing/drafts/YYYY-MM-DD/<slug>/`. The last folder remains the stable slug and public URLs remain `/writing/<slug>/`.
+- `meta.yaml` remains authoritative for publication and dates even before folder organization. `npm run new:writing` creates a dated draft. After editing `publishedAt` or `draft`, run `npm run organize:writing` to move the whole article folder. The organizer validates every date, global duplicate slug, and destination before any move; reruns are safe and unrelated files are preserved.
+- Recursive loading, covers, content checks, and newsletter lookup support both dated real writing and the unchanged flat test fixtures.
+- Migration preserved all 15 articles and 51 writing files byte for byte (SHA-256 checked). No writing text or metadata was edited by the migration. On 2026-11-15 the author set `suffering-to-success` to `draft: true` (it now lives in `drafts/2026-10-17/`) and asked to commit the previously untracked drafts `chain-of-thoughts` and `suffering-to-success`; drafts are tracked in git and only hidden from the public site.
+- Both P2 review findings were fixed on 2026-11-15: `src/lib/writing-loader.ts` rejects a duplicate slug added while `astro dev` runs, and automatic covers come only from files directly inside a loaded article folder. Committed on `main`; pushing (deployment) needs separate user approval. Verification results are recorded in `.superpowers/sdd/2026-11-13-dated-writing/implementation-report.md`.
+- Deferred to the planned writing input/storage/maintenance overhaul: while `astro dev` runs, moving an article folder (for example by `npm run organize:writing`) can drop it from the preview until restart if the watcher reports the new file before the old one is removed, and a rejected duplicate appears only after restart once the original is deleted. `npm run organize:writing` ignores unknown arguments such as `--help` and moves folders immediately; it has no dry run.
 
 ## Resume checklist
 

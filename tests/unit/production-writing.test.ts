@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { relative } from 'node:path';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { beforeAll, describe, expect, it } from 'vitest';
 import {
@@ -138,7 +139,7 @@ describe('default production build', () => {
   it('never reads the test fixtures without WRITING_FIXTURES=1', () => {
     expectHiddenWriting(site, fixtures);
     expect(site.loadedEntries).not.toContain('tests/fixtures/');
-    for (const item of writing) expect(site.loadedEntries, item.slug).toContain(`src/content/writing/${item.slug}/`);
+    for (const item of writing) expect(site.loadedEntries, item.slug).toContain(`${relative(process.cwd(), item.directory)}/`);
   });
 });
 

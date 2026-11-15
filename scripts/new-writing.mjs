@@ -1,13 +1,8 @@
-import { existsSync } from 'node:fs';
-import { mkdtemp, rename, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rename, rm, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 
-const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
-
-export function isValidWritingSlug(slug) {
-  return typeof slug === 'string' && slugPattern.test(slug);
-}
+import { assertWritingDate, assertWritingDestination, isValidWritingSlug, writingSlugExists } from './writing-directories.mjs';
+export { isValidWritingSlug } from './writing-directories.mjs';
 
 function assertWritingDraftInput({ slug, originalLanguage, publishedAt }) {
   if (!isValidWritingSlug(slug)) {
@@ -18,9 +13,7 @@ function assertWritingDraftInput({ slug, originalLanguage, publishedAt }) {
     throw new Error(`Invalid original language: ${originalLanguage}`);
   }
 
-  if (typeof publishedAt !== 'string' || !isoDatePattern.test(publishedAt)) {
-    throw new Error(`Invalid published date: ${publishedAt}`);
-  }
+  assertWritingDate(publishedAt);
 }
 
 function metadata({ originalLanguage, publishedAt }) {
@@ -38,11 +31,13 @@ function englishDraft() {
 export async function createWritingDraft({ root, slug, originalLanguage, publishedAt }) {
   assertWritingDraftInput({ slug, originalLanguage, publishedAt });
 
-  const target = join(root, slug);
-  if (existsSync(target)) {
+  const target = join(root, 'drafts', publishedAt, slug);
+  if (writingSlugExists(root, slug)) {
     throw new Error(`Writing already exists: ${slug}`);
   }
 
+  assertWritingDestination(root, target);
+  await mkdir(root, { recursive: true });
   const temporaryDirectory = await mkdtemp(join(root, `.${slug}-`));
   try {
     await Promise.all([
@@ -50,6 +45,8 @@ export async function createWritingDraft({ root, slug, originalLanguage, publish
       writeFile(join(temporaryDirectory, 'ko.md'), koreanDraft(), 'utf8'),
       writeFile(join(temporaryDirectory, 'en.md'), englishDraft(), 'utf8'),
     ]);
+    await mkdir(join(root, 'drafts', publishedAt), { recursive: true });
+    assertWritingDestination(root, target);
     await rename(temporaryDirectory, target);
   } catch (error) {
     await rm(temporaryDirectory, { force: true, recursive: true });

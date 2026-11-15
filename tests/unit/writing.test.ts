@@ -84,6 +84,12 @@ describe('bilingual writing article domain', () => {
     expect(originalTranslation(article()).title).toBe('기본 제목');
   });
 
+  it.each(['2026-11-13/quiet-note', 'drafts/2026-11-13/quiet-note'])('keeps nested %s IDs independent of storage parents', (directory) => {
+    expect(getWritingSourceId(`${directory}/ko.md`)).toBe('quiet-note/ko');
+    expect(getWritingSourceId(`${directory}/en.md`)).toBe('quiet-note/en');
+    expect(getWritingMetaSourceId(`${directory}/meta.yaml`)).toBe('quiet-note');
+  });
+
   it('filters articles by type', () => {
     expect(filterWritingArticles([article(), article({ slug: 'note', type: 'note' })], 'note'))
       .toHaveLength(1);

@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -56,6 +56,23 @@ describe('writing content reader', () => {
     expect(isoDatetime(cases[0])).toBe('2025-03-03T00:00:00.000Z');
     expect(typeLabel('essay')).toBe('Essay');
     expect(typeLabel('note')).toBe('Note');
+  });
+
+  it('discovers nested writing and flat fixtures while ignoring hidden directories and symlinks', () => {
+    const root = project({
+      '2025-01-01/live': {},
+      'drafts/2025-01-01/hidden': { meta: 'publishedAt: 2025-01-01\ndraft: true\n' },
+      '.ignored/secret': {},
+    }, { sample: {} });
+    symlinkSync(join(root, 'src/content/writing/2025-01-01'), join(root, 'src/content/writing/link'));
+    const cases = loadWritingCases({ root, fixtures: true });
+    expect(cases.map((item) => item.slug)).toEqual(['hidden', 'live', 'sample']);
+    expect(visibleCases(cases, { includeDrafts: false }).map((item) => item.slug)).toEqual(['live', 'sample']);
+  });
+
+  it('rejects duplicate leaf slugs across dates and draft areas', () => {
+    const root = project({ '2025-01-01/same': {}, 'drafts/2025-01-02/same': {} });
+    expect(() => loadWritingCases({ root })).toThrow(/Duplicate writing slug: same/);
   });
 
   it('finds the cover and reads optional alt text files', () => {

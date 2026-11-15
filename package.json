@@ -15,6 +15,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "new:writing": "node scripts/new-writing.mjs",
+    "organize:writing": "node scripts/organize-writing.mjs",
     "newsletter": "node scripts/newsletter.mjs",
     "check:links": "node scripts/check-built-links.mjs",
     "check:assets": "node scripts/check-source-assets.mjs",

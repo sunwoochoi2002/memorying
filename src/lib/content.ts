@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import type { ImageMetadata } from 'astro';
+import { posix } from 'node:path';
 import {
   prepareWritingData,
   resolveIncludeDrafts,
@@ -21,15 +22,24 @@ export type LoadedWritingArticle = PreparedWritingPair<WritingMetaEntry, Writing
 // the matching fixture article (see src/lib/writing-sources.ts).
 const coverModules = import.meta.glob<{ default: ImageMetadata }>(
   [
-    '../content/writing/*/cover.{avif,jpeg,jpg,png,svg,webp}',
-    '../../tests/fixtures/writing/*/cover.{avif,jpeg,jpg,png,svg,webp}',
+    '../content/writing/**/cover.{avif,jpeg,jpg,png,svg,webp}',
+    '../../tests/fixtures/writing/**/cover.{avif,jpeg,jpg,png,svg,webp}',
   ],
   { eager: true },
 );
 const coverAltModules = import.meta.glob<string>(
-  ['../content/writing/*/cover.alt.{ko,en}.txt', '../../tests/fixtures/writing/*/cover.alt.{ko,en}.txt'],
+  ['../content/writing/**/cover.alt.{ko,en}.txt', '../../tests/fixtures/writing/**/cover.alt.{ko,en}.txt'],
   { eager: true, import: 'default', query: '?raw' },
 );
+
+// Glob keys are relative to this file (src/lib); entry file paths are relative to the project root.
+function articleGlobDirectories(metaEntries: readonly WritingMetaEntry[]): Set<string> {
+  return new Set(
+    metaEntries.flatMap((entry) =>
+      entry.filePath ? [posix.dirname(posix.relative('src/lib', entry.filePath))] : [],
+    ),
+  );
+}
 
 async function loadPreparedWriting(includeDrafts: boolean) {
   const [metaEntries, translationEntries] = await Promise.all([
@@ -39,7 +49,7 @@ async function loadPreparedWriting(includeDrafts: boolean) {
   const prepared = prepareWritingData(metaEntries, translationEntries, includeDrafts);
   const items = applyAutomaticWritingCovers(
     prepared.items,
-    collectAutomaticWritingCovers(coverModules, coverAltModules),
+    collectAutomaticWritingCovers(coverModules, coverAltModules, articleGlobDirectories(metaEntries)),
   );
   const itemBySlug = new Map(items.map((item) => [item.slug, item]));
 

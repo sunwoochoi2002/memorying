@@ -1,7 +1,8 @@
-import { mkdtemp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { afterEach, describe, expect, it } from 'vitest';
+import { loadWritingCases } from '../support/writing-content';
 import { buildNewsletter, writeNewsletter } from '../../scripts/newsletter.mjs';
 
 const temporaryRoots: string[] = [];
@@ -92,6 +93,22 @@ describe('newsletter template', () => {
     await expect(buildNewsletter({ root, slug: '../escape', siteUrl })).rejects.toThrow(/Invalid writing slug/);
   });
 
+  it.each(['2026-09-01', 'drafts/2026-09-01'])('finds metadata-published writing inside %s without changing its public URL', async (parent) => {
+    const root = await createArticle('remembering-summer');
+    await mkdir(join(root, parent), { recursive: true });
+    await rename(join(root, 'remembering-summer'), join(root, parent, 'remembering-summer'));
+    const mail = await buildNewsletter({ root, slug: 'remembering-summer', siteUrl });
+    expect(mail.subject).toBe('여름을 기억하며');
+    expect(mail.body).toContain('https://sunwoochoi.com/writing/remembering-summer/');
+  });
+
+  it('refuses duplicate slugs across storage parents', async () => {
+    const root = await createArticle('remembering-summer');
+    await mkdir(join(root, '2026-09-01/remembering-summer'), { recursive: true });
+    await writeFile(join(root, '2026-09-01/remembering-summer/meta.yaml'), 'draft: false');
+    await expect(buildNewsletter({ root, slug: 'remembering-summer' })).rejects.toThrow(/Duplicate writing slug/);
+  });
+
   it('rejects an unsupported language', async () => {
     const root = await createArticle('remembering-summer');
 
@@ -116,12 +133,11 @@ describe('newsletter template', () => {
 describe('newsletter for the real archive', () => {
   it('builds a well-formed mail for every published article', async () => {
     const root = join(process.cwd(), 'src/content/writing');
-    const slugs = (await readdir(root, { withFileTypes: true })).filter((entry) => entry.isDirectory());
+    const articles = loadWritingCases();
     let checked = 0;
 
-    for (const { name } of slugs) {
-      const meta = await readFile(join(root, name, 'meta.yaml'), 'utf8');
-      if (/^draft:\s*true\s*$/m.test(meta)) continue;
+    for (const { slug: name, draft } of articles) {
+      if (draft) continue;
 
       const mail = await buildNewsletter({ root, slug: name, siteUrl });
       expect(mail.subject.trim().length, name).toBeGreaterThan(0);

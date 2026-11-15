@@ -1,6 +1,6 @@
 # 글쓰기용 Markdown 참고서
 
-Memorying의 글 본문은 `src/content/writing/<슬러그>/ko.md`, `en.md`에 씁니다. 이 문서는 글을 쓰면서 찾아보는 문법 참고서입니다. 글 생성·공개 방법은 [운영 가이드](MAINTENANCE.md)를 참고하세요.
+Memorying의 글 본문은 `src/content/writing/YYYY-MM-DD/<슬러그>/ko.md`, `en.md` (초안은 `writing/drafts/YYYY-MM-DD/<슬러그>/`)에 씁니다. 이 문서는 글을 쓰면서 찾아보는 문법 참고서입니다. 글 생성·공개 방법은 [운영 가이드](MAINTENANCE.md)를 참고하세요.
 
 ## 파일의 기본 모양
 

@@ -1,6 +1,7 @@
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse } from 'yaml';
+import { assertUniqueWritingSlugs, discoverWritingDirectories } from '../../scripts/writing-directories.mjs';
 
 /**
  * Reads the writing that actually exists in the repository, so tests can derive
@@ -109,13 +110,11 @@ export interface WritingDirectory {
 export function writingDirectories(root: string, options: { fixtures?: boolean } = {}): WritingDirectory[] {
   const groups: Array<[string, WritingCase['source']]> = [[CONTENT_DIRECTORY, 'content']];
   if (options.fixtures) groups.push([FIXTURE_DIRECTORY, 'fixture']);
-  return groups.flatMap(([relative, source]) => {
-    const base = join(root, relative);
-    if (!existsSync(base)) return [];
-    return readdirSync(base)
-      .filter((name) => !name.startsWith('.') && statSync(join(base, name)).isDirectory())
-      .map((slug) => ({ directory: join(base, slug), slug, source }));
-  });
+  const directories = groups.flatMap(([relative, source]) =>
+    discoverWritingDirectories(join(root, relative)).map((entry) => ({ ...entry, source })),
+  );
+  assertUniqueWritingSlugs(directories);
+  return directories;
 }
 
 /** Newest first, then by slug: the same order the site uses. */

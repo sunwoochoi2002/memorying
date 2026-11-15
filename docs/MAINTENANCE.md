@@ -27,7 +27,7 @@
 
 | 하고 싶은 일 | 고치는 곳 | 자세히 |
 | --- | --- | --- |
-| 새 글 쓰기 | `src/content/writing/<슬러그>/` 폴더 | 3-1 |
+| 새 글 쓰기 | `src/content/writing/drafts/YYYY-MM-DD/<슬러그>/` 폴더 | 3-1 |
 | 글의 오타·문장 고치기 | 그 글의 `ko.md`, `en.md` | 3-2 |
 | Essay를 Note로, 또는 반대로 | 그 글의 `meta.yaml` | 3-3 |
 | 글 잠시 숨기기, 지우기 | 그 글의 `meta.yaml`, 폴더 | 3-4 |
@@ -46,7 +46,7 @@
 npm run new:writing -- remembering-summer --original ko
 ```
 
-원문이 영어면 `--original en`으로 씁니다. 그러면 `src/content/writing/remembering-summer/` 아래에 파일 3개가 만들어집니다.
+원문이 영어면 `--original en`으로 씁니다. `YYYY-MM-DD`는 명령을 실행한 날짜입니다. 그러면 `src/content/writing/drafts/YYYY-MM-DD/remembering-summer/` 아래에 파일 3개가 만들어집니다.
 
 - `meta.yaml`: 글의 정보
 - `ko.md`: 한국어 제목, 본문
@@ -73,11 +73,12 @@ npm run dev -- --host 0.0.0.0
 ```
 
 6. 공개할 준비가 되면 `meta.yaml`의 `draft: true`를 `draft: false`로 바꿉니다. `[Draft]`가 붙은 제목이 남아 있으면 빌드가 실패합니다.
-7. 4번 「배포하는 순서」로 올립니다.
+7. `npm run organize:writing`을 실행합니다. `publishedAt` 날짜에 맞춰 공개 글은 `src/content/writing/YYYY-MM-DD/<슬러그>/`로, 초안은 `src/content/writing/drafts/YYYY-MM-DD/<슬러그>/`로 글 폴더 전체가 이동합니다. 두 언어와 사진, 첨부 파일은 함께 유지되며 글 주소는 그대로입니다.
+8. 4번 「배포하는 순서」로 올립니다.
 
 ### 3-2. 글 내용 고치기
 
-1. `src/content/writing/<슬러그>/ko.md` 또는 `en.md`를 열어 고칩니다. 원문과 번역이 어긋나지 않게, 뜻이 바뀌는 수정은 두 파일 모두에서 합니다.
+1. `src/content/writing/YYYY-MM-DD/<슬러그>/ko.md` 또는 `en.md`를 (초안은 `writing/drafts/YYYY-MM-DD/<슬러그>/`) 열어 고칩니다. 원문과 번역이 어긋나지 않게, 뜻이 바뀌는 수정은 두 파일 모두에서 합니다.
 2. 크게 고쳤다면 `meta.yaml`에 수정한 날짜를 추가할 수 있습니다. 글 위쪽에 「Updated 날짜」가 표시됩니다.
 
 ```yaml
@@ -105,7 +106,7 @@ type: note    # Note
 
 ### 3-4. 글 숨기기와 삭제
 
-**잠시 숨기기 (추천)**: `meta.yaml`에서 `draft: false`를 `draft: true`로 바꿉니다. 목록, 홈, 사이트맵에서 빠지고 글 주소도 열리지 않습니다. 나중에 `false`로 돌리면 그대로 돌아옵니다.
+**잠시 숨기기 (추천)**: `meta.yaml`에서 `draft: false`를 `draft: true`로 바꿉니다. 목록, 홈, 사이트맵에서 빠지고 글 주소도 열리지 않습니다. 나중에 `false`로 돌리면 그대로 돌아옵니다. 바꾼 뒤 `npm run organize:writing`을 실행해 초안·공개 폴더 위치도 맞춥니다. 명령 실행 전에도 공개 여부는 `draft` 값으로 결정됩니다.
 
 **완전히 지우기**: 글 폴더 전체를 지웁니다. 되돌리려면 Git 기록에서 복원해야 하므로, 정말 필요할 때만 하세요.
 
@@ -123,7 +124,13 @@ type: note    # Note
 
 ### 3-6. 글 날짜 바꾸기
 
-`meta.yaml`의 `publishedAt`을 `2025-11-21`처럼 `연-월-일`로 씁니다. 목록은 이 날짜의 최신순으로 정렬됩니다. 공개된 글에는 미래 날짜를 쓸 수 없습니다.
+`meta.yaml`의 `publishedAt`을 `2025-11-21`처럼 `연-월-일`로 씁니다. 목록은 이 날짜의 최신순으로 정렬됩니다. 공개된 글에는 미래 날짜를 쓸 수 없습니다. 날짜를 고친 뒤 아래 명령으로 폴더 날짜도 맞춥니다.
+
+```bash
+npm run organize:writing
+```
+
+이 명령은 모든 글의 날짜와 슬러그 중복, 목적지 충돌을 먼저 검사합니다. 문제가 있으면 이동을 시작하지 않습니다. 비어 있는 이전 날짜 폴더만 지우고, 관계없는 파일은 남깁니다. 여러 번 실행해도 안전합니다. 날짜·공개 여부는 폴더 이름보다 `meta.yaml` 값이 우선이며, 정리 전에도 목록 정렬과 공개 여부에 적용됩니다. 폴더를 옮겨도 마지막 `<슬러그>`와 `/writing/<슬러그>/` 주소는 바뀌지 않습니다.
 
 ### 3-7. 글이 아닌 페이지의 문구 고치기
 
@@ -163,7 +170,7 @@ Sunwoo Choi
 구독 취소 링크는 Buttondown이 자동으로 붙입니다. 메일은 **원문 언어 한 가지**로 만들고, 다른 언어는 사이트 링크에서 바꿔 읽습니다.
 
 1. 글이 공개되어 있는지 확인합니다(`draft: false`).
-2. 터미널에서 메일을 만듭니다. 슬러그는 글 폴더 이름입니다.
+2. 터미널에서 메일을 만듭니다. 슬러그는 날짜나 `drafts`를 뺀 마지막 글 폴더 이름입니다. 명령이 날짜 폴더를 찾아 읽으므로 호출 방식은 그대로입니다.
 
 ```bash
 npm run newsletter -- remembering-summer

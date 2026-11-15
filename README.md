@@ -33,7 +33,7 @@ GitHub Actions runs `npm run verify` for `main` pushes and pull requests.
 
 ## Content
 
-- Writing: `src/content/writing/`
+- Writing: `src/content/writing/YYYY-MM-DD/<slug>/` (drafts: `src/content/writing/drafts/YYYY-MM-DD/<slug>/`); run `npm run organize:writing` after changing `publishedAt` or `draft`.
 - Folder guide and writing/photo conventions: [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md)
 - Selected Work: `src/content/work/`
 - Product design: `docs/superpowers/specs/2026-07-24-memorying-design.md`

@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { parse } from 'yaml';
-import { isValidWritingSlug } from './new-writing.mjs';
+import { assertUniqueWritingSlugs, discoverWritingDirectories, isValidWritingSlug } from './writing-directories.mjs';
 
 const languages = ['ko', 'en'];
 const defaultSiteUrl = 'https://sunwoochoi.com';
@@ -16,15 +16,6 @@ function splitFrontmatter(source) {
   return { data: parse(match[1]) ?? {}, content: match[2] };
 }
 
-async function readOptional(path) {
-  try {
-    return await readFile(path, 'utf8');
-  } catch (error) {
-    if (error && error.code === 'ENOENT') return undefined;
-    throw error;
-  }
-}
-
 /**
  * @param {{ root: string, slug: string, siteUrl?: string, language?: string }} options
  */
@@ -33,10 +24,11 @@ export async function buildNewsletter({ root, slug, siteUrl = defaultSiteUrl, la
     throw new Error(`Invalid writing slug: ${slug}`);
   }
 
-  const metaSource = await readOptional(join(root, slug, 'meta.yaml'));
-  if (metaSource === undefined) {
-    throw new Error(`Writing not found: ${slug}`);
-  }
+  const articles = discoverWritingDirectories(root);
+  assertUniqueWritingSlugs(articles);
+  const article = articles.find((entry) => entry.slug === slug);
+  if (!article) throw new Error(`Writing not found: ${slug}`);
+  const metaSource = await readFile(join(article.directory, 'meta.yaml'), 'utf8');
 
   const meta = parse(metaSource) ?? {};
   if (meta.draft === true) {
@@ -48,7 +40,7 @@ export async function buildNewsletter({ root, slug, siteUrl = defaultSiteUrl, la
     throw new Error(`Unsupported language: ${chosenLanguage}. Use ko or en.`);
   }
 
-  const { data, content } = splitFrontmatter(await readFile(join(root, slug, `${chosenLanguage}.md`), 'utf8'));
+  const { data, content } = splitFrontmatter(await readFile(join(article.directory, `${chosenLanguage}.md`), 'utf8'));
   const subject = String(data.title ?? '').trim();
   if (subject === '') {
     throw new Error(`${slug} has no ${chosenLanguage} title.`);

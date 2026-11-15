@@ -36,6 +36,7 @@ describe('new writing scaffold', () => {
     });
 
     expect(basename(created)).toBe('remembering-summer');
+    expect(created).toBe(join(root, 'drafts/2026-07-25/remembering-summer'));
     expect(await readdir(created)).toEqual(['en.md', 'ko.md', 'meta.yaml']);
     expect(await readFile(join(created, 'meta.yaml'), 'utf8')).toContain('publishedAt: 2026-07-25');
     expect(await readFile(join(created, 'meta.yaml'), 'utf8')).toContain('originalLanguage: ko');
@@ -44,6 +45,20 @@ describe('new writing scaffold', () => {
     expect(await readFile(join(created, 'en.md'), 'utf8')).toContain('[Draft] English title');
     expect(await readFile(join(created, 'ko.md'), 'utf8')).not.toContain('description');
     expect(await readFile(join(created, 'en.md'), 'utf8')).not.toContain('description');
+  });
+
+  it.each(['2026-02-29', '2026-04-31', '2026-13-01', '2026-1-01'])('rejects invalid calendar date %s before creating anything', async (publishedAt) => {
+    const root = await createRoot();
+    await expect(createWritingDraft({ root, slug: 'valid', originalLanguage: 'ko', publishedAt })).rejects.toThrow(/Invalid published date/);
+    expect(await readdir(root)).toEqual([]);
+  });
+
+  it.each(['2025-01-01/remembering-summer', 'drafts/2025-01-01/remembering-summer'])('refuses a globally occupied slug at %s', async (path) => {
+    const root = await createRoot();
+    await mkdir(join(root, path), { recursive: true });
+    await writeFile(join(root, path, 'sentinel.txt'), 'unchanged');
+    await expect(createWritingDraft({ root, slug: 'remembering-summer', originalLanguage: 'ko', publishedAt: '2026-07-25' })).rejects.toThrow(/already exists/);
+    expect(await readFile(join(root, path, 'sentinel.txt'), 'utf8')).toBe('unchanged');
   });
 
   it.each([

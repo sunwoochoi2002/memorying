@@ -28,7 +28,8 @@ export interface WritingArticle {
 }
 
 export function getWritingSourceId(entry: string): string {
-  return entry.replace(/\.md$/, '');
+  const id = entry.replace(/\.md$/, '');
+  return /\/(ko|en)$/.test(id) ? id.split('/').slice(-2).join('/') : id;
 }
 
 export function parseWritingTranslationId(id: string): { slug: string; language: WritingLanguage } {
@@ -42,7 +43,7 @@ export function parseWritingTranslationId(id: string): { slug: string; language:
 }
 
 export function getWritingMetaSourceId(entry: string): string {
-  return entry.replace(/\/meta\.ya?ml$/, '');
+  return entry.replace(/\/meta\.ya?ml$/, '').split('/').at(-1)!;
 }
 
 export function originalTranslation(article: WritingArticle): WritingTranslation {

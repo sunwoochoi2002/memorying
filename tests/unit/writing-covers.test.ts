@@ -21,6 +21,8 @@ const article = (overrides: Partial<WritingArticle> = {}): WritingArticle => ({
   ...overrides,
 });
 
+const articleDirectories = (...directories: string[]) => new Set(directories);
+
 const image: ImageMetadata = {
   src: '/_astro/alone.cover.png',
   width: 1200,
@@ -54,6 +56,7 @@ describe('automatic writing covers', () => {
     const covers = collectAutomaticWritingCovers(
       { '../content/writing/alone/cover.png': { default: image } },
       {},
+      articleDirectories('../content/writing/alone'),
     );
 
     expect(covers).toEqual({ alone: { image, alt: { ko: '', en: '' } } });
@@ -63,6 +66,7 @@ describe('automatic writing covers', () => {
     const covers = collectAutomaticWritingCovers(
       { '../content/writing/alone/cover.png': { default: image } },
       { '../content/writing/alone/cover.alt.ko.txt': '  창가에 놓인 헤드폰\n' },
+      articleDirectories('../content/writing/alone'),
     );
 
     expect(covers.alone.alt).toEqual({ ko: '창가에 놓인 헤드폰', en: '' });
@@ -72,6 +76,7 @@ describe('automatic writing covers', () => {
     const covers = collectAutomaticWritingCovers(
       { '../content/writing/alone/cover.png': { default: image } },
       {},
+      articleDirectories('../content/writing/alone'),
     );
     const [alone, other] = applyAutomaticWritingCovers(
       [article(), article({ slug: 'teammates' })],
@@ -93,6 +98,7 @@ describe('automatic writing covers', () => {
         '../content/writing/alone/cover.alt.ko.txt': '창가에 놓인 헤드폰',
         '../content/writing/alone/cover.alt.en.txt': 'Headphones by a window',
       },
+      articleDirectories('../content/writing/alone'),
     )).toThrow('Writing article "alone" has multiple cover images. Keep only one cover file.');
   });
 
@@ -107,5 +113,38 @@ describe('automatic writing covers', () => {
 
     expect(resolved.coverImage).toBe(manualImage);
     expect(resolved.coverImageAlt).toEqual(manualAlt);
+  });
+
+  it('finds the cover of an article stored in a dated folder', () => {
+    const covers = collectAutomaticWritingCovers(
+      { '../content/writing/2025-11-21/alone/cover.png': { default: image } },
+      { '../content/writing/2025-11-21/alone/cover.alt.en.txt': 'Headphones' },
+      articleDirectories('../content/writing/2025-11-21/alone'),
+    );
+
+    expect(covers).toEqual({ alone: { image, alt: { ko: '', en: 'Headphones' } } });
+  });
+
+  it('ignores cover-named attachments inside article subfolders', () => {
+    const covers = collectAutomaticWritingCovers(
+      {
+        '../content/writing/2026-01-01/first/images/cover.png': { default: image },
+        '../content/writing/2026-02-01/second/images/cover.png': { default: image },
+      },
+      {},
+      articleDirectories('../content/writing/2026-01-01/first', '../content/writing/2026-02-01/second'),
+    );
+
+    expect(covers).toEqual({});
+  });
+
+  it('does not give an attachment folder named like another article that article\'s cover', () => {
+    const covers = collectAutomaticWritingCovers(
+      { '../content/writing/2026-01-01/first/alone/cover.png': { default: image } },
+      {},
+      articleDirectories('../content/writing/2026-01-01/first', '../content/writing/2025-11-21/alone'),
+    );
+
+    expect(covers).toEqual({});
   });
 });
